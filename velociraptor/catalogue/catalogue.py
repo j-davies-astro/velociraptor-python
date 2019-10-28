@@ -9,7 +9,7 @@ import unyt
 
 import numpy as np
 
-from typing import Union, Callable, List
+from typing import Union, Callable, List, Dict
 
 from velociraptor.units import VelociraptorUnits
 from velociraptor.catalogue.registration import global_registration_functions
@@ -35,15 +35,16 @@ class VelociraptorFieldMetadata(object):
     # The snake case name of this field for use accessing the object.
     snake_case: str = ""
     # The unit of this field
-    unit: str = ""
+    unit: unyt.Unit
     # The registartion function that matched with this field
-    corresponding_registration_function: Union[Callable, None] = None
+    corresponding_registration_function_name: Union[str, None]
+    corresponding_registration_function: Union[Callable, None]
 
     def __init__(
         self,
         filename,
         path: str,
-        registration_functions: List[Callable],
+        registration_functions: Dict[str, Callable],
         units: VelociraptorUnits,
     ):
         """
@@ -72,13 +73,14 @@ class VelociraptorFieldMetadata(object):
         Registers the field properties using the registration functions.
         """
 
-        for reg in self.registration_functions:
+        for reg_name, reg in self.registration_functions.items():
             try:
                 self.unit, self.name, self.snake_case = reg(
                     field_path=self.path, unit_system=self.units
                 )
                 self.valid = True
                 self.corresponding_registration_function = reg
+                self.corresponding_registration_function_name = reg_name
             except RegistrationDoesNotMatchError:
                 continue
 
@@ -151,16 +153,20 @@ def generate_deleter(name: str):
     return deleter
 
 
-def generate_catalogue(
-    filename, extra_registration_functions: Union[None, List[Callable]] = None
+def generate_sub_catalogue(
+    filename,
+    registration_name: str,
+    registration_function: Callable,
+    units: VelociraptorUnits,
+    field_metadata: List[VelociraptorFieldMetadata],
 ):
     """
-    Generates a catalogue object with the correct properties set.
+    Generates a sub-catalogue object with the correct properties set.
     This is required as we can add properties to a class, but _not_
     to an object dynamically.
 
     So, here, we initialise the metadata, create a _copy_ of the
-    __VelociraptorCatlaogue class, and then add all of our properties
+    __VelociraptorSubCatlaogue class, and then add all of our properties
     to that _class_ before instantiating it with the metadata.
 
     This is thanks to the very helpful StackOverflow answer here:
@@ -168,52 +174,23 @@ def generate_catalogue(
     """
 
     # This creates a _copy_ of the _class_, not object.
-    ThisCatalogue = type(
-        "DynamicVelociraptorCatalogue",
-        __VelociraptorCatalogue.__bases__,
-        dict(__VelociraptorCatalogue.__dict__),
+    ThisSubCatalogue = type(
+        f"Dynamic_{registration_name}_VelociraptorCatalogue",
+        __VelociraptorSubCatalogue.__bases__,
+        dict(__VelociraptorSubCatalogue.__dict__),
     )
-
-    # We need two things to continue: the complete list of registration
-    # functions, and the units.
-    units = VelociraptorUnits(filename)
-
-    if extra_registration_functions is not None:
-        registration_functions = (
-            extra_registration_functions + global_registration_functions
-        )
-    else:
-        registration_functions = global_registration_functions
 
     # Using our full list of registration functions we can
     # find all of the valid datasets:
 
-    # First load all field names from the HDF5 file so that they can be parsed.
-    with h5py.File(filename, "r") as handle:
-        field_paths = list(handle.keys())
-
-    # Now build metadata:
-    valid_field_metadata = []
-    invalid_field_paths = []
-
-    for path in field_paths:
-        metadata = VelociraptorFieldMetadata(
-            filename, path, registration_functions, units
-        )
-
-        if metadata.valid:
-            valid_field_metadata.append(metadata)
-        else:
-            invalid_field_paths.append(path)
-
     # Now we can generate our local datasets for the valid paths.
-    for metadata in valid_field_metadata:
+    for metadata in field_metadata:
         # First set our fake objects internally to none
-        setattr(ThisCatalogue, f"_{metadata.snake_case}", None)
+        setattr(ThisSubCatalogue, f"_{metadata.snake_case}", None)
 
         # Now set the getters, setters, and deleters.
         setattr(
-            ThisCatalogue,
+            ThisSubCatalogue,
             metadata.snake_case,
             property(
                 generate_getter(
@@ -229,30 +206,40 @@ def generate_catalogue(
         )
 
     # Finally, we can actually create an instance of our new class.
-    catalogue = ThisCatalogue(
-        filename=filename,
-        registration_functions=registration_functions,
-        units=units,
-        valid_field_metadata=valid_field_metadata,
-        invalid_field_paths=invalid_field_paths,
-    )
+    catalogue = ThisSubCatalogue(filename=filename)
 
     return catalogue
 
 
-class __VelociraptorCatalogue(object):
+class __VelociraptorSubCatalogue(object):
+    """
+    A velociraptor mini-catalogue, containing the only the information from one
+    registration function. This allows us to separate the top-level variables
+    into more manageable chunks.
+
+    Do not directly instantiate this class, you should use generate_sub_catalogue.
+    This is called in VelociraptorCatalogue.
+    """
+
+    def __init__(self, filename):
+        self.filename = filename
+
+        return
+
+
+class VelociraptorCatalogue(object):
     """
     A velociraptor dataset, containing information that has correct units
     and are easily accessible through snake_case names.
     """
 
+    # Top-level definitions for autocomplete
+    registration_functions: Union[List[Callable], None]
+
     def __init__(
         self,
         filename,
-        registration_functions: Union[None, List[Callable]],
-        units: VelociraptorUnits,
-        valid_field_metadata: Union[List[VelociraptorFieldMetadata], None],
-        invalid_field_paths: Union[List[str], None],
+        extra_registration_functions: Union[None, Dict[str, Callable]] = None,
     ):
         """
         Initialise the velociraptor catalogue with all of the available
@@ -271,12 +258,14 @@ class __VelociraptorCatalogue(object):
                                paths within the velociraptor catalogue.
         """
         self.filename = filename
-        self.registration_functions = registration_functions
-        self.units = units
-        self.valid_field_metadata = valid_field_metadata
-        self.invalid_field_paths = invalid_field_paths
+        self.extra_registration_functions = extra_registration_functions
 
+        self.get_units()
         self.extract_properties_from_units()
+
+        self.__register_extra_registration_functions()
+
+        self.__create_sub_catalogues()
 
         return
 
@@ -287,6 +276,30 @@ class __VelociraptorCatalogue(object):
         """
 
         return f"Velociraptor catalogue at {self.filename}."
+
+    def get_units(self):
+        """
+        Gets the units instance from the file properties.
+        """
+
+        self.units = VelociraptorUnits(self.filename)
+
+        return self.units
+
+    def __register_extra_registration_functions(self):
+        """
+        Sets the self.registration_functions attribute such that it includes
+        both the globals and any user-provided extra values.
+        """
+        if self.extra_registration_functions is not None:
+            self.registration_functions = {
+                **self.extra_registration_functions,
+                **global_registration_functions,
+            }
+        else:
+            self.registration_functions = global_registration_functions
+
+        return
 
     def extract_properties_from_units(self):
         """
@@ -302,3 +315,50 @@ class __VelociraptorCatalogue(object):
 
         return
 
+    def __create_sub_catalogues(self):
+        """
+        Creates the sub-catalogues by instantiating many different versions
+        of the __VelociraptorSubCatalogue. Each sub-catalogue corresponds to
+        the output of a single registration function.
+        """
+
+        # First load all field names from the HDF5 file so that they can be parsed.
+
+        with h5py.File(self.filename, "r") as handle:
+            field_paths = list(handle.keys())
+
+        # Now build metadata:
+        self.valid_field_metadata = {
+            reg: [] for reg in self.registration_functions.keys()
+        }
+        self.invalid_field_paths = []
+
+        for path in field_paths:
+            metadata = VelociraptorFieldMetadata(
+                self.filename, path, self.registration_functions, self.units
+            )
+
+            if metadata.valid:
+                self.valid_field_metadata[
+                    metadata.corresponding_registration_function_name
+                ].append(metadata)
+            else:
+                self.invalid_field_paths.append(path)
+
+        # For each registration function, we create a dynamic sub-class that
+        # contains only that information - otherwise the namespace of the
+        # VelociraptorCatalogue is way too crowded.
+        for attribute_name, field_metadata in self.valid_field_metadata.items():
+            setattr(
+                self,
+                attribute_name,
+                generate_sub_catalogue(
+                    filename=self.filename,
+                    registration_name=attribute_name,  # This ensures each class has a unique name
+                    registration_function=self.registration_functions[attribute_name],
+                    units=self.units,
+                    field_metadata=field_metadata,
+                ),
+            )
+
+        return

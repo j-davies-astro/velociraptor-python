@@ -14,7 +14,7 @@ except RuntimeError:
     # We've already done that, oops.
     pass
 
-from velociraptor.catalogue.catalogue import generate_catalogue
+from velociraptor.catalogue.catalogue import VelociraptorCatalogue
 
 
 def load(filename):
@@ -23,4 +23,4 @@ def load(filename):
     object.
     """
 
-    return generate_catalogue(filename)
+    return VelociraptorCatalogue(filename)

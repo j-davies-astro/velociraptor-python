@@ -80,7 +80,7 @@ def registration_apertures(
             sf_in_name = ""
 
         full_name = f"{sf_in_name}{name} ({aperture_size} kpc)"
-        snake_case = field_path.lower()
+        snake_case = field_path.lower().replace("aperture_", "")
 
         return unit, full_name, snake_case
     else:
@@ -123,7 +123,7 @@ def registration_projected_apertures(
             sf_in_name = ""
 
         full_name = f"{sf_in_name}{name} (Projection {aperture}, {aperture_size} kpc)"
-        snake_case = field_path.lower()
+        snake_case = field_path.lower().replace("aperture_", "")
 
         return unit, full_name, snake_case
     else:
@@ -158,7 +158,7 @@ def registration_energies(
     return unit, full_name, field_path.lower()
 
 
-def registration_particle_ids(
+def registration_ids(
     field_path: str, unit_system: VelociraptorUnits
 ) -> (unyt.Unit, str, str):
     """
@@ -592,25 +592,32 @@ def registration_veldisp(
 
 # This must be placed at the bottom of the file so that we
 # have defined all functions before getting to it.
-global_registration_functions = [
-    registration_metallicity,
-    registration_particle_ids,
-    registration_energies,
-    registration_rotational_support,
-    registration_star_formation_rate,
-    registration_masses,
-    registration_eigenvectors,
-    registration_radii,
-    registration_temperature,
-    registration_veldisp,
-    registration_structure_type,
-    registration_velocities,
-    registration_positions,
-    registration_concentration,
-    registration_rvmax_quantities,
-    registration_angular_momentum,
-    registration_projected_apertures,
-    registration_apertures,
-    registration_fail_all,
-]
+# This dictionary will be turned into sets of datasets that
+# contain the results of the registraiton functions. For example.
+# we will have VelociraptorProperties.energies.erot for the rotation
+# energy.
+global_registration_functions = {
+    k: globals()[f"registration_{k}"]
+    for k in [
+        "metallicity",
+        "ids",
+        "energies",
+        "rotational_support",
+        "star_formation_rate",
+        "masses",
+        "eigenvectors",
+        "radii",
+        "temperature",
+        "veldisp",
+        "structure_type",
+        "velocities",
+        "positions",
+        "concentration",
+        "rvmax_quantities",
+        "angular_momentum",
+        "projected_apertures",
+        "apertures",
+        "fail_all",
+    ]
+}
 
