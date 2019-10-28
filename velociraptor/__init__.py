@@ -9,7 +9,7 @@ More information is available in the documnetation.
 import unyt
 
 try:
-    unyt.define_unit("msun", unyt.msun, rex_repr=r"M_\odot")
+    unyt.define_unit("msun", unyt.msun, tex_repr=r"M_\odot")
 except RuntimeError:
     # We've already done that, oops.
     pass
