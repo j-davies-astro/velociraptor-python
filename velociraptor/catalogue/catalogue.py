@@ -85,7 +85,7 @@ class VelociraptorFieldMetadata(object):
         return
 
 
-def generate_getter(filename, name: str, field: str, unit):
+def generate_getter(filename, name: str, field: str, full_name: str, unit):
     """
     Generates a function that:
 
@@ -94,6 +94,14 @@ def generate_getter(filename, name: str, field: str, unit):
     c) Reads filename[`field`]
     d) Set self._`name`
     e) Return self._`name`.
+
+    Takes:
+
+    + filename, the filename of the hdf5 file
+    + name, the snake_case name of the property
+    + field, the field in the hdf5 file corresponding to this property
+    + full_name, the fancy printing name for this quantity (registered to array.name)
+    + unit, the unyt unit corresponding to this value
     """
 
     def getter(self):
@@ -105,6 +113,7 @@ def generate_getter(filename, name: str, field: str, unit):
             with h5py.File(filename, "r") as handle:
                 try:
                     setattr(self, f"_{name}", unyt.unyt_array(handle[field][...], unit))
+                    getattr(self, f"_{name}").name = full_name
                 except KeyError:
                     print(f"Could not read {field}")
                     return None
@@ -208,7 +217,11 @@ def generate_catalogue(
             metadata.snake_case,
             property(
                 generate_getter(
-                    filename, metadata.snake_case, metadata.path, metadata.unit
+                    filename,
+                    metadata.snake_case,
+                    metadata.path,
+                    metadata.name,
+                    metadata.unit,
                 ),
                 generate_setter(metadata.snake_case),
                 generate_deleter(metadata.snake_case),
