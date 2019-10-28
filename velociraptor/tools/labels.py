@@ -3,6 +3,7 @@ Tools for generating labels from catalogue datasets.
 """
 
 import unyt
+import re
 
 
 def get_full_label(dataset: unyt.unyt_array):
@@ -14,7 +15,7 @@ def get_full_label(dataset: unyt.unyt_array):
 
     unit_tex = dataset.units.latex_representation()
 
-    full_label = fr"{dataset.name} $\left[{unit_tex}\right]$"
+    full_label = f"{dataset.name} $\\left[{unit_tex}\\right]$"
 
     return full_label
 

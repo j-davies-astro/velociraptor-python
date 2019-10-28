@@ -41,7 +41,7 @@ def registration_fail_all(
     if field_path == "ThisFieldPathWouldNeverExist":
         return (
             unit_system.length,
-            r"Fancy $N_{\rm ever}$ exists",
+            "Fancy $N_{\\rm ever}$ exists",
             "this_field_path_would_never_exist",
         )
     else:
@@ -211,10 +211,10 @@ def registration_rotational_support(
         ptype = match.group(1)
         star_forming = match.group(2)
 
-        full_name = r"$\kappa_{{\rm rot}"
+        full_name = "$\\kappa_{{\\rm rot}"
 
         if ptype:
-            full_name += rf", {{\rm {ptype}}}"
+            full_name += f", {{\\rm {ptype}}}"
 
         full_name += "}$"
 
@@ -262,7 +262,7 @@ def registration_angular_momentum(
         if axis:
             full_name += axis
         if radius:
-            full_name += f", {{\rm {radius}}}"
+            full_name += f", {{\\rm {radius}}}"
 
         full_name += "}$"
 
@@ -302,9 +302,9 @@ def registration_masses(
 
     # Deal with special cases.
     if field_path == "Mvir":
-        full_name = r"$M_{\rm vir}$"
+        full_name = "$M_{\\rm vir}$"
     elif field_path == "Mass_FOF":
-        full_name = r"$M_{\rm FOF}$"
+        full_name = "$M_{\\rm FOF}$"
     elif field_path == "Mass_tot":
         full_name = r"$M$"
 
@@ -333,9 +333,9 @@ def registration_masses(
         full_name = "$M"
 
         if radius:
-            full_name += f"_{{\rm {radius}}}"
+            full_name += f"_{{\\rm {radius}}}"
         elif other:
-            full_name += f"_{{\rm {other}}}"
+            full_name += f"_{{\\rm {other}}}"
 
         full_name += "$"
 
@@ -391,9 +391,9 @@ def registration_radii(
 
     # First, two special cases.
     if field_path == "Rvir":
-        full_name = r"$R_{\rm vir}$"
+        full_name = "$R_{\\rm vir}$"
     elif field_path == "Rmax":
-        full_name = r"$R_{\rm max}$"
+        full_name = "$R_{\\rm max}$"
     elif field_path[:2] != "R_":
         raise RegistrationDoesNotMatchError
 
@@ -416,7 +416,7 @@ def registration_radii(
         full_name = "$R"
 
         if radius:
-            full_name += f"_{{\rm {radius}}}"
+            full_name += f"_{{\\rm {radius}}}"
 
         full_name += "$"
 
@@ -523,7 +523,7 @@ def registration_concentration(
     if not field_path == "cNFW":
         raise RegistrationDoesNotMatchError
 
-    return unyt.dimensionless, r"Concentration $c_{\rm NFW}$", field_path.lower()
+    return unyt.dimensionless, "Concentration $c_{\\rm NFW}$", field_path.lower()
 
 
 def registration_metallicity(
