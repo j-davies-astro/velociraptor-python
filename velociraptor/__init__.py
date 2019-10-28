@@ -1,4 +1,4 @@
-from velociraptor.catalogue import generate_catalogue
+from velociraptor.catalogue.catalogue import generate_catalogue
 
 
 def load(filename):

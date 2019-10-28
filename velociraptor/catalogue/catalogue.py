@@ -12,7 +12,7 @@ import numpy as np
 from typing import Union, Callable, List
 
 from velociraptor.units import VelociraptorUnits
-from velociraptor.registration import global_registration_functions
+from velociraptor.catalogue.registration import global_registration_functions
 from velociraptor.exceptions import RegistrationDoesNotMatchError
 
 

@@ -12,7 +12,7 @@ from typing import Union
 from velociraptor.exceptions import RegistrationDoesNotMatchError
 from velociraptor.units import VelociraptorUnits
 from velociraptor.regex import cached_regex
-from velociraptor.translator import (
+from velociraptor.catalogue.translator import (
     get_aperture_unit,
     get_particle_property_name_conversion,
 )
