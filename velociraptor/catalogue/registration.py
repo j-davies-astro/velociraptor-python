@@ -438,14 +438,175 @@ def registration_radii(
     return unit, full_name, field_path.lower()
 
 
+def registration_star_formation_rate(
+    field_path: str, unit_system: VelociraptorUnits
+) -> (unyt.Unit, str, str):
+    """
+    Registers star formation rate quantities. (Start with SFR)
+    """
+
+    if not field_path[:3] == "SFR":
+        raise RegistrationDoesNotMatchError
+
+    unit = unit_system.star_formation_rate
+
+    full_name = r"Star Formation Rate $\dot{\rho}_*$"
+
+    return unit, full_name, field_path.lower()
+
+
+def registration_temperature(
+    field_path: str, unit_system: VelociraptorUnits
+) -> (unyt.Unit, str, str):
+    """
+    Registers temperature based quantites (Those beginning with T).
+    """
+
+    if not field_path[0] == "T":
+        raise RegistrationDoesNotMatchError
+
+    raise RegistrationDoesNotMatchError
+
+    return  # TODO
+
+
+def registration_structure_type(
+    field_path: str, unit_system: VelociraptorUnits
+) -> (unyt.Unit, str, str):
+    """
+    Registers the StructureType field.
+    """
+
+    if not field_path == "StructureType":
+        raise RegistrationDoesNotMatchError
+
+    return unyt.dimensionless, "Structure Type", field_path.lower()
+
+
+def registration_velocities(
+    field_path: str, unit_system: VelociraptorUnits
+) -> (unyt.Unit, str, str):
+    """
+    Registers velocity quantities (those starting with V).
+    """
+
+    if not field_path[0] == "V":
+        raise RegistrationDoesNotMatchError
+
+    raise RegistrationDoesNotMatchError
+
+    return  # TODO
+
+
+def registration_positions(
+    field_path: str, unit_system: VelociraptorUnits
+) -> (unyt.Unit, str, str):
+    """
+    Registers all positon based quantities (those beginning with X, Y, or Z).
+    """
+
+    if not field_path[0] in ["X", "Y", "Z"] and not field_path[:4] == "Zmet":
+        raise RegistrationDoesNotMatchError
+
+    raise RegistrationDoesNotMatchError
+
+    return  # TODO
+
+
+def registration_concentration(
+    field_path: str, unit_system: VelociraptorUnits
+) -> (unyt.Unit, str, str):
+    """
+    Registers concentration values (those beginning with c).
+    """
+
+    if not field_path == "cNFW":
+        raise RegistrationDoesNotMatchError
+
+    return unyt.dimensionless, r"Concentration $c_{\rm NFW}$", field_path.lower()
+
+
+def registration_metallicity(
+    field_path: str, unit_system: VelociraptorUnits
+) -> (unyt.Unit, str, str):
+    """
+    Registers metallicity-based quantities (those beginning with Zmet)
+    """
+
+    if not field_path[:4] == "Zmet":
+        raise RegistrationDoesNotMatchError
+
+    raise RegistrationDoesNotMatchError
+
+    return  # TODO
+
+
+def registration_eigenvectors(
+    field_path: str, unit_system: VelociraptorUnits
+) -> (unyt.Unit, str, str):
+    """
+    Registers eigenvector quantities (those beginning with eig).
+    """
+
+    if not field_path[:3] == "eig":
+        raise RegistrationDoesNotMatchError
+
+    raise RegistrationDoesNotMatchError
+
+    return  # TODO
+
+
+def registration_veldisp(
+    field_path: str, unit_system: VelociraptorUnits
+) -> (unyt.Unit, str, str):
+    """
+    Registers velocity dispersion quantities (those beginning with veldisp).
+    """
+
+    if not field_path[:7] == "veldisp":
+        raise RegistrationDoesNotMatchError
+
+    raise RegistrationDoesNotMatchError
+
+    return  # TODO
+
+
+# TODO
+# lambda_B
+# n_bh
+# n_gas
+# n_star
+# npart
+# numSubStruct
+# q
+# q_gas
+# q_star
+# s
+# s_gas
+# s_star
+# sigV
+# sigV_gas_nsf
+# sigV_gas_sf
+# tage_star
+
+
 # This must be placed at the bottom of the file so that we
 # have defined all functions before getting to it.
 global_registration_functions = [
+    registration_metallicity,
     registration_particle_ids,
     registration_energies,
     registration_rotational_support,
+    registration_star_formation_rate,
     registration_masses,
+    registration_eig,
     registration_radii,
+    registration_temperature,
+    registration_veldisp,
+    registration_structure_type,
+    registration_velocities,
+    registration_positions,
+    registration_concentration,
     registration_rvmax_quantities,
     registration_angular_momentum,
     registration_projected_apertures,
