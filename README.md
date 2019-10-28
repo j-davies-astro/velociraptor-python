@@ -23,10 +23,20 @@ The velociraptor library requires:
 
 + `unyt` and its dependencies
 + `h5py` and its dependencies
++ `python3.6` or above
 
 Note that for development, we suggest that you have `pytest` and `black`
 installed. To create the plots in the example directory, you will need
 the plotting framework `matplotlib`.
+
+Installation
+------------
+
+For now, you can install the library by downloading this repository, changing
+to the top-level directory and running:
+```
+pip3 install .
+```
 
 Why a custom library?
 ---------------------
