@@ -5,11 +5,13 @@ Tools to generate various lines from datasets.
 import unyt
 import numpy as np
 
+from typing import List
+
 
 def binned_mean_line(
-    x: unyt.unit_array,
-    y: unyt.unit_array,
-    x_bins: unyt.unit_array,
+    x: unyt.unyt_array,
+    y: unyt.unyt_array,
+    x_bins: unyt.unyt_array,
     minimum_in_bin: int = 1,
 ):
     """
@@ -24,7 +26,7 @@ def binned_mean_line(
 
     Returns:
 
-    mean, standard deviation, bin centers
+    bin centers, mean, standard deviation
     """
 
     assert (
@@ -53,13 +55,13 @@ def binned_mean_line(
     standard_deviations *= y.units
     centers *= x.units
 
-    return means, standard_deviations, centers
+    return centers, means, standard_deviations
 
 
 def binned_median_line(
-    x: unyt.unit_array,
-    y: unyt.unit_array,
-    x_bins: unyt.unit_array,
+    x: unyt.unyt_array,
+    y: unyt.unyt_array,
+    x_bins: unyt.unyt_array,
     percentiles: List[int] = [16, 86],
     minimum_in_bin: int = 1,
 ):
@@ -76,7 +78,7 @@ def binned_median_line(
 
     Returns:
 
-    median, deviation, bin centers
+    bin centers, median, deviation, 
     """
 
     assert (
@@ -87,7 +89,7 @@ def binned_median_line(
     hist = np.digitize(x, x_bins)
 
     medians = []
-    percentiles = []
+    deviations = []
     centers = []
 
     for bin in range(len(x_bins) - 1):
@@ -108,5 +110,5 @@ def binned_median_line(
     deviations = abs(deviations.T - medians)
     centers *= x.units
 
-    return medians, deviations, centers
+    return centers, medians, deviations
 
