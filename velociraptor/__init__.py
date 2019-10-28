@@ -1,4 +1,4 @@
-from velociraptor.objects import VelociraptorCatalogue
+from velociraptor.catalogue import generate_catalogue
 
 
 def load(filename):
@@ -7,4 +7,4 @@ def load(filename):
     object.
     """
 
-    return VelociraptorCatalogue(filename)
+    return generate_catalogue(filename)
