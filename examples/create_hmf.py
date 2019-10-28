@@ -25,7 +25,7 @@ box_volume = (float(sys.argv[2]) * unyt.Mpc) ** 3
 data = vr.load(sys.argv[1])
 
 # Create local references to data and convert to our units
-halo_masses = data.mass_200crit
+halo_masses = data.masses.mass_200crit
 halo_masses.convert_to_units(unyt.msun)
 
 fig, ax = plt.subplots(constrained_layout=True)

@@ -16,8 +16,8 @@ import sys
 data = vr.load(sys.argv[1])
 
 # Create local pointers to data and convert them to the units we'd like to plot
-stellar_masses = data.aperture_mass_star_30_kpc
-galaxy_sizes = data.aperture_rhalfmass_star_30_kpc
+stellar_masses = data.apertures.mass_star_30_kpc
+galaxy_sizes = data.apertures.rhalfmass_star_30_kpc
 
 stellar_masses.convert_to_units(unyt.msun)
 galaxy_sizes.convert_to_units(unyt.kpc)
