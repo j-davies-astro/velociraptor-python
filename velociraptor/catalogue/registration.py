@@ -599,7 +599,7 @@ global_registration_functions = [
     registration_rotational_support,
     registration_star_formation_rate,
     registration_masses,
-    registration_eig,
+    registration_eigenvectors,
     registration_radii,
     registration_temperature,
     registration_veldisp,
