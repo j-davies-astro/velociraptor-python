@@ -508,9 +508,40 @@ def registration_positions(
     if not field_path[0] in ["X", "Y", "Z"] and not field_path[:4] == "Zmet":
         raise RegistrationDoesNotMatchError
 
-    raise RegistrationDoesNotMatchError
+    # All position quantities have units of length
+    unit = unit_system.length
 
-    return  # TODO
+    # Capture group 1: x, y, or z
+    # Capture group 2: ignore
+    # Capture group 3: ptype
+    # Capture group 4: misc info, e.g. mbp or minpot
+    match_string = "(X|Y|Z)c(_([a-z]*))?([a-z]*)?"
+    regex = cached_regex(match_string)
+    match = regex.match(field_path)
+
+    if match:
+        coordinate = match.group(1)
+        ptype = match.group(3)
+        misc = match.group(4)
+
+        full_name = f"${coordinate.lower()}$"
+
+        if ptype:
+            full_name += " ({ptype})"
+
+        if misc:
+            if misc == "mbp":
+                full_name = f"Most bound particle {full_name}"
+            elif misc == "minpot":
+                full_name = f"Minimum potential {full_name}"
+            else:
+                full_name = f"{misc} {full_name}"
+        else:
+            full_name = "Halo centre " + full_name
+    else:
+        raise RegistrationDoesNotMatchError
+
+    return unit, full_name, field_path.lower()
 
 
 def registration_concentration(
