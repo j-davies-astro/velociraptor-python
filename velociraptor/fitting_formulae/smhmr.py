@@ -7,10 +7,53 @@ Creates a stellar mass function plot for various velociraptor
 catalogues.
 """
 
+import unyt
 import numpy as np
 
+from velociraptor.catalogue.catalogue import VelociraptorCatalogue
 
-def moster(z, Mhalo):
+from typing import Union, List
+
+
+def moster(
+    catalogue: VelociraptorCatalogue,
+    mass_range: Union[unyt.unyt_array, List[unyt.unyt_quantity]] = [
+        1e4 * unyt.msun,
+        1e16 * unyt.msun,
+    ],
+    n_eval: int = 256,
+):
+    """
+    The moster retaion (from Moster+ 2013). Original code provided by
+    Matthieu Schaller. Takes:
+
+    + catalogue, your velociraptor catalogue object
+    + mass_range, a length 2 array with the lowest and highest halo mass
+                  you would like the relation to be evaluated between
+                  (default: 1e4 msun to 1e16 msun)
+    + n_eval, the number of function evaluations (equally spaced in log (Mhalo))
+              (default: 256)
+
+    Returns:
+
+    + halo_mass, the halo masses at which the relation is evaluated at
+    + stellar_mass, the stellar masses matching with the above halo masses
+    """
+
+    z = catalogue.z
+    halo_mass = (
+        np.logspace(
+            np.log10(mass_range[0].value), np.log10(mass_range[1].value), n_eval
+        )
+        * mass_range[0].units
+    )
+
+    stellar_mass = moster_raw(z, halo_mass.value) * halo_mass.units
+
+    return halo_mass, stellar_mass
+
+
+def moster_raw(z, Mhalo):
     """
     Stellar mass-halo mass relation from Moster+2013.
 
@@ -41,7 +84,45 @@ def moster(z, Mhalo):
     return Mstar_over_Mhalo * Mhalo
 
 
-def behroozi(z, Mhalo):
+def behroozi(
+    catalogue: VelociraptorCatalogue,
+    mass_range: Union[unyt.unyt_array, List[unyt.unyt_quantity]] = [
+        1e4 * unyt.msun,
+        1e16 * unyt.msun,
+    ],
+    n_eval: int = 256,
+):
+    """
+    The behroozi fit to the SMHMR (from Behroozi+ 2013). Original code provided by
+    Matthieu Schaller. Takes:
+
+    + catalogue, your velociraptor catalogue object
+    + mass_range, a length 2 array with the lowest and highest halo mass
+                  you would like the relation to be evaluated between
+                  (default: 1e4 msun to 1e16 msun)
+    + n_eval, the number of function evaluations (equally spaced in log (Mhalo))
+              (default: 256)
+
+    Returns:
+
+    + halo_mass, the halo masses at which the relation is evaluated at
+    + stellar_mass, the stellar masses matching with the above halo masses
+    """
+
+    z = catalogue.z
+    halo_mass = (
+        np.logspace(
+            np.log10(mass_range[0].value), np.log10(mass_range[1].value), n_eval
+        )
+        * mass_range[0].units
+    )
+
+    stellar_mass = behroozi_raw(z, halo_mass.value) * halo_mass.units
+
+    return halo_mass, stellar_mass
+
+
+def behroozi_raw(z, Mhalo):
     """
     Stellar mass-halo mass relation from Behroozi +2013.
 
