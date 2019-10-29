@@ -44,9 +44,8 @@ def create_mass_function(
     """
 
     assert (
-        masses.units == lowest_mass.units and lowest_mass.units == highest_mass.units,
-        "Please ensure that all mass quantities have the same units.",
-    )
+        masses.units == lowest_mass.units and lowest_mass.units == highest_mass.units
+    ), "Please ensure that all mass quantities have the same units."
 
     bins = (
         np.logspace(np.log10(lowest_mass), np.log10(highest_mass), n_bins + 1)

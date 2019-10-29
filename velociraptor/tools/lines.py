@@ -30,9 +30,8 @@ def binned_mean_line(
     """
 
     assert (
-        x.units == x_bins.units,
-        "Please ensure that the x values and bins have the same units.",
-    )
+        x.units == x_bins.units
+    ), "Please ensure that the x values and bins have the same units."
 
     hist = np.digitize(x, x_bins)
 
@@ -82,9 +81,8 @@ def binned_median_line(
     """
 
     assert (
-        x.units == x_bins.units,
-        "Please ensure that the x values and bins have the same units.",
-    )
+        x.units == x_bins.units
+    ), "Please ensure that the x values and bins have the same units."
 
     hist = np.digitize(x, x_bins)
 
