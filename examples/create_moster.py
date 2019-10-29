@@ -25,7 +25,7 @@ stellar_mass_range = [1e6, 1e11] * unyt.msun
 halo_mass_range = [1e9, 1e14] * unyt.msun
 
 halo_mass_bins = (
-    np.logspace(*np.log10(halo_mass_range.value), 32) * halo_mass_range.units
+    np.logspace(*np.log10(halo_mass_range.value), 64) * halo_mass_range.units
 )
 
 # constrained_layout is similar to tight_layout() but continuous
@@ -50,6 +50,9 @@ ax.errorbar(
         halo_masses[selection], stellar_masses[selection], halo_mass_bins
     ),
     label="Median",
+    marker="o",
+    ms=3,
+    linestyle="none",
 )
 
 # Plot two relations
