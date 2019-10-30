@@ -28,6 +28,14 @@ class VelociraptorUnits(object):
     was cosmological (VelociraptorUnits.cosmological).
     """
 
+    # Pre-define these for autocomplete.
+    length: unyt.unyt_quantity
+    mass: unyt.unyt_quantity
+    metallicity: unyt.unyt_quantity
+    age: unyt.unyt_quantity
+    velocity: unyt.unyt_quantity
+    star_formation_rate: unyt.unyt_quantity
+
     def __init__(self, filename):
         self.filename = filename
 
