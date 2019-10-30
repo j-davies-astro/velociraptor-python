@@ -602,6 +602,19 @@ def registration_veldisp(
     return  # TODO
 
 
+def registration_stellar_age(
+    field_path: str, unit_system: VelociraptorUnits
+) -> (unyt.Unit, str, str):
+    """
+    Registers the stellar ages properties (currently tage_star).
+    """
+
+    if field_path == "tage_star":
+        return unit_system.age, "Mean Stellar Age", field_path.lower()
+    else:
+        raise RegistrationDoesNotMatchError
+
+
 # TODO
 # lambda_B
 # n_bh
@@ -633,6 +646,7 @@ global_registration_functions = {
         "metallicity",
         "ids",
         "energies",
+        "stellar_age",
         "rotational_support",
         "star_formation_rate",
         "masses",
