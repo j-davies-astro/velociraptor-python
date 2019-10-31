@@ -12,14 +12,15 @@ halo (the third argument).
 
 import matplotlib.pyplot as plt
 import numpy as np
+
 from tqdm import tqdm
+from matplotlib.colors import LogNorm
+from matplotlib.animation import FuncAnimation
 
 from velociraptor.swift.swift import to_swiftsimio_dataset
 from velociraptor.particles import load_groups
 from velociraptor import load
 from swiftsimio.visualisation.sphviewer import SPHViewerWrapper
-from matplotlib.colors import LogNorm
-from matplotlib.animation import FuncAnimation
 
 import sys
 
