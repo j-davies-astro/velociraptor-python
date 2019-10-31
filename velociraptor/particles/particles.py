@@ -3,7 +3,7 @@ Objects for the particles files. This includes:
 
 + catalog_groups
 + catalog_particles
-+ catalog_partypes
++ catalog_parttypes
 
 and their unbound variants.
 
@@ -14,7 +14,7 @@ VelociraptorGroups: This depends on the VelociraptorCatalogue object
                     in each file each group belongs.
 VelociraptorParticles: This depends on VelociraptorGroups and itself allows
                        for the particles in a _single group_ to be loaded.
-                       Along with this, we also load the catalog_partypes
+                       Along with this, we also load the catalog_parttypes
                        file for those selected particles.
 """
 
@@ -114,13 +114,13 @@ class VelociraptorGroups(object):
                 "catalog_groups", "catalog_particles"
             )
             parttypes_filename = str(self.filename).replace(
-                "catalog_groups", "catalog_partypes"
+                "catalog_groups", "catalog_parttypes"
             )
             unbound_particles_filename = str(self.filename).replace(
                 "catalog_groups", "catalog_particles.unbound"
             )
             unbound_parttypes_filename = str(self.filename).replace(
-                "catalog_groups", "catalog_partypes.unbound"
+                "catalog_groups", "catalog_parttypes.unbound"
             )
         else:
             particles_filename = filenames["particles_filename"]
@@ -144,6 +144,7 @@ class VelociraptorGroups(object):
             parttypes_filename=parttypes_filename,
             offset=self.offset[halo_id],
             group_size=number_of_particles,
+            groups_instance=self,
         )
 
         unbound_particles = VelociraptorParticles(
@@ -151,6 +152,7 @@ class VelociraptorGroups(object):
             parttypes_filename=parttypes_filename,
             offset=self.offset_unbound[halo_id],
             group_size=number_of_unbound_particles,
+            groups_instance=self,
         )
 
         if self.catalogue is not None:
@@ -169,21 +171,28 @@ class VelociraptorParticles(object):
     """
 
     def __init__(
-        self, particles_filename, parttypes_filename, offset: int, group_size: int
+        self,
+        particles_filename,
+        parttypes_filename,
+        offset: int,
+        group_size: int,
+        groups_instance: VelociraptorGroups,
     ):
         """
         Takes:
 
         + particles filename, the filename of the .catalog_particles file
-        + parttype filename, the filename of the .catalog_partypes file
+        + parttype filename, the filename of the .catalog_parttypes file
         + offset, the offset from the .catalog_groups file
         + group_size, the size of the group in number of particles.
+        + groups_instance, the associated groups instance
         """
 
         self.particles_filename = particles_filename
         self.parttypes_filename = parttypes_filename
         self.offset = offset
         self.group_size = group_size
+        self.groups_instance = groups_instance
 
         self.__load_particles()
         self.__load_parttypes()
@@ -215,7 +224,7 @@ class VelociraptorParticles(object):
 
     def __load_parttypes(self):
         """
-        Load the information from the .catalog_partypes file.
+        Load the information from the .catalog_parttypes file.
         """
 
         read_to_attribute = [
@@ -227,7 +236,7 @@ class VelociraptorParticles(object):
 
         with h5py.File(self.parttypes_filename, "r") as handle:
             for attribute in read_to_attribute:
-                setattr(self, f"partypes_{attribute.lower()}", handle[attribute][0])
+                setattr(self, f"parttypes_{attribute.lower()}", handle[attribute][0])
 
             # Load only the particle ids that we actually need
             self.particle_types = handle["Particle_types"][
@@ -259,5 +268,14 @@ class VelociraptorParticles(object):
         self.x = catalogue.positions.xc[halo_id]
         self.y = catalogue.positions.yc[halo_id]
         self.z = catalogue.positions.zc[halo_id]
+
+        # x_gas and x_star are measured relative to xc for some reason
+        self.x_gas = catalogue.positions.xc_gas[halo_id] + self.x
+        self.y_gas = catalogue.positions.yc_gas[halo_id] + self.y
+        self.z_gas = catalogue.positions.zc_gas[halo_id] + self.z
+
+        self.x_star = catalogue.positions.xc_star[halo_id] + self.x
+        self.y_star = catalogue.positions.yc_star[halo_id] + self.y
+        self.z_star = catalogue.positions.zc_star[halo_id] + self.z
 
         return

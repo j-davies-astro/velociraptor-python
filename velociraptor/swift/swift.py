@@ -11,6 +11,7 @@ import numpy as np
 
 from velociraptor.particles.particles import VelociraptorParticles
 
+from typing import Union, Tuple
 
 from collections import namedtuple
 
@@ -19,7 +20,9 @@ def to_swiftsimio_dataset(
     particles: VelociraptorParticles,
     snapshot_filename,
     generate_extra_mask: bool = False,
-) -> swiftsimio.reader.SWIFTDataset:
+) -> Union[
+    swiftsimio.reader.SWIFTDataset, Tuple[swiftsimio.reader.SWIFTDataset, namedtuple]
+]:
     """
     Loads a VelociraptorParticles instance for one halo into a 
     `swiftsimio` masked dataset.
@@ -58,13 +61,37 @@ def to_swiftsimio_dataset(
     # (this is only approximate down to the swift cell size)
     swift_mask = swiftsimio.mask(snapshot_filename, spatial_only=True)
 
+    # SWIFT data is stored in comoving units, so we need to un-correct
+    # the velociraptor data if it is stored in physical.
+    try:
+        if not particles.groups_instance.catalogue.units.comoving:
+            length_factor = particles.groups_instance.catalogue.units.a
+        else:
+            length_factor = 1.0
+    except AttributeError:
+        raise RuntimeError(
+            "Please use a particles instance with an associated halo catalogue."
+        )
+
     spatial_mask = [
-        [paritcles.x - particles.rmax, particles.x + particles.rmax],
-        [paritcles.y - particles.rmax, particles.y + particles.rmax],
-        [paritcles.z - particles.rmax, particles.z + particles.rmax],
+        [
+            particles.x / length_factor - particles.r_size / length_factor,
+            particles.x / length_factor + particles.r_size / length_factor,
+        ],
+        [
+            particles.y / length_factor - particles.r_size / length_factor,
+            particles.y / length_factor + particles.r_size / length_factor,
+        ],
+        [
+            particles.z / length_factor - particles.r_size / length_factor,
+            particles.z / length_factor + particles.r_size / length_factor,
+        ],
     ]
 
     swift_mask.constrain_spatial(spatial_mask)
+
+    # TODO: Make spatial masking work
+    # swift_mask = None
 
     data = swiftsimio.load(snapshot_filename, mask=swift_mask)
 
