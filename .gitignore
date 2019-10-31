@@ -7,4 +7,8 @@ env/*
 
 # Plot outputs, just in case
 *.pdf
+*.png
+*.mp4
 
+# MacOS
+*.DS_Store

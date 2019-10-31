@@ -127,12 +127,79 @@ bin_centers, mass_function, error = tools.create_mass_function(
 ```
 We now have a halo mass function, but the fun doesn't end there - we can get
 pretty labels _automatically_ out of the python tools:
-```
+```python
 mass_label = get_full_label(masses_200crit)
 mf_label = get_mass_function_label("200crit", mass_function)
 ```
 If you want to try this out yourself, you can use the example scripts available in the
 repository. Currently, we have scripts that create a HMF, SMF, and a galaxy-size
 stellar-mass plot.
+
+
+Particles Files
+---------------
+
+With the `velociraptor` tool, you can easily extract the groups information available
+from the catalogues by using the tools found in `velociraptor.particles`. To do this,
+you must first open the groups file, and then you may extract the particles belonging
+to individual haloes in the following way:
+```python
+from velociraptor.particles import load_groups
+from velociraptor import load
+
+catalogue = load("/path/to.properties")
+# Passing the catalogue file is not required but is is necessary to make use
+# of all features
+groups = load_groups("/path/to.catalog_groups", catalogue=catalogue)
+
+# This returns two instances of the VelociraptorParticles class.
+# The first contains all bound particles, and the second contains all unbound particles.
+particles, unbound_particles = groups.extract_halo(halo_id=123)
+
+# To view the contents of the particles files, you can use:
+bound_particle_ids = particles.particle_ids
+unbound_bound_particle_ids = unbound_particles.particle_ids
+
+halo_mass = particles.mass_200crit
+```
+See below for a more advanced use of this, to extract a `swiftsimio` dataset corresponding
+to the particles that are available in this group.
+
+SWIFTsimIO Integration
+----------------------
+
+Using the `VelociraptorParticles` class, it is possible to find which particles
+belong to a given halo. We also provide functionality to quickly (by using spatial
+metadata in the snapshots) extract the regions around haloes, and the specific particles
+in each halo itself. To do this, you will need to use the tools in `velociraptor.swift`,
+in particular the `to_swiftsimio_dataset` function. It is used as follows:
+```python
+data, mask = to_swiftsimio_dataset(particles, "/path/to/snapshot.hdf5", generate_extra_mask=True)
+
+# The dataset that is returned is only spatially masked. It only contains particles that
+# are within the same top-level cell as the region that the halo overlaps with, but it can
+# be accessed as if it is just a regular `swiftsimio` dataset. For instance
+gas_densities = data.gas.densities
+redshift = data.metadata.z
+hydro_info = data.metadata.hydro_info
+
+# The extra mask allows for you to find only the particles that are classed as being
+# part of the FoF group (in this case only the bound particles). To select the gas densities
+# of particles in the group, for example, perform the following:
+gas_densities_only_fof = data.gas.densities[mask.gas]
+# Or the dark matter co-ordinates
+dm_coordinates_only_fof = data.dark_matter.coordinates[mask.dark_matter]
+
+# All of the swiftsimio features are available, so for instance you can generate
+# a py-sphviewer instance out of these
+from swiftismio.visualisation.sphviewer import SPHViewerWrapper
+sphviewer = SPHViewerWrapper(data.gas)
+sphviewer.quickview(xsize=1024,ysize=1024,r="infinity")
+...
+```
+To see these functions in action, you can check out the examples available in
+`examples/swift_integration*.py` in this repository.
+
+
 
 
