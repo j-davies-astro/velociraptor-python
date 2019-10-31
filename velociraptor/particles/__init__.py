@@ -9,7 +9,9 @@ from velociraptor.catalogue.catalogue import VelociraptorCatalogue
 from typing import Union
 
 
-def load_groups(filename, catalogue: Union[VelociraptorCatalogue, None] = None):
+def load_groups(
+    filename, catalogue: Union[VelociraptorCatalogue, None] = None
+) -> VelociraptorGroups:
     """
     Load the groups file, passed by its filename to this
     function. Passing the velociraptor catalogue to the
