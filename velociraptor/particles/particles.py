@@ -269,13 +269,28 @@ class VelociraptorParticles(object):
         self.y = catalogue.positions.yc[halo_id]
         self.z = catalogue.positions.zc[halo_id]
 
-        # x_gas and x_star are measured relative to xc for some reason
-        self.x_gas = catalogue.positions.xc_gas[halo_id] + self.x
-        self.y_gas = catalogue.positions.yc_gas[halo_id] + self.y
-        self.z_gas = catalogue.positions.zc_gas[halo_id] + self.z
+        # x_gas and x_star are measured relative to xc for some reason.
+        # The following may not be available in the catalogues.
+        try:
+            self.x_gas = catalogue.positions.xc_gas[halo_id] + self.x
+            self.y_gas = catalogue.positions.yc_gas[halo_id] + self.y
+            self.z_gas = catalogue.positions.zc_gas[halo_id] + self.z
+        except AttributeError:
+            pass
 
-        self.x_star = catalogue.positions.xc_star[halo_id] + self.x
-        self.y_star = catalogue.positions.yc_star[halo_id] + self.y
-        self.z_star = catalogue.positions.zc_star[halo_id] + self.z
+        try:
+            self.x_star = catalogue.positions.xc_star[halo_id] + self.x
+            self.y_star = catalogue.positions.yc_star[halo_id] + self.y
+            self.z_star = catalogue.positions.zc_star[halo_id] + self.z
+        except AttributeError:
+            pass
+
+        try:
+            self.x_mbp = catalogue.positions.xcmbp[halo_id]
+            self.y_mbp = catalogue.positions.ycmbp[halo_id]
+            self.z_mbp = catalogue.positions.zcmbp[halo_id]
+        except AttributeError:
+            pass
 
         return
+
