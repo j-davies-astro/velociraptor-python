@@ -1,17 +1,11 @@
 """
 An example script showing the `swiftsimio` integration of
 the velociraptor library.
-
-Give it the snapshot path as the first arugment, and the
-velociraptor base name (i.e. without any 'groups' or
-'properties' and no dot) as the second.
-
-This then creates a rotating visualisation movie of a selected
-halo (the third argument).
 """
 
 import matplotlib.pyplot as plt
 import numpy as np
+import unyt
 
 from tqdm import tqdm
 from matplotlib.colors import LogNorm
@@ -22,11 +16,80 @@ from velociraptor.particles import load_groups
 from velociraptor import load
 from swiftsimio.visualisation.sphviewer import SPHViewerWrapper
 
-import sys
+from typing import Union
 
-snapshot_path = sys.argv[1]
-velociraptor_base_name = sys.argv[2]
-halo_id = int(sys.argv[3])
+import argparse as ap
+
+parser = ap.ArgumentParser(
+    description="Create a rotation movie around a specified halo"
+)
+
+parser.add_argument(
+    "-s", "--snap", help="Snapshot location. Required.", required=True, type=str
+)
+
+parser.add_argument(
+    "-v",
+    "--velociraptor",
+    help="Velociraptor base name, i.e. without the file extension. Required.",
+    required=True,
+    type=str,
+)
+
+parser.add_argument(
+    "-i", "--id", help="Halo ID to visualise. Required.", required=True, type=int
+)
+
+parser.add_argument(
+    "-r",
+    "--resolution",
+    help="Resolution of the output video. Default: 1920.",
+    required=False,
+    default=1920,
+    type=int,
+)
+
+parser.add_argument(
+    "-p",
+    "--property",
+    help="Property to smooth over. Default: masses.",
+    required=False,
+    default="masses",
+    type=str,
+)
+
+parser.add_argument(
+    "-c",
+    "--cmap",
+    help="Colour map to use. Default: RdBu_r.",
+    required=False,
+    default="RdBu_r",
+    type=str,
+)
+
+parser.add_argument(
+    "-n",
+    "--nframes",
+    help="Number of frames to generate in the 360 degree rotation. Default: 360.",
+    required=False,
+    default=360,
+    type=int,
+)
+
+args = vars(parser.parse_args())
+
+snapshot_path = args["snap"]
+velociraptor_base_name = args["velociraptor"]
+halo_id = args["id"]
+resolution = args["resolution"]
+smooth_over = args["property"]
+cmap = args["cmap"]
+n_frames = args["nframes"]
+
+# Generate the frame numbers we're actually going to use.
+step = 360 / n_frames
+# This is better than linspace as it ensures things wrap properly
+frames = np.arange(0, 360, step)
 
 # Instantiate main velociraptor objects
 velociraptor_properties = f"{velociraptor_base_name}.properties"
@@ -40,39 +103,67 @@ groups = load_groups(velociraptor_groups, catalogue)
 particles, unbound_particles = groups.extract_halo(halo_id)
 data = to_swiftsimio_dataset(particles, snapshot_path, generate_extra_mask=False)
 
-# Velociraptor stores these as physical, so we need to convert them back to comoving
-x = particles.x_star / data.metadata.a
-y = particles.y_star / data.metadata.a
-z = particles.z_star / data.metadata.a
-r_size = particles.r_size * 0.6 / data.metadata.a
+# Velociraptor stores these as physical, so we need to convert them back to comoving.
+# Focus around the most bound particle.
+x = particles.x_mbp / data.metadata.a
+y = particles.y_mbp / data.metadata.a
+z = particles.z_mbp / data.metadata.a
+r_size = particles.r_size * 1.0 / data.metadata.a
 
 # Use the sphviewer integration in swiftsimio to perform the rendering
-sphviewer = SPHViewerWrapper(data.gas)
+smooth_over_dataset = getattr(data.gas, smooth_over)
+smooth_over_dataset[smooth_over_dataset < 0 * smooth_over_dataset.units] = (
+    0.0 * smooth_over_dataset.units
+)
 
+sphviewer = SPHViewerWrapper(data.gas, smooth_over=smooth_over)
 
-def update_sphviewer(sphviewer: SPHViewerWrapper, angle=0) -> SPHViewerWrapper:
-    """
-    Update the SPHViewerWrapper instance with a new rotation
-    angle, and render the image at that angle.
-    """
-    sphviewer.get_camera(
-        x=x, y=y, z=z, zoom=2, xsize=1024, ysize=1024, r=r_size, p=angle
+if smooth_over != "masses":
+    sphviewer_norm = SPHViewerWrapper(
+        data.gas,
+        smooth_over=unyt.unyt_array(np.ones(data.metadata.n_gas), unyt.dimensionless),
     )
+else:
+    sphviewer_norm = None
+
+
+def update_sphviewer(
+    sphviewer: SPHViewerWrapper,
+    sphviewer_norm: Union[SPHViewerWrapper, None] = None,
+    angle=0,
+) -> SPHViewerWrapper:
+    """
+    Update the image (which is returned) by modifying the sphviewer and
+    sphviewer norm objects.
+    """
+
+    update_camera_props = dict(
+        x=x, y=y, z=z, zoom=2, xsize=resolution, ysize=resolution, r=r_size, p=angle
+    )
+
+    sphviewer.get_camera(**update_camera_props)
 
     sphviewer.get_scene()
     sphviewer.get_render()
 
-    return sphviewer
+    if sphviewer_norm is not None:
+        sphviewer_norm.get_camera(**update_camera_props)
+        sphviewer_norm.get_scene()
+        sphviewer_norm.get_render()
+
+        return (sphviewer.image / sphviewer_norm.image).value
+    else:
+        return (sphviewer.image).value
 
 
 # Finally, set up the actual plotting code.
-fig, ax = plt.subplots(figsize=(8, 8), dpi=1024 // 8)
+fig, ax = plt.subplots(figsize=(8, 8), dpi=resolution // 8)
 fig.subplots_adjust(0, 0, 1, 1)
 ax.axis("off")
 
-sphviewer = update_sphviewer(sphviewer, angle=0)
-norm = LogNorm(vmin=sphviewer.image.min(), vmax=sphviewer.image.max())
-image = ax.imshow(sphviewer.image, norm=norm, cmap="RdBu_r", origin="lower")
+this_frame = update_sphviewer(sphviewer, angle=0)
+norm = LogNorm(vmin=this_frame.min(), vmax=this_frame.max())
+image = ax.imshow(this_frame, norm=norm, cmap=cmap, origin="lower")
 
 ax.text(
     0.975,
@@ -86,13 +177,13 @@ ax.text(
 
 
 def frame(angle):
-    update_sphviewer(sphviewer, angle=angle)
-    image.set_array(sphviewer.image)
+    this_frame = update_sphviewer(sphviewer, sphviewer_norm, angle=angle)
+    image.set_array(this_frame)
 
     return
 
 
 # Render the animation and quit!
-fa = FuncAnimation(fig, frame, tqdm(np.arange(360)), fargs=[], interval=1000 / 25)
+fa = FuncAnimation(fig, frame, tqdm(frames), fargs=[], interval=1000 / 25)
 
-fa.save(f"out_{halo_id}.mp4")
+fa.save(f"out_{halo_id}_{smooth_over}.mp4")
