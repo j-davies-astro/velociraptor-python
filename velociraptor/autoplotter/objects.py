@@ -166,6 +166,7 @@ class VelociraptorPlot(object):
         if self.mean_line is not None:
             self.mean_line.plot_line(ax=ax, x=x, y=y, label="Mean")
 
+        fig.tight_layout()
         fig.savefig(f"{directory}/{self.filename}.{file_extension}")
 
         return
