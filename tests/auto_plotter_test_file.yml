@@ -1,0 +1,29 @@
+stellar_mass_halo_mass: 
+  x:
+    quantity: "masses.mass_200_crit"
+    log: false
+    label_override: "Halo Mass"
+    units: Solar_Mass
+  y:
+    quantity: "apertures.mass_star_100_kpc"
+    units: Solar_Mass
+  median:
+    plot: true
+    log: false
+    number_of_bins: 10
+    start:
+      value: 1e10
+      units: Solar_Mass
+    end:
+      value: 1e12
+      units: Solar_Mass
+  mean:
+    plot: false
+    log: true
+    number_of_bins: 10
+    start:
+      value: 1e10
+      units: Solar_Mass
+    end:
+      value: 1e12
+      units: Solar_Mass
