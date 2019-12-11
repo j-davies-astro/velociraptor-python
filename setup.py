@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="velociraptor",
-    version="0.1.0",
+    version="0.1.1",
     description="Velociraptor catalogue reading routines.",
     url="https://github.com/swiftsim/velociraptor-python",
     author="Josh Borrow",
