@@ -89,7 +89,11 @@ class VelociraptorGroups(object):
                 setattr(self, attribute.lower(), handle[attribute][0])
 
             for attribute in read_to_array:
-                setattr(self, attribute.lower(), handle[attribute][:])
+                try:
+                    setattr(self, attribute.lower(), handle[attribute][:])
+                except KeyError:
+                    # Whoops! Not available.
+                    pass
 
         return
 
@@ -148,8 +152,8 @@ class VelociraptorGroups(object):
         )
 
         unbound_particles = VelociraptorParticles(
-            particles_filename=particles_filename,
-            parttypes_filename=parttypes_filename,
+            particles_filename=unbound_particles_filename,
+            parttypes_filename=unbound_parttypes_filename,
             offset=self.offset_unbound[halo_id],
             group_size=number_of_unbound_particles,
             groups_instance=self,
