@@ -10,10 +10,6 @@ def test_basic_load_catalogue_no_crash(
 ):
     catalogue = load(filename)
 
-    import pdb
-
-    pdb.set_trace()
-
     return
 
 
