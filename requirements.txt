@@ -2,4 +2,5 @@ numpy
 h5py
 pytest
 unyt
+pyyaml
 black
