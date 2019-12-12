@@ -1,4 +1,5 @@
-stellar_mass_halo_mass: 
+stellar_mass_halo_mass_100:
+  type: "scatter"
   x:
     quantity: "masses.mass_200crit"
     units: Solar_Mass
@@ -19,6 +20,60 @@ stellar_mass_halo_mass:
     end:
       value: 1e14
       units: Solar_Mass
+
+stellar_mass_halo_mass_30: 
+  type: "2dhistogram"
+  x:
+    quantity: "masses.mass_200crit"
+    units: Solar_Mass
+    start: 1e9
+    end: 1e14
+  y:
+    quantity: "apertures.mass_star_30_kpc"
+    units: Solar_Mass
+    start: 1e6
+    end: 1e12
+  median:
+    plot: true
+    log: true
+    number_of_bins: 25
+    start:
+      value: 1e9
+      units: Solar_Mass
+    end:
+      value: 1e14
+      units: Solar_Mass
+
+stellar_mass_halo_mass_50: 
+  x:
+    quantity: "masses.mass_200crit"
+    units: Solar_Mass
+    start: 1e9
+    end: 1e14
+  y:
+    quantity: "apertures.mass_star_50_kpc"
+    units: Solar_Mass
+    start: 1e6
+    end: 1e12
+  median:
+    plot: true
+    log: true
+    number_of_bins: 25
+    start:
+      value: 1e9
+      units: Solar_Mass
+    end:
+      value: 1e14
+      units: Solar_Mass
+
+stellar_mass_function:
+  type: "massfunction"
+  number_of_bins: 25
+  x:
+    quantity: "apertures.mass_star_100_kpc"
+    units: Solar_Mass
+    start: 1e7
+    end: 1e12
 
 stellar_mass_galaxy_size:
   x:
