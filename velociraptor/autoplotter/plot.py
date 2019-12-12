@@ -3,8 +3,10 @@ Functions that actually plot x against y.
 """
 
 import matplotlib.pyplot as plt
+import numpy as np
 import unyt
 
+from matplotlib.colors import Normalize, LogNorm
 from velociraptor import VelociraptorCatalogue
 from velociraptor.autoplotter.objects import VelociraptorLine
 from typing import Tuple
@@ -24,6 +26,56 @@ def scatter_x_against_y(
     ax.scatter(x.value, y.value, s=1, edgecolor="none", alpha=0.5)
 
     set_labels(ax=ax, x=x, y=y)
+
+    return fig, ax
+
+
+def histogram_x_against_y(
+    x: unyt.unyt_array,
+    y: unyt.unyt_array,
+    x_bins: unyt.unyt_array,
+    y_bins: unyt.unyt_array,
+) -> Tuple[plt.Figure, plt.Axes]:
+    """
+    Creates a plot of x against y with a 2d histogram in the background.
+    
+    Actually uses pcolormesh and the numpy histogram method.
+    """
+
+    fig, ax = plt.subplots()
+
+    H, x_bins, y_bins = np.histogram2d(x=x, y=y, bins=[x_bins, y_bins])
+
+    im = ax.pcolormesh(x_bins, y_bins, H.T, norm=LogNorm())
+
+    fig.colorbar(im, ax=ax, label="Number of haloes")
+
+    set_labels(ax=ax, x=x, y=y)
+
+    return fig, ax
+
+
+def mass_function(
+    x: unyt.unyt_array, x_bins: unyt.unyt_array, box_volume: unyt.unyt_quantity
+) -> Tuple[plt.Figure, plt.Axes]:
+    """
+    Creates a plot of x as a mass function, binned with x_bins.
+    """
+
+    fig, ax = plt.subplots()
+
+    centers, mass_function, error = tools.mass_functions.create_mass_function_given_bins(
+        masses=x, bins=x_bins, box_volume=box_volume
+    )
+
+    ax.errorbar(centers, mass_function, error)
+
+    ax.set_xlabel(tools.get_full_label(x))
+    ax.set_ylabel(
+        tools.get_mass_function_label(
+            mass_function_sub_label="{}", mass_function_units=mass_function.units
+        )
+    )
 
     return fig, ax
 

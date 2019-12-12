@@ -76,3 +76,48 @@ def create_mass_function(
     else:
         return bin_centers[valid_bins], mass_function[valid_bins], error[valid_bins]
 
+
+def create_mass_function_given_bins(
+    masses: unyt.unyt_array,
+    bins: unyt.unyt_array,
+    box_volume: unyt.unyt_quantity,
+    objects_for_valid_bin: int = 1,
+):
+    """
+    Creates a mass function (with equal width bins in log M) for you to plot.
+
+    Takes:
+
+    + masses, the array that you want to create a mass function of
+    + box_volume, the volume of the box such that we can return n / volume
+    + bins, the mass bins to use.
+    + objects_for_valid_bin, the number of objects in a bin for it to be classed as
+                             valid.
+
+    Returns:
+
+    + bin_centers, the centers of the bins that we used
+    + mass_function, the value of the mass function at the bin centers
+    + error, the scatter in the mass function at the bin centers
+    + (optional) bin_edges, the edges of the bins used to histogram the data.
+    """
+
+    bins.convert_to_units(masses.units)
+
+    # This is required to ensure that the mass function converges with bin width
+    bin_width_in_logspace = np.log10(bins[1]) - np.log10(bins[0])
+    normalization_factor = 1.0 / (bin_width_in_logspace * box_volume)
+
+    mass_function, _ = np.histogram(masses, bins)
+    valid_bins = mass_function > objects_for_valid_bin
+
+    # Poisson sampling
+    error = np.sqrt(mass_function)
+
+    mass_function *= normalization_factor
+    error *= normalization_factor
+
+    bin_centers = 0.5 * (bins[1:] + bins[:-1])
+
+    return bin_centers[valid_bins], mass_function[valid_bins], error[valid_bins]
+

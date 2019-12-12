@@ -8,11 +8,16 @@ from velociraptor.exceptions import AutoPlotterError
 import velociraptor.autoplotter.plot as plot
 
 from unyt import unyt_quantity, unyt_array
+from numpy import log10, linspace, logspace
+from matplotlib.pyplot import Axes, Figure
 from yaml import safe_load
-from typing import Union, List, Dict
+from typing import Union, List, Dict, Tuple
 
 from os import path, mkdir
 from functools import reduce
+
+valid_plot_types = ["scatter", "2dhistogram", "massfunction"]
+valid_line_types = ["median", "mean"]
 
 
 class VelociraptorPlot(object):
@@ -21,6 +26,8 @@ class VelociraptorPlot(object):
     """
 
     # Forward declarations
+    # What type of plot are we?
+    plot_type: str
     # variable to plot on the x-axis
     x: str
     # variable to plot on the y-axis
@@ -40,6 +47,10 @@ class VelociraptorPlot(object):
     # plot median/mean line and give it properties
     mean_line: Union[None, VelociraptorLine]
     median_line: Union[None, VelociraptorLine]
+    # Binning for x, y axes.
+    number_of_bins: int
+    x_bins: unyt_array
+    y_bins: unyt_array
 
     def __init__(self, filename: str, data: Dict[str, Union[Dict, str]]):
         """
@@ -52,97 +63,249 @@ class VelociraptorPlot(object):
 
         return
 
-    def _parse_data(self):
+    def _parse_coordinate_quantity(self, coordinate: str) -> None:
         """
-        Parse the data and set defaults if not present.
+        Parses x or y to self.{x,y} and self.{x,y}_units.
         """
-
         try:
-            self.x = self.data["x"]["quantity"]
-            self.x_units = unyt_quantity(1.0, units=self.data["x"]["units"])
+            setattr(self, coordinate, self.data[coordinate]["quantity"])
+            setattr(
+                self,
+                f"{coordinate}_units",
+                unyt_quantity(1.0, units=self.data[coordinate]["units"]),
+            )
         except KeyError:
             raise AutoPlotterError(
-                f"You must provide an x-quantity and units to plot for {self.filename}"
+                f"You must provide an {coordinate}-quantity and units to plot for {self.filename}"
             )
-
-        try:
-            self.y = self.data["y"]["quantity"]
-            self.y_units = unyt_quantity(1.0, units=self.data["y"]["units"])
-        except KeyError:
-            raise AutoPlotterError(
-                f"You must provide an y-quantity and units to plot for {self.filename}"
-            )
-
-        self.x_lim = [None, None]
-
-        try:
-            self.x_lim[0] = unyt_quantity(
-                float(self.data["x"]["start"]), units=self.data["x"]["units"]
-            )
-        except KeyError:
-            pass
-
-        try:
-            self.x_lim[1] = unyt_quantity(
-                float(self.data["x"]["end"]), units=self.data["x"]["units"]
-            )
-        except KeyError:
-            pass
-
-        self.y_lim = [None, None]
-
-        try:
-            self.y_lim[0] = unyt_quantity(
-                float(self.data["y"]["start"]), units=self.data["y"]["units"]
-            )
-        except KeyError:
-            pass
-
-        try:
-            self.y_lim[1] = unyt_quantity(
-                float(self.data["y"]["end"]), units=self.data["y"]["units"]
-            )
-        except KeyError:
-            pass
-
-        try:
-            self.x_log = bool(self.data["x"]["log"])
-        except KeyError:
-            self.x_log = True
-
-        try:
-            self.y_log = bool(self.data["y"]["log"])
-        except KeyError:
-            self.y_log = True
-
-        try:
-            self.x_label_override = self.data["x"]["label_override"]
-        except KeyError:
-            self.x_label_override = None
-
-        try:
-            self.y_label_override = self.data["y"]["label_override"]
-        except KeyError:
-            self.y_label_override = None
-
-        try:
-            self.median_line = VelociraptorLine("median", self.data["median"])
-        except KeyError:
-            self.median_line = None
-
-        try:
-            self.mean_line = VelociraptorLine("mean", self.data["mean"])
-        except KeyError:
-            self.mean_line = None
 
         return
 
-    def make_plot(
-        self, catalogue: VelociraptorCatalogue, directory: str, file_extension: str
-    ):
+    def _set_coordinate_quantity_none(self, coordinate: str) -> None:
         """
-        Creates a plot using the given catalogue and the data that
-        we have available.
+        Sets a coordinates quantity and units to None and (dimensionless)
+        respectively. Useful for e.g. mass functions or histograms.
+        """
+
+        setattr(self, coordinate, None)
+        setattr(self, f"{coordinate}_units", unyt_quantity(1.0, units=None))
+
+        return
+
+    def _parse_coordinate_limit(self, coordinate: str) -> None:
+        """
+        Parses the x or y limit to {x,y}_limit.
+        """
+        setattr(self, f"{coordinate}_lim", [None, None])
+
+        try:
+            getattr(self, f"{coordinate}_lim")[0] = unyt_quantity(
+                float(self.data[coordinate]["start"]),
+                units=self.data[coordinate]["units"],
+            )
+        except KeyError:
+            pass
+
+        try:
+            getattr(self, f"{coordinate}_lim")[1] = unyt_quantity(
+                float(self.data[coordinate]["end"]),
+                units=self.data[coordinate]["units"],
+            )
+        except KeyError:
+            pass
+
+        return
+
+    def _parse_coordinate_log(self, coordinate: str) -> None:
+        """
+        Parses x_log from the parameter file data.
+        """
+
+        try:
+            setattr(self, f"{coordinate}_log", bool(self.data[coordinate]["log"]))
+        except KeyError:
+            setattr(self, f"{coordinate}_log", True)
+
+        return
+
+    def _parse_coordinate_label_override(self, coordinate: str) -> None:
+        """
+        Parses {x,y}_label_override.
+        """
+
+        try:
+            setattr(
+                self,
+                f"{coordinate}_label_override",
+                self.data[coordinate]["label_override"],
+            )
+        except KeyError:
+            setattr(self, f"{coordinate}_label_override", None)
+
+        return
+
+    def _parse_line(self, line_type: str) -> None:
+        """
+        Parses a line type to {line_type}_line.
+        """
+
+        try:
+            setattr(
+                self,
+                f"{line_type}_line",
+                VelociraptorLine(line_type, self.data[line_type]),
+            )
+        except KeyError:
+            setattr(self, f"{line_type}_line", None)
+
+        return
+
+    def _parse_lines(self) -> None:
+        """
+        Parses all lines to VelociraptorLine objects using _parse_line individually.
+        """
+
+        for line_type in valid_line_types:
+            self._parse_line(line_type)
+
+        return
+
+    def _parse_number_of_bins(self) -> None:
+        """
+        Parses the number of bins.
+        """
+
+        try:
+            self.number_of_bins = int(self.data["number_of_bins"])
+        except KeyError:
+            self.number_of_bins = 128
+
+        return
+
+    def _parse_coordinate_histogram_bin(self, coordinate: str) -> None:
+        """
+        Parses the histogram bins for a given histogram axis, given by
+        co-ordinate. Specifically x:start and x:end.
+        """
+
+        start, end = getattr(self, f"{coordinate}_lim")
+
+        if getattr(self, f"{coordinate}_log"):
+            # Need to strip units, unfortunately
+            setattr(
+                self,
+                f"{coordinate}_bins",
+                unyt_array(
+                    logspace(log10(start), log10(end), self.number_of_bins),
+                    units=start.units,
+                ),
+            )
+        else:
+            # Can get away with this one without stripping
+            setattr(
+                self, f"{coordinate}_bins", linspace(start, end, self.number_of_bins)
+            )
+
+        return
+
+    def _parse_scatter(self) -> None:
+        """
+        Parses the required variables for producing a scatter plot.
+        """
+
+        for coordinate in ["x", "y"]:
+            self._parse_coordinate_quantity(coordinate)
+            self._parse_coordinate_log(coordinate)
+            self._parse_coordinate_limit(coordinate)
+            self._parse_coordinate_label_override(coordinate)
+
+        self._parse_lines()
+
+        return
+
+    def _parse_2dhistogram(self) -> None:
+        """
+        Parses the required variables for producing a background
+        2d histogram plot.
+        """
+
+        # Requires everything for the scatter, but with extra tacked
+        # on.
+
+        self._parse_scatter()
+        self._parse_number_of_bins()
+
+        for coordinate in ["x", "y"]:
+            self._parse_coordinate_histogram_bin(coordinate)
+
+        return
+
+    def _parse_massfunction(self) -> None:
+        """
+        Parses the required variables for producing a mass function
+        plot.
+        """
+
+        self._parse_coordinate_quantity("x")
+        self._set_coordinate_quantity_none("y")
+
+        for coordinate in ["x", "y"]:
+            self._parse_coordinate_log(coordinate)
+            self._parse_coordinate_limit(coordinate)
+            self._parse_coordinate_label_override(coordinate)
+
+        self._parse_number_of_bins()
+        self._parse_coordinate_histogram_bin("x")
+
+        return
+
+    def _parse_histogram(self) -> None:
+        """
+        Parses the required variables for producing a 1D histogram plot.
+        """
+
+        # Same as mass function, unsurprisingly!
+        self._parse_massfunction()
+
+        return
+
+    def _parse_data(self):
+        """
+        Federates out data parsing to individual functions based on the
+        plot type.
+        """
+
+        try:
+            self.plot_type = self.data["type"]
+        except KeyError:
+            self.plot_type = "scatter"
+
+        if self.plot_type not in valid_plot_types:
+            raise AutoPlotterError(
+                f"Plot type {self.plot_type} is not valid. Please choose from {valid_plot_types}."
+            )
+
+        getattr(self, f"_parse_{self.plot_type}")()
+
+        return
+
+    def _add_lines_to_axes(self, ax: Axes, x: unyt_array, y: unyt_array) -> None:
+        """
+        Adds any lines present to the given axes.
+        """
+
+        if self.median_line is not None:
+            self.median_line.plot_line(ax=ax, x=x, y=y, label="Median")
+        if self.mean_line is not None:
+            self.mean_line.plot_line(ax=ax, x=x, y=y, label="Mean")
+
+        return
+
+    def _make_plot_scatter(
+        self, catalogue: VelociraptorCatalogue
+    ) -> Tuple[Figure, Axes]:
+        """
+        Makes a scatter plot and returns the figure and axes.
         """
 
         x = reduce(getattr, self.x.split("."), catalogue)
@@ -151,7 +314,6 @@ class VelociraptorPlot(object):
         y.convert_to_units(self.y_units)
 
         fig, ax = plot.scatter_x_against_y(x, y)
-        plot.decorate_axes(ax=ax, catalogue=catalogue)
 
         if self.x_log:
             ax.set_xscale("log")
@@ -161,10 +323,78 @@ class VelociraptorPlot(object):
         ax.set_xlim(*self.x_lim)
         ax.set_ylim(*self.y_lim)
 
-        if self.median_line is not None:
-            self.median_line.plot_line(ax=ax, x=x, y=y, label="Median")
-        if self.mean_line is not None:
-            self.mean_line.plot_line(ax=ax, x=x, y=y, label="Mean")
+        self._add_lines_to_axes(ax=ax, x=x, y=y)
+
+        return fig, ax
+
+    def _make_plot_2dhistogram(
+        self, catalogue: VelociraptorCatalogue
+    ) -> Tuple[Figure, Axes]:
+        """
+        Makes a 2d histogram plot and returns the figure and axes.
+        """
+
+        x = reduce(getattr, self.x.split("."), catalogue)
+        x.convert_to_units(self.x_units)
+        y = reduce(getattr, self.y.split("."), catalogue)
+        y.convert_to_units(self.y_units)
+
+        self.x_bins.convert_to_units(self.x_units)
+        self.y_bins.convert_to_units(self.y_units)
+
+        fig, ax = plot.histogram_x_against_y(x, y, self.x_bins, self.y_bins)
+
+        if self.x_log:
+            ax.set_xscale("log")
+        if self.y_log:
+            ax.set_yscale("log")
+
+        ax.set_xlim(*self.x_lim)
+        ax.set_ylim(*self.y_lim)
+
+        self._add_lines_to_axes(ax=ax, x=x, y=y)
+
+        return fig, ax
+
+    def _make_plot_massfunction(
+        self, catalogue: VelociraptorCatalogue
+    ) -> Tuple[Figure, Axes]:
+        """
+        Makes a mass function plot and returns the figure and axes.
+        """
+
+        x = reduce(getattr, self.x.split("."), catalogue)
+        x.convert_to_units(self.x_units)
+
+        self.x_bins.convert_to_units(self.x_units)
+
+        fig, ax = plot.mass_function(
+            x,
+            self.x_bins,
+            box_volume=catalogue.units.box_volume / (catalogue.units.a ** 3),
+        )
+
+        if self.x_log:
+            ax.set_xscale("log")
+        if self.y_log:
+            ax.set_yscale("log")
+
+        ax.set_xlim(*self.x_lim)
+        ax.set_ylim(*self.y_lim)
+
+        return fig, ax
+
+    def make_plot(
+        self, catalogue: VelociraptorCatalogue, directory: str, file_extension: str
+    ):
+        """
+        Federates out data parsing to individual functions based on the
+        plot type.
+        """
+
+        fig, ax = getattr(self, f"_make_plot_{self.plot_type}")(catalogue=catalogue)
+
+        plot.decorate_axes(ax=ax, catalogue=catalogue)
 
         fig.tight_layout()
         fig.savefig(f"{directory}/{self.filename}.{file_extension}")

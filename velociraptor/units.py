@@ -35,6 +35,8 @@ class VelociraptorUnits(object):
     age: unyt.unyt_quantity
     velocity: unyt.unyt_quantity
     star_formation_rate: unyt.unyt_quantity
+    period: unyt.unyt_quantity
+    box_volume: unyt.unyt_quantity
 
     def __init__(self, filename):
         self.filename = filename
@@ -74,6 +76,9 @@ class VelociraptorUnits(object):
 
             self.cosmological = bool(attributes["Cosmological_Sim"])
             self.comoving = bool(attributes["Comoving_or_Physical"])
+
+            self.period = attributes["Period"] * self.units["length"]
+            self.box_volume = self.period ** 3
 
         # Unpack the dictionary to variables
         for name, unit in self.units.items():
