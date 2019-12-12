@@ -5,6 +5,7 @@ catalogue automatically, through the use of a configuration yaml file.
 """
 
 import argparse as ap
+from typing import Union
 
 parser = ap.ArgumentParser(
     prog="velociraptor-plot",
@@ -57,10 +58,19 @@ parser.add_argument(
     help="Run in debug mode if this flag is present. Default: no.",
 )
 
+parser.add_argument(
+    "-s",
+    "--stylesheet",
+    required=False,
+    default=None,
+    help="Path to the matplotlib stylesheet to apply for the plots. Default: None.",
+)
+
 if __name__ == "__main__":
     # Parse our lovely arguments and pass them to the velociraptor library
     from velociraptor.autoplotter.objects import AutoPlotter
     from velociraptor import load
+    from matplotlib.pyplot import style
 
     args = parser.parse_args()
 
@@ -75,6 +85,10 @@ if __name__ == "__main__":
     print_if_debug("Running in debug mode. Arguments given are:")
     for name, value in dict(vars(args)).items():
         print_if_debug(f"{name}: {value}")
+
+    if args.stylesheet is not None:
+        print_if_debug(f"Applying matplotlib stylesheet at {args.stylesheet}.")
+        style.use(args.stylesheet)
 
     print_if_debug(f"Generating initial AutoPlotter instance for {args.config}.")
     auto_plotter = AutoPlotter(args.config)
