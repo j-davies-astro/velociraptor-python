@@ -39,7 +39,7 @@ def binned_mean_line(
     standard_deviations = []
     centers = []
 
-    for bin in range(len(x_bins) - 1):
+    for bin in range(1, len(x_bins)):
         indicies_in_this_bin = hist == bin
 
         if indicies_in_this_bin.sum() >= minimum_in_bin:
@@ -48,7 +48,7 @@ def binned_mean_line(
             means.append(np.mean(y_values_in_this_bin))
             standard_deviations.append(np.std(y_values_in_this_bin))
 
-            centers.append(0.5 * (x_bins[bin].value + x_bins[bin + 1].value))
+            centers.append(0.5 * (x_bins[bin - 1].value + x_bins[bin].value))
 
     means *= y.units
     standard_deviations *= y.units
@@ -90,7 +90,7 @@ def binned_median_line(
     deviations = []
     centers = []
 
-    for bin in range(len(x_bins) - 1):
+    for bin in range(1, len(x_bins)):
         indicies_in_this_bin = hist == bin
 
         if indicies_in_this_bin.sum() >= minimum_in_bin:
@@ -99,7 +99,7 @@ def binned_median_line(
             medians.append(np.median(y_values_in_this_bin))
             deviations.append(np.percentile(y_values_in_this_bin, percentiles))
 
-            centers.append(0.5 * (x_bins[bin].value + x_bins[bin + 1].value))
+            centers.append(0.5 * (x_bins[bin - 1].value + x_bins[bin].value))
 
     medians *= y.units
     deviations *= y.units
