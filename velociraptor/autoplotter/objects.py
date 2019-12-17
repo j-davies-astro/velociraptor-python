@@ -396,7 +396,6 @@ class VelociraptorPlot(object):
 
         plot.decorate_axes(ax=ax, catalogue=catalogue)
 
-        fig.tight_layout()
         fig.savefig(f"{directory}/{self.filename}.{file_extension}")
 
         return
