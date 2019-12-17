@@ -17,7 +17,7 @@ from os import path, mkdir
 from functools import reduce
 
 valid_plot_types = ["scatter", "2dhistogram", "massfunction"]
-valid_line_types = ["median", "mean"]
+valid_line_types = ["median", "mean", "mass_function"]
 
 
 class VelociraptorPlot(object):
@@ -47,6 +47,7 @@ class VelociraptorPlot(object):
     # plot median/mean line and give it properties
     mean_line: Union[None, VelociraptorLine]
     median_line: Union[None, VelociraptorLine]
+    mass_function_line: Union[None, VelociraptorLine]
     # Binning for x, y axes.
     number_of_bins: int
     x_bins: unyt_array
@@ -244,6 +245,9 @@ class VelociraptorPlot(object):
         """
         Parses the required variables for producing a mass function
         plot.
+
+        TODO: Re-write the mass function in a better way to be the
+        same as other lines.
         """
 
         self._parse_coordinate_quantity("x")
@@ -256,6 +260,20 @@ class VelociraptorPlot(object):
 
         self._parse_number_of_bins()
         self._parse_coordinate_histogram_bin("x")
+
+        # A bit of a hacky workaround - improve this in the future
+        # by combining this functionality properly into the
+        # VelociraptorLine methods.
+        self.mass_function_line = VelociraptorLine(
+            line_type="mass_function",
+            line_data=dict(
+                plot=True,
+                log=self.x_log,
+                number_of_bins=self.number_of_bins,
+                start=dict(value=self.x_lim[0].value, units=self.x_lim[0].units),
+                end=dict(value=self.x_lim[1].value, units=self.x_lim[1].units),
+            ),
+        )
 
         return
 
@@ -368,10 +386,14 @@ class VelociraptorPlot(object):
 
         self.x_bins.convert_to_units(self.x_units)
 
-        fig, ax = plot.mass_function(
-            x,
-            self.x_bins,
+        self.mass_function_line.create_line(
+            x=x,
+            y=None,
             box_volume=catalogue.units.box_volume / (catalogue.units.a ** 3),
+        )
+
+        fig, ax = plot.mass_function(
+            x=x, x_bins=self.x_bins, mass_function=self.mass_function_line
         )
 
         if self.x_log:

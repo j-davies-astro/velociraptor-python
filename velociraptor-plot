@@ -66,10 +66,20 @@ parser.add_argument(
     help="Path to the matplotlib stylesheet to apply for the plots. Default: None.",
 )
 
+parser.add_argument(
+    "-m",
+    "--metadata",
+    required=False,
+    default=None,
+    help="Path to write the metadata to. If not supplied, no metadata is written.",
+)
+
 if __name__ == "__main__":
     # Parse our lovely arguments and pass them to the velociraptor library
     from velociraptor.autoplotter.objects import AutoPlotter
+    from velociraptor.autoplotter.metadata import AutoPlotterMetadata
     from velociraptor import load
+    from matplotlib import __version__
     from matplotlib.pyplot import style
 
     args = parser.parse_args()
@@ -87,6 +97,7 @@ if __name__ == "__main__":
         print_if_debug(f"{name}: {value}")
 
     if args.stylesheet is not None:
+        print_if_debug(f"Matplotlib version: {__version__}.")
         print_if_debug(f"Applying matplotlib stylesheet at {args.stylesheet}.")
         style.use(args.stylesheet)
 
@@ -105,5 +116,11 @@ if __name__ == "__main__":
         auto_plotter.plots = tqdm(auto_plotter.plots, desc="Creating figures")
 
     auto_plotter.create_plots(directory=args.output, file_extension=args.file_type)
+
+    if args.metadata:
+        print_if_debug("Creating AutoPlotterMetadata instance.")
+        auto_plotter_metadata = AutoPlotterMetadata(auto_plotter=auto_plotter)
+        print(f"Creating and writing metadata to {args.metadata}")
+        auto_plotter_metadata.write_metadata(args.metadata)
 
     print_if_debug("Done.")

@@ -56,7 +56,7 @@ def histogram_x_against_y(
 
 
 def mass_function(
-    x: unyt.unyt_array, x_bins: unyt.unyt_array, box_volume: unyt.unyt_quantity
+    x: unyt.unyt_array, x_bins: unyt.unyt_array, mass_function: VelociraptorLine
 ) -> Tuple[plt.Figure, plt.Axes]:
     """
     Creates a plot of x as a mass function, binned with x_bins.
@@ -64,9 +64,7 @@ def mass_function(
 
     fig, ax = plt.subplots()
 
-    centers, mass_function, error = tools.mass_functions.create_mass_function_given_bins(
-        masses=x, bins=x_bins, box_volume=box_volume
-    )
+    centers, mass_function, error = mass_function.output
 
     ax.errorbar(centers, mass_function, error)
 

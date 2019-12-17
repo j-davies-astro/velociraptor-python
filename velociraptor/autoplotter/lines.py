@@ -8,6 +8,7 @@ from typing import Dict, Union, Tuple, List
 from matplotlib.pyplot import Axes
 
 import velociraptor.tools.lines as lines
+from velociraptor.tools.mass_functions import create_mass_function_given_bins
 
 
 class VelociraptorLine(object):
@@ -19,9 +20,10 @@ class VelociraptorLine(object):
     # Forward declarations
     # Actually plot this line?
     plot: bool
-    # Is a median or a mean line?
+    # Is a median, mass function, or a mean line?
     median: bool
     mean: bool
+    mass_function: bool
     # Create bins in logspace?
     log: bool
     # Binning properties
@@ -29,6 +31,8 @@ class VelociraptorLine(object):
     start: unyt_quantity
     end: unyt_quantity
     bins: unyt_array
+    # Output: centers, values, scatter
+    output: Tuple[unyt_array]
 
     def __init__(self, line_type: str, line_data: Dict[str, Union[Dict, str]]):
         """
@@ -50,7 +54,8 @@ class VelociraptorLine(object):
         Parse the line type to a boolean.
         """
 
-        for line_type in ["median", "mean"]:
+        # TODO: Use centralised metadata for this list.
+        for line_type in ["median", "mean", "mass_function"]:
             setattr(self, line_type, self.line_type == line_type)
 
         return
@@ -117,19 +122,31 @@ class VelociraptorLine(object):
 
         return
 
-    def create_line(self, x: unyt_array, y: unyt_array):
+    def create_line(
+        self,
+        x: unyt_array,
+        y: unyt_array,
+        box_volume: Union[None, unyt_quantity] = None,
+    ):
         """
         Creates the line!
         """
 
         self.bins.convert_to_units(x.units)
+        self.output = None
 
         if self.median:
-            return lines.binned_median_line(x=x, y=y, x_bins=self.bins)
+            self.output = lines.binned_median_line(x=x, y=y, x_bins=self.bins)
         elif self.mean:
-            return lines.binned_mean_line(x=x, y=y, x_bins=self.bins)
+            self.output = lines.binned_mean_line(x=x, y=y, x_bins=self.bins)
+        elif self.mass_function:
+            self.output = create_mass_function_given_bins(
+                x, self.bins, box_volume=box_volume
+            )
         else:
-            return None
+            self.output = None
+
+        return self.output
 
     def plot_line(
         self, ax: Axes, x: unyt_array, y: unyt_array, label: Union[str, None] = None
