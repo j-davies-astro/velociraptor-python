@@ -48,7 +48,7 @@ def histogram_x_against_y(
 
     im = ax.pcolormesh(x_bins, y_bins, H.T, norm=LogNorm())
 
-    fig.colorbar(im, ax=ax, label="Number of haloes")
+    fig.colorbar(im, ax=ax, label="Number of haloes", pad=0.0)
 
     set_labels(ax=ax, x=x, y=y)
 
