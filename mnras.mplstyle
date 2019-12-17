@@ -1,5 +1,5 @@
 # Line Properties
-lines.linewidth: 2
+lines.linewidth: 1.5
 
 # Font options
 font.size: 8
@@ -7,7 +7,7 @@ font.family: STIXGeneral
 mathtext.fontset: stix
 
 # Automatically make the plots look nice
-figure.constrained_layout.use: True
+figure.autolayout: True
 
 # LaTeX options
 text.usetex: False

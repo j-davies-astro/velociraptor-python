@@ -1,5 +1,5 @@
 stellar_mass_halo_mass_100:
-  type: "scatter"
+  type: "2dhistogram"
   x:
     quantity: "masses.mass_200crit"
     units: Solar_Mass
@@ -20,51 +20,8 @@ stellar_mass_halo_mass_100:
     end:
       value: 1e14
       units: Solar_Mass
-
-stellar_mass_halo_mass_30: 
-  type: "2dhistogram"
-  x:
-    quantity: "masses.mass_200crit"
-    units: Solar_Mass
-    start: 1e9
-    end: 1e14
-  y:
-    quantity: "apertures.mass_star_30_kpc"
-    units: Solar_Mass
-    start: 1e6
-    end: 1e12
-  median:
-    plot: true
-    log: true
-    number_of_bins: 25
-    start:
-      value: 1e9
-      units: Solar_Mass
-    end:
-      value: 1e14
-      units: Solar_Mass
-
-stellar_mass_halo_mass_50: 
-  x:
-    quantity: "masses.mass_200crit"
-    units: Solar_Mass
-    start: 1e9
-    end: 1e14
-  y:
-    quantity: "apertures.mass_star_50_kpc"
-    units: Solar_Mass
-    start: 1e6
-    end: 1e12
-  median:
-    plot: true
-    log: true
-    number_of_bins: 25
-    start:
-      value: 1e9
-      units: Solar_Mass
-    end:
-      value: 1e14
-      units: Solar_Mass
+  metadata:
+    title: Stellar Mass-Halo Mass relation (100 kpc aperture)
 
 stellar_mass_function:
   type: "massfunction"
@@ -74,8 +31,13 @@ stellar_mass_function:
     units: Solar_Mass
     start: 1e7
     end: 1e12
+  y:
+    units: 1/Mpc**3
+  metadata:
+    title: Stellar Mass Function (100 kpc aperture)
 
 stellar_mass_galaxy_size:
+  type: "2dhistogram"
   x:
     quantity: "apertures.mass_star_100_kpc"
     units: Solar_Mass
@@ -96,3 +58,80 @@ stellar_mass_galaxy_size:
     end:
       value: 1e12
       units: Solar_Mass
+  metadata:
+    title: Stellar Mass-Galaxy Size relation (100 kpc aperture)
+
+stellar_mass_galaxy_size:
+  type: "2dhistogram"
+  x:
+    quantity: "apertures.mass_star_100_kpc"
+    units: Solar_Mass
+    start: 1e6
+    end: 1e12
+  y:
+    quantity: "apertures.rhalfmass_star_100_kpc"
+    units: kpc
+    start: 0.5
+    end: 50
+  median:
+    plot: true
+    log: true
+    number_of_bins: 25
+    start:
+      value: 1e6
+      units: Solar_Mass
+    end:
+      value: 1e12
+      units: Solar_Mass
+  metadata:
+    title: Stellar Mass-Galaxy Size relation (100 kpc aperture)
+
+stellar_mass_stellar_metallicity:
+  type: "2dhistogram"
+  x:
+    quantity: "apertures.mass_star_100_kpc"
+    units: Solar_Mass
+    start: 1e6
+    end: 1e12
+  y:
+    quantity: "apertures.zmet_star_100_kpc"
+    units: ""
+    start: 1e-6
+    end: 1e-1
+  median:
+    plot: true
+    log: true
+    number_of_bins: 25
+    start:
+      value: 1e6
+      units: Solar_Mass
+    end:
+      value: 1e12
+      units: Solar_Mass
+  metadata:
+    title: Stellar Mass-Stellar Metallicity relation (100 kpc aperture)
+
+stellar_mass_gas_metallicity:
+  type: "2dhistogram"
+  x:
+    quantity: "apertures.mass_star_100_kpc"
+    units: Solar_Mass
+    start: 1e6
+    end: 1e12
+  y:
+    quantity: "apertures.zmet_gas_100_kpc"
+    units: ""
+    start: 1e-6
+    end: 1e-1
+  median:
+    plot: true
+    log: true
+    number_of_bins: 25
+    start:
+      value: 1e6
+      units: Solar_Mass
+    end:
+      value: 1e12
+      units: Solar_Mass
+  metadata:
+    title: Stellar Mass-Gas Metallicity relation (100 kpc aperture)

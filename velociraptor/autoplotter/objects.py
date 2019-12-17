@@ -82,6 +82,24 @@ class VelociraptorPlot(object):
 
         return
 
+    def _parse_coordinate_quantity_units(self, coordinate: str) -> None:
+        """
+        Parses x or y to self.{x,y}_units.
+        """
+
+        try:
+            setattr(
+                self,
+                f"{coordinate}_units",
+                unyt_quantity(1.0, units=self.data[coordinate]["units"]),
+            )
+        except KeyError:
+            raise AutoPlotterError(
+                f"You must provide a {coordinate} units to plot for {self.filename}"
+            )
+
+        return
+
     def _set_coordinate_quantity_none(self, coordinate: str) -> None:
         """
         Sets a coordinates quantity and units to None and (dimensionless)
@@ -252,6 +270,7 @@ class VelociraptorPlot(object):
 
         self._parse_coordinate_quantity("x")
         self._set_coordinate_quantity_none("y")
+        self._parse_coordinate_quantity_units("y")
 
         for coordinate in ["x", "y"]:
             self._parse_coordinate_log(coordinate)
@@ -391,6 +410,9 @@ class VelociraptorPlot(object):
             y=None,
             box_volume=catalogue.units.box_volume / (catalogue.units.a ** 3),
         )
+
+        self.mass_function_line.output[1].convert_to_units(self.y_units)
+        self.mass_function_line.output[2].convert_to_units(self.y_units)
 
         fig, ax = plot.mass_function(
             x=x, x_bins=self.x_bins, mass_function=self.mass_function_line
