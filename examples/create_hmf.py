@@ -28,7 +28,7 @@ data = vr.load(sys.argv[1])
 halo_masses = data.masses.mass_200crit
 halo_masses.convert_to_units(unyt.msun)
 
-fig, ax = plt.subplots(constrained_layout=True)
+fig, ax = plt.subplots()
 ax.loglog()
 
 # create_mass_function creates a mass function in the expected way,
@@ -56,4 +56,5 @@ ax.set_xlabel(tools.get_full_label(halo_masses))
 # This nice function allows for you to get a good label for your SMF for free!
 ax.set_ylabel(tools.get_mass_function_label("H", mass_function.units))
 
+fig.tight_layout()
 fig.savefig("halo_mass_function.pdf")
