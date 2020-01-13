@@ -477,7 +477,7 @@ def registration_structure_type(
     Registers the StructureType field.
     """
 
-    if not field_path == "StructureType":
+    if not field_path == "Structuretype":
         raise RegistrationDoesNotMatchError
 
     return unyt.dimensionless, "Structure Type", field_path.lower()

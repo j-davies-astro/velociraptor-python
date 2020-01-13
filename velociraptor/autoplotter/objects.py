@@ -8,7 +8,7 @@ from velociraptor.exceptions import AutoPlotterError
 import velociraptor.autoplotter.plot as plot
 
 from unyt import unyt_quantity, unyt_array
-from numpy import log10, linspace, logspace
+from numpy import log10, linspace, logspace, array
 from matplotlib.pyplot import Axes, Figure
 from yaml import safe_load
 from typing import Union, List, Dict, Tuple
@@ -52,6 +52,9 @@ class VelociraptorPlot(object):
     number_of_bins: int
     x_bins: unyt_array
     y_bins: unyt_array
+    # Select a specific strucutre type?
+    select_structure_type: Union[None, int]
+    structure_mask: Union[None, array]
 
     def __init__(self, filename: str, data: Dict[str, Union[Dict, str]]):
         """
@@ -189,6 +192,22 @@ class VelociraptorPlot(object):
 
         return
 
+    def _parse_structure_type(self) -> None:
+        """
+        Parses the structure type selector to select_structure_type, as well as
+        creating the structure_mask
+        """
+        try:
+            self.select_structure_type = int(self.data["select_structure_type"])
+        except KeyError:
+            self.select_structure_type = None
+
+        # Initialise to None; we set/create this when we first have access to the
+        # catalogue in the plotting functions.
+        self.structure_mask = None
+
+        return
+
     def _parse_number_of_bins(self) -> None:
         """
         Parses the number of bins.
@@ -239,6 +258,7 @@ class VelociraptorPlot(object):
             self._parse_coordinate_label_override(coordinate)
 
         self._parse_lines()
+        self._parse_structure_type()
 
         return
 
@@ -279,6 +299,7 @@ class VelociraptorPlot(object):
 
         self._parse_number_of_bins()
         self._parse_coordinate_histogram_bin("x")
+        self._parse_structure_type()
 
         # A bit of a hacky workaround - improve this in the future
         # by combining this functionality properly into the
@@ -338,6 +359,33 @@ class VelociraptorPlot(object):
 
         return
 
+    def get_quantity_from_catalogue_with_mask(
+        self, quantity: str, catalogue: VelociraptorCatalogue
+    ) -> unyt_array:
+        """
+        Get a quantity from the catalogue using the mask.
+        """
+
+        x = reduce(getattr, quantity.split("."), catalogue)
+        # We give each dataset a custom name, that gets ruined when masking
+        # TODO: Fix this to be something more general.
+        name = x.name
+
+        if self.structure_mask is not None:
+            x = x[self.structure_mask]
+            x.name = name
+        elif self.select_structure_type is not None:
+            print("Creating structure mask for ", self.select_structure_type)
+            # Need to create mask
+            self.structure_mask = (
+                catalogue.structure_type.structuretype == self.select_structure_type
+            )
+
+            x = x[self.structure_mask]
+            x.name = name
+
+        return x
+
     def _make_plot_scatter(
         self, catalogue: VelociraptorCatalogue
     ) -> Tuple[Figure, Axes]:
@@ -345,9 +393,9 @@ class VelociraptorPlot(object):
         Makes a scatter plot and returns the figure and axes.
         """
 
-        x = reduce(getattr, self.x.split("."), catalogue)
+        x = self.get_quantity_from_catalogue_with_mask(self.x, catalogue)
         x.convert_to_units(self.x_units)
-        y = reduce(getattr, self.y.split("."), catalogue)
+        y = self.get_quantity_from_catalogue_with_mask(self.y, catalogue)
         y.convert_to_units(self.y_units)
 
         fig, ax = plot.scatter_x_against_y(x, y)
@@ -371,9 +419,9 @@ class VelociraptorPlot(object):
         Makes a 2d histogram plot and returns the figure and axes.
         """
 
-        x = reduce(getattr, self.x.split("."), catalogue)
+        x = self.get_quantity_from_catalogue_with_mask(self.x, catalogue)
         x.convert_to_units(self.x_units)
-        y = reduce(getattr, self.y.split("."), catalogue)
+        y = self.get_quantity_from_catalogue_with_mask(self.y, catalogue)
         y.convert_to_units(self.y_units)
 
         self.x_bins.convert_to_units(self.x_units)
@@ -400,7 +448,7 @@ class VelociraptorPlot(object):
         Makes a mass function plot and returns the figure and axes.
         """
 
-        x = reduce(getattr, self.x.split("."), catalogue)
+        x = self.get_quantity_from_catalogue_with_mask(self.x, catalogue)
         x.convert_to_units(self.x_units)
 
         self.x_bins.convert_to_units(self.x_units)
