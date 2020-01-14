@@ -5,9 +5,12 @@ Main objects for holding information relating to the autoplotter.
 from velociraptor import VelociraptorCatalogue
 from velociraptor.autoplotter.lines import VelociraptorLine
 from velociraptor.exceptions import AutoPlotterError
+from velociraptor.observations.objects import ObservationalData
+
 import velociraptor.autoplotter.plot as plot
 
 from unyt import unyt_quantity, unyt_array
+from unyt.exceptions import UnitConversionError
 from numpy import log10, linspace, logspace, array
 from matplotlib.pyplot import Axes, Figure
 from yaml import safe_load
@@ -55,6 +58,8 @@ class VelociraptorPlot(object):
     # Select a specific strucutre type?
     select_structure_type: Union[None, int]
     structure_mask: Union[None, array]
+    # Observational data
+    observational_data: List[ObservationalData]
 
     def __init__(self, filename: str, data: Dict[str, Union[Dict, str]]):
         """
@@ -345,6 +350,43 @@ class VelociraptorPlot(object):
 
         getattr(self, f"_parse_{self.plot_type}")()
 
+        self._parse_observational_data()
+
+        return
+
+    def _parse_observational_data(self):
+        """
+        Parses the observational data segment.
+        """
+
+        self.observational_data = []
+
+        try:
+            obs_data = self.data["observational_data"]
+
+            for data in obs_data:
+                if not path.exists(data["filename"]):
+                    raise AutoPlotterError(
+                        f"Unable to find file at {data['filename']}."
+                    )
+                else:
+                    obs_data_instance = ObservationalData()
+                    obs_data_instance.load(data["filename"])
+
+                    try:
+                        obs_data_instance.x.convert_to_units(self.x_units)
+                        obs_data_instance.y.convert_to_units(self.y_units)
+                    except UnitConversionError as e:
+                        raise AutoPlotterError(
+                            f"Unable to convert observational data units for "
+                            f"{data['filename']} in plot {self.filename}. See: {e}."
+                        )
+
+                    self.observational_data.append(obs_data_instance)
+
+        except KeyError:
+            pass
+
         return
 
     def _add_lines_to_axes(self, ax: Axes, x: unyt_array, y: unyt_array) -> None:
@@ -375,7 +417,6 @@ class VelociraptorPlot(object):
             x = x[self.structure_mask]
             x.name = name
         elif self.select_structure_type is not None:
-            print("Creating structure mask for ", self.select_structure_type)
             # Need to create mask
             self.structure_mask = (
                 catalogue.structure_type.structuretype == self.select_structure_type
@@ -486,7 +527,12 @@ class VelociraptorPlot(object):
 
         fig, ax = getattr(self, f"_make_plot_{self.plot_type}")(catalogue=catalogue)
 
+        for data in self.observational_data:
+            data.plot_on_axes(ax, errorbar_kwargs=dict(zorder=-10))
+
         plot.decorate_axes(ax=ax, catalogue=catalogue)
+
+        ax.legend()
 
         fig.savefig(f"{directory}/{self.filename}.{file_extension}")
 
@@ -557,11 +603,14 @@ class AutoPlotter(object):
             mkdir(directory)
 
         for plot in self.plots:
-            plot.make_plot(
-                catalogue=self.catalogue,
-                directory=directory,
-                file_extension=file_extension,
-            )
+            try:
+                plot.make_plot(
+                    catalogue=self.catalogue,
+                    directory=directory,
+                    file_extension=file_extension,
+                )
+            except AttributeError as e:
+                print(f"Unable to create plot {plot.filename} due to exception: {e}.")
 
         return
 
