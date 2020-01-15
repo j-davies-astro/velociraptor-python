@@ -1,11 +1,12 @@
 import setuptools
+from velociraptor import __version__
 
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
     name="velociraptor",
-    version="0.3.0",
+    version=__version__,
     description="Velociraptor catalogue reading routines.",
     url="https://github.com/swiftsim/velociraptor-python",
     author="Josh Borrow",

@@ -15,6 +15,7 @@ except RuntimeError:
     pass
 
 from velociraptor.catalogue.catalogue import VelociraptorCatalogue
+from velociraptor.__version__ import __version__
 
 
 def load(filename):
