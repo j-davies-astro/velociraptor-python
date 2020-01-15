@@ -23,7 +23,7 @@ def scatter_x_against_y(
 
     fig, ax = plt.subplots()
 
-    ax.scatter(x.value, y.value, s=1, edgecolor="none", alpha=0.5)
+    ax.scatter(x.value, y.value, s=1, edgecolor="none", alpha=0.5, zorder=-100)
 
     set_labels(ax=ax, x=x, y=y)
 
@@ -46,7 +46,7 @@ def histogram_x_against_y(
 
     H, x_bins, y_bins = np.histogram2d(x=x, y=y, bins=[x_bins, y_bins])
 
-    im = ax.pcolormesh(x_bins, y_bins, H.T, norm=LogNorm())
+    im = ax.pcolormesh(x_bins, y_bins, H.T, norm=LogNorm(), zorder=-100)
 
     fig.colorbar(im, ax=ax, label="Number of haloes", pad=0.0)
 
