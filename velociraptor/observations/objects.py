@@ -98,8 +98,8 @@ class ObservationalData(object):
 
             self.x_comoving = bool(handle["x"].attrs["comoving"])
             self.y_comoving = bool(handle["y"].attrs["comoving"])
-            self.x_description = bool(handle["x"].attrs["description"])
-            self.y_description = bool(handle["y"].attrs["description"])
+            self.x_description = str(handle["x"].attrs["description"])
+            self.y_description = str(handle["y"].attrs["description"])
 
         return
 
