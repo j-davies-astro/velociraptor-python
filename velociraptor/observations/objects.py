@@ -23,6 +23,23 @@ from typing import Union
 def save_cosmology(handle: h5py.File, cosmology: Cosmology):
     """
     Save the (astropy) cosmology to a HDF5 dataset.
+
+    Parameters
+    ----------
+
+    handle: h5py.File
+        h5py file handle to save the cosmology to. This is performed
+        by creating a cosmology group and setting attributes.
+
+    cosmology: astropy.cosmology.Cosmology
+        The Astropy cosmology instance to save to the HDF5 file. This
+        is performed by extracting all of the key variables and saving
+        them as either floating point numbers or strings.
+
+    Notes
+    -----
+
+    This process can be reversed by using load_cosmology.
     """
     group = handle.create_group("cosmology").attrs
 
@@ -48,6 +65,18 @@ def save_cosmology(handle: h5py.File, cosmology: Cosmology):
 def load_cosmology(handle: h5py.File):
     """
     Save the (astropy) cosmology to a HDF5 dataset.
+
+    Parameters
+    ----------
+
+    handle: h5py.File
+        h5py file handle to read the cosmology from.
+
+    Returns
+    -------
+
+    astropy.cosmology.Cosmology:
+        Astropy cosmology instance extracted from the HDF5 file.
     """
 
     try:
@@ -87,6 +116,77 @@ class ObservationalData(object):
     Observational data object. Contains routines
     for both writing and reading HDF5 files containing
     the observations, as well as plotting.
+
+    Attributes
+    ----------
+    name: str
+        Name of the observation for users to identifty
+
+    x_units: unyt_quantity
+        Units for horizontal axes
+
+    y_units: unyt_quantity
+        Units for vertical axes
+
+    x: unyt_array
+        Horizontal data points
+
+    y: unyt_array
+        Vertical data points
+
+    x_scatter: Union[unyt_array, None]
+        Scatter in horizontal direction. Can be None, or an
+        unyt_array of shape 1XN (symmetric) or 2XN (non-symmetric)
+        such that it can be passed to plt.errorbar easily.
+
+    y_scatter: Union[unyt_array, None]
+        Scatter in vertical direction. Can be None, or an
+        unyt_array of shape 1XN (symmetric) or 2XN (non-symmetric)
+        such that it can be passed to plt.errorbar easily.
+
+    x_comoving: bool
+        Whether or not the horizontal values are comoving (True)
+        or physical (False)
+
+    y_comoving: bool
+        Whether or not the vertical values are comoving (True)
+        or physical (False)
+
+    x_description: str
+        Default label for horizontal axis (without units), also a
+        description of the variable.
+
+    y_description: str
+        Default label for horizontal axis (without units), also a
+        description of the variable.
+
+    filename: str
+        Filename that the data was read from, or was written to.
+
+    comment: str
+        A free-text comment describing the data, including e.g.
+        which cosmology and IMF it is calibrated to.
+
+    citation: str
+        Short citation for data, e.g. Author et al. (Year) (Project),
+        such as Baldry et al. (2012) (GAMA)
+
+    bibcode: str
+        Bibcode for citation, this can be found on the NASA ADS.
+
+    redshift: float
+        Redshift at which the data is collected at. If a range, use
+        the mid-point.
+
+    plot_as: Union[str, None]
+        Whether the data should be plotted as points (typical for observations)
+        or as a line (typical for simulation data). Allowed values:
+
+        + points
+        + line
+
+    cosmology: Cosmology
+        Astropy cosmology that the data has been corrected to.
     """
 
     # Data stored in this object
@@ -132,6 +232,14 @@ class ObservationalData(object):
     def load(self, filename: str):
         """
         Loads the observations from file.
+
+
+        Parameters
+        ----------
+
+        filename: str
+            The filename to load the data from. Probably should end in
+            .hdf5.
         """
 
         self.filename = filename
@@ -178,6 +286,13 @@ class ObservationalData(object):
     def write(self, filename: str):
         """
         Writes the observations to file.
+
+        Parameters
+        ----------
+
+        filename: str
+            The filename to write the data to. Probably should end in
+            .hdf5.
         """
 
         self.filename = filename
@@ -220,6 +335,22 @@ class ObservationalData(object):
     ):
         """
         Associate an x quantity with this observational data instance.
+
+        Parameters
+        ----------
+
+        array: unyt_array
+            The array of (horizontal) data points, including units.
+
+        scatter: Union[unyt_array, None]
+            The array of scatter (1XN or 2XN) in the horizontal
+            co-ordinates with associated units.
+
+        comoving: bool
+            Whether or not the horizontal values are comoving.
+
+        description: str
+            Short description of the data, e.g. Stellar Masses
         """
 
         self.x = array
@@ -243,6 +374,22 @@ class ObservationalData(object):
     ):
         """
         Associate an y quantity with this observational data instance.
+
+        Parameters
+        ----------
+
+        array: unyt_array
+            The array of (vertical) data points, including units.
+
+        scatter: Union[unyt_array, None]
+            The array of scatter (1XN or 2XN) in the vertical
+            co-ordinates with associated units.
+
+        comoving: bool
+            Whether or not the vertical values are comoving.
+
+        description: str
+            Short description of the data, e.g. Stellar Masses
         """
 
         self.y = array
@@ -260,6 +407,17 @@ class ObservationalData(object):
     def associate_citation(self, citation: str, bibcode: str):
         """
         Associate a citation with this observational data instance.
+
+        Parameters
+        ----------
+
+        citation: str
+            Short citation, formatted as follows: Author et al. (Year) (Project),
+            e.g. Baldry et al. (2012) (GAMA)
+
+        bibcode: str
+            Bibcode for the paper the data was extracted from, available
+            from the NASA ADS or publisher. E.g. 2012MNRAS.421..621B
         """
 
         self.citation = citation
@@ -270,6 +428,12 @@ class ObservationalData(object):
     def associate_name(self, name: str):
         """
         Associate a name with this observational data instance.
+        
+        Parameters
+        ----------
+
+        name: str
+            Short name to describe the dataset.
         """
 
         self.name = name
@@ -279,6 +443,13 @@ class ObservationalData(object):
     def associate_comment(self, comment: str):
         """
         Associate a comment with this observational data instance.
+
+        Parameters
+        ----------
+
+        comment: str
+            A free-text comment describing the data, including e.g.
+            which cosmology and IMF it is calibrated to.
         """
 
         self.comment = comment
@@ -289,6 +460,14 @@ class ObservationalData(object):
         """
         Associate the redshift that the observations were taken at
         with this observational data instance.
+
+        Parameters
+        ----------
+
+        redshift: float
+            Redshift at which the data is collected at. If a range, use
+            the mid-point.
+
         """
 
         self.redshift = redshift
@@ -299,6 +478,12 @@ class ObservationalData(object):
         """
         Associate the 'plot_as' field - this should either be line
         or points.
+
+        Parameters
+        ----------
+
+        plot_as: str
+            Either points or line
         """
 
         if plot_as not in ["line", "points"]:
@@ -312,6 +497,13 @@ class ObservationalData(object):
         """
         Associate a cosmology with this dataset that it has been corrected for.
         This should be an astropy cosmology instance.
+
+        Parameters
+        ----------
+
+        cosmology: astropy.cosmology.Cosmology
+            Astropy cosmology instance describing what cosmology the data has
+            been corrected to.
         """
 
         self.cosmology = cosmology
@@ -321,6 +513,18 @@ class ObservationalData(object):
     def plot_on_axes(self, axes: Axes, errorbar_kwargs: Union[dict, None] = None):
         """
         Plot this set of observational data as an errorbar().
+
+        Parameters
+        ----------
+
+        axes: plt.Axes
+            The matplotlib axes to plot the data on. This will either
+            plot the data as a line or a set of errorbar points, with
+            the short citation (self.citation) being included in the
+            legend automatically.
+
+        errorbar_kwargs: dict
+            Optional keyword arguments to pass to plt.errorbar.
         """
 
         # Do this because dictionaries are mutable

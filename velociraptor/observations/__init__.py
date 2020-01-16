@@ -12,6 +12,21 @@ def load_observation(filename: str):
     """
     Load an observation from file filename. This should be in the
     standard velociraptor format.
+
+    Parameters
+    ----------
+
+    filename: str
+        Filename of the observational dataset that you wish to load.
+        Should probably end in .hdf5. See the documentation for
+        :class:`velociraptor.observations.objects.ObservationalData`
+        for more information.
+
+    Returns
+    -------
+
+    velociraptor.observations.objects.ObservationalData:
+        Observational data instance read from file.
     """
 
     data = ObservationalData()
