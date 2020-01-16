@@ -13,7 +13,7 @@ Dealing with this observational data is usually a mess of scattered
 metadata to be created, and for easily usable files containing this
 observational data to be saved to disk and recovered for future use.
 The overarching abstraction here is a python object (of type
-:cls:`velociraptor.observations.ObservationalData`) that can be
+:class:`velociraptor.observations.objects.ObservationalData`) that can be
 written to or read from file with HDF5 as the backing format.
 
 This data can also be used with the :mod:`velociraptor.autoplotter`

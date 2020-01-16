@@ -23,6 +23,7 @@ publication-ready and quick figures.
    particles_files/index
    plotting_tools/index
    observational_data/index
+   auto_plotter/index
    modules/index
 
 
