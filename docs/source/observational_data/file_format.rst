@@ -19,6 +19,17 @@ The required fields in a file are given here:
 .. code-block:: bash
 
 	file_name.hdf5
+	├cosmology
+	│ └9 attributes:
+	│   ├H0: H0 in km/s/Mpc
+	│   ├Neff: Effective number of neutrino species
+	│   ├Ob0: Omega baryons: density of baryonic matter in units of the critical density at z=0.
+	│   ├Ode0: Omega dark energy: density of dark energy in units of the critical density at z=0.
+	│   ├Om0: Omega matter: density of matter in units of the critical density at z=0.
+	│   ├Tcmb0: CMB temperature at z=0
+	│   ├m_nu: Masses of neutrino species (size 3)
+	│   ├m_nu_units: Neutrino mass units
+	│   └name: Name of this cosmology (e.g. WMAP7)
 	├metadata
 	│ └6 attributes:
 	│   ├bibcode: 'Bibcode - available from e.g. ADS'
