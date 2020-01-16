@@ -5,45 +5,49 @@ reading from a yaml file.
 
 This yaml file has the following format:
 
-output_filename: 
-    params:
-        type: scatter / histogram / 2dhistogram / massfunction
-        number_of_bins: 128
-        #TODO:
-        norm: log
-    x:
-        quantity: "quantity.name"
-        units: Solar_Mass
-        log: true
-        label_override: "string"
-        # if hist or massfunc, in units
-        start_bin: 0
-        end_bin: 1e10
-    y:  quantity: "quantity.name"
-        units: Solar_Mass
-        log: true
-        label_override: "string"
-        # if hist
-        start_bin: 0
-        end_bin: 1e10
-    median:
-        plot: true
-        log: true
-        number_of_bins: 10
-        start:
-            value: 1e10
-            units: Solar_Mass
-        end:
-            value: 1e12
-            units: Solar_Mass
-    mean:
-        plot: false
-        log: true
-        number_of_bins: 10
-        start:
-            value: 1e10
-            units: Solar_Mass
-        end:
-            value: 1e12
-            units: Solar_Mass
+.. code-block:: yaml
+
+   output_filename:
+     # Global plot quantities
+     type: scatter / histogram / 2dhistogram / massfunction
+     select_structure_type: number of substructure to select (e.g. 10 is centrals)
+     number_of_bins: number of bins in the (background) histogram or massfunc
+     # Horizontal quantity
+     x:
+       quantity: "quantity.name" (e.g. masses.mass_200crit)
+       units: units to plot in (e.g. Solar_Mass)
+       start: horizontal axis start (in units above)
+       end: horizontal axis to end (in units above)
+       log: true/false (true by default), do you want a log axis?
+       label_override: override the label with your own choice
+       # if hist or massfunc, in units above
+       start_bin: number to start binning at (default is start)
+       end_bin: number to end binning at (default is end)
+     # Vertical quantity - only need units for massfunction
+     y:
+       quantity: "quantity.name" (e.g. masses.mass_200crit)
+       units: units to plot in (e.g. Solar_Mass)
+       start: vertical axis start (in units above)
+       end: vertical axis to end (in units above)
+       log: true/false (true by default), do you want a log axis?
+       label_override: override the label with your own choice
+     # Lines that you can plot on top - line_type can be median or mean
+     line_type: 
+       plot: true/false (true by default) actually plot this?
+       log: true/false (true by default) use log bins?
+       number_of_bins: number of bins for median line, different from number_of_bins above
+       start: value to start binning at
+         value: start value
+         units: start value units
+       end:
+         value: end value
+         units: end value units
+     # Generic metadata for plot
+     metadata:
+       title: title for the plot, should you want one
+     # Comparison data to plot on top
+     observational_data:
+       - filename: filename of data to plot on this plot (use ObservationalData written to disk)
+       - filename: second filename for observational data
+       - filename: ... you can plot as many of these as you'd like
 """
