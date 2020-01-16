@@ -49,7 +49,11 @@ def load_cosmology(handle: h5py.File):
     """
     Save the (astropy) cosmology to a HDF5 dataset.
     """
-    group = handle["cosmology"].attrs
+
+    try:
+        group = handle["cosmology"].attrs
+    except:
+        return None
 
     try:
         cosmology = wCDM(
