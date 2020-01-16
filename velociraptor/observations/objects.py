@@ -9,9 +9,73 @@ and reading files.
 
 from unyt import unyt_quantity, unyt_array
 from matplotlib.pyplot import Axes
+
+from astropy.units import Quantity
+from astropy.cosmology.core import Cosmology
+from astropy.cosmology import wCDM, FlatLambdaCDM
+
 import h5py
+import json
 
 from typing import Union
+
+
+def save_cosmology(handle: h5py.File, cosmology: Cosmology):
+    """
+    Save the (astropy) cosmology to a HDF5 dataset.
+    """
+    group = handle.create_group("cosmology").attrs
+
+    group.create("H0", cosmology.H0)
+    group.create("Om0", cosmology.Om0)
+    group.create("Ode0", cosmology.Ode0)
+    group.create("Tcmb0", cosmology.Tcmb0)
+    group.create("Neff", cosmology.Neff)
+    group.create("m_nu", cosmology.m_nu)
+    group.create("m_nu_units", str(cosmology.m_nu.unit))
+    group.create("Ob0", cosmology.Ob0)
+    group.create("name", cosmology.name)
+
+    try:
+        group.create("w0", cosmology.w0)
+    except:
+        # No EoS!
+        pass
+
+    return
+
+
+def load_cosmology(handle: h5py.File):
+    """
+    Save the (astropy) cosmology to a HDF5 dataset.
+    """
+    group = handle["cosmology"].attrs
+
+    try:
+        cosmology = wCDM(
+            H0=group["H0"],
+            Om0=group["Om0"],
+            Ode0=group["Ode0"],
+            w0=group["w0"],
+            Tcmb0=group["Tcmb0"],
+            Neff=group["Neff"],
+            m_nu=Quantity(group["m_nu"], unit=group["m_nu_units"]),
+            Ob0=group["Ob0"],
+            name=group["name"],
+        )
+    except KeyError:
+        # No EoS
+        cosmology = FlatLambdaCDM(
+            H0=group["H0"],
+            Om0=group["Om0"],
+            Tcmb0=group["Tcmb0"],
+            Neff=group["Neff"],
+            m_nu=Quantity(group["m_nu"], unit=group["m_nu_units"]),
+            Ob0=group["Ob0"],
+            name=group["name"],
+        )
+
+    return cosmology
 
 
 class ObservationalData(object):
@@ -50,6 +114,8 @@ class ObservationalData(object):
     redshift: float
     # plot as points, or a line?
     plot_as: Union[str, None] = None
+    # the cosmology that this dataset was corrected to
+    cosmology: Cosmology
 
     def __init__(self):
         """
@@ -98,8 +164,10 @@ class ObservationalData(object):
 
             self.x_comoving = bool(handle["x"].attrs["comoving"])
             self.y_comoving = bool(handle["y"].attrs["comoving"])
-            self.x_description = str(handle["x"].attrs["description"])
             self.y_description = str(handle["y"].attrs["description"])
+            self.x_description = str(handle["x"].attrs["description"])
+
+            self.cosmology = load_cosmology(handle)
 
         return
 
@@ -134,6 +202,8 @@ class ObservationalData(object):
             handle["y"].attrs.create("comoving", self.y_comoving)
             handle["x"].attrs.create("description", self.x_description)
             handle["y"].attrs.create("description", self.y_description)
+
+            save_cosmology(handle=handle, cosmology=self.cosmology)
 
         return
 
@@ -234,6 +304,16 @@ class ObservationalData(object):
 
         return
 
+    def associate_cosmology(self, cosmology: Cosmology):
+        """
+        Associate a cosmology with this dataset that it has been corrected for.
+        This should be an astropy cosmology instance.
+        """
+
+        self.cosmology = cosmology
+
+        return
+
     def plot_on_axes(self, axes: Axes, errorbar_kwargs: Union[dict, None] = None):
         """
         Plot this set of observational data as an errorbar().
@@ -244,6 +324,13 @@ class ObservationalData(object):
             kwargs = errorbar_kwargs
         else:
             kwargs = {}
+
+        # Ensure correct units throughout, in case somebody chagned them
+        if self.x_scatter is not None:
+            self.x_scatter.convert_to_units(self.x.units)
+
+        if self.y_scatter is not None:
+            self.y_scatter.convert_to_units(self.y.units)
 
         if self.plot_as == "points":
             kwargs["linestyle"] = "none"
