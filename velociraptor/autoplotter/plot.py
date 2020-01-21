@@ -79,12 +79,14 @@ def mass_function(
 
 
 def decorate_axes(
-    ax: plt.Axes, catalogue: VelociraptorCatalogue, loc: str = "bottom right"
+    ax: plt.Axes, catalogue: VelociraptorCatalogue, loc: str = "top left"
 ) -> None:
     """
     Decorates the axes with information about the redshift and
     scale-factor.
     """
+
+    legend = ax.legend()
 
     # First need to parse the 'loc' string
     va, ha = loc.split(" ")

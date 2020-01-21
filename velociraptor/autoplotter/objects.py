@@ -532,8 +532,6 @@ class VelociraptorPlot(object):
 
         plot.decorate_axes(ax=ax, catalogue=catalogue)
 
-        ax.legend()
-
         fig.savefig(f"{directory}/{self.filename}.{file_extension}")
 
         return

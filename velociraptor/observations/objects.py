@@ -8,7 +8,9 @@ and reading files.
 """
 
 from unyt import unyt_quantity, unyt_array
+from numpy import tanh, log10
 from matplotlib.pyplot import Axes
+from matplotlib import rcParams
 
 from astropy.units import Quantity
 from astropy.cosmology.core import Cosmology
@@ -18,6 +20,10 @@ import h5py
 import json
 
 from typing import Union
+
+# Default z_orders for errorbar points and lines
+line_zorder = -5
+points_zorder = -6
 
 
 def save_cosmology(handle: h5py.File, cosmology: Cosmology):
@@ -543,6 +549,22 @@ class ObservationalData(object):
         if self.plot_as == "points":
             kwargs["linestyle"] = "none"
             kwargs["marker"] = "."
+            kwargs["zorder"] = points_zorder
+
+            # Need to "intelligently" size the markers
+            kwargs["markersize"] = (
+                rcParams["lines.markersize"]
+                * (1.5 - tanh(2.0 * log10(len(self.x)) - 4.0))
+                / 2.5
+            )
+
+            kwargs["alpha"] = (3.0 - tanh(2.0 * log10(len(self.x)) - 4.0)) / 4.0
+            kwargs["markeredgecolor"] = "none"
+
+            if len(self.x) > 1000:
+                kwargs["rasterize"] = True
+        elif self.plot_as == "line":
+            kwargs["zorder"] = line_zorder
 
         axes.errorbar(
             self.x,
