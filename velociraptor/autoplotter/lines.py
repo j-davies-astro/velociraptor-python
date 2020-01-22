@@ -3,7 +3,7 @@ Objects for handling and plotting mean and median lines.
 """
 
 from unyt import unyt_quantity, unyt_array
-from numpy import logspace, linspace, log10
+from numpy import logspace, linspace, log10, logical_and
 from typing import Dict, Union, Tuple, List
 from matplotlib.pyplot import Axes
 
@@ -127,21 +127,60 @@ class VelociraptorLine(object):
         x: unyt_array,
         y: unyt_array,
         box_volume: Union[None, unyt_quantity] = None,
+        y_limit: Union[None, List[unyt_quantity]] = None,
     ):
         """
         Creates the line!
+
+        Parameters
+        ----------
+
+        x: unyt_array
+            Horizontal axis data
+        
+        y: unyt_array
+            Vertical axis data
+
+        box_volume: Union[None, unyt_quantity]
+            Box volume for the simulation, required for mass functions. Should
+            have associated volume units.
+
+        y_limit: Union[None, List[unyt_quantity]], optional
+            List of two unyt quantities. If this is provided, we restrict the
+            line binning between these values. Useful if you want to e.g.
+            not include zero values within the median line binning.
+
+        Returns
+        -------
+
+        output: Tuple[unyt_array]
+            A three-length tuple of unyt arrays that takes the following form:
+            (bin centers, vertical values, vertical scatter).
+
         """
 
         self.bins.convert_to_units(x.units)
         self.output = None
 
+        if y_limit is not None:
+            mask = logical_and(y > y_limit[0], y < y_limit[1])
+            masked_x = x[mask]
+            masked_y = y[mask]
+        else:
+            masked_x = x
+            masked_y = y
+
         if self.median:
-            self.output = lines.binned_median_line(x=x, y=y, x_bins=self.bins)
+            self.output = lines.binned_median_line(
+                x=masked_x, y=masked_y, x_bins=self.bins
+            )
         elif self.mean:
-            self.output = lines.binned_mean_line(x=x, y=y, x_bins=self.bins)
+            self.output = lines.binned_mean_line(
+                x=masked_x, y=masked_y, x_bins=self.bins
+            )
         elif self.mass_function:
             self.output = create_mass_function_given_bins(
-                x, self.bins, box_volume=box_volume
+                masked_x, self.bins, box_volume=box_volume
             )
         else:
             self.output = None
@@ -149,16 +188,42 @@ class VelociraptorLine(object):
         return self.output
 
     def plot_line(
-        self, ax: Axes, x: unyt_array, y: unyt_array, label: Union[str, None] = None
+        self,
+        ax: Axes,
+        x: unyt_array,
+        y: unyt_array,
+        label: Union[str, None] = None,
+        y_limit: Union[None, List[unyt_quantity]] = None,
     ):
         """
         Plot a line using these parameters on some axes, x against y.
+
+        Parameters
+        ----------
+
+        ax: Axes
+            Matplotlib axes to plot on.
+
+        x: unyt_array
+            Horizontal axis data
+        
+        y: unyt_array
+            Vertical axis data
+
+        label: str
+            Label associated with this data that will be included in the
+            legend.
+
+        y_limit: Union[None, List[unyt_quantity]], optional
+            List of two unyt quantities. If this is provided, we restrict the
+            line binning between these values. Useful if you want to e.g.
+            not include zero values within the median line binning.
         """
 
         if not self.plot:
             return
 
-        centers, heights, errors = self.create_line(x=x, y=y)
+        centers, heights, errors = self.create_line(x=x, y=y, y_limit=y_limit)
 
         ax.errorbar(centers, heights, yerr=errors, label=label)
 
