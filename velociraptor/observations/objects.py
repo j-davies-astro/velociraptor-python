@@ -559,7 +559,10 @@ class ObservationalData(object):
             )
 
             kwargs["alpha"] = (3.0 - tanh(2.0 * log10(len(self.x)) - 4.0)) / 4.0
-            kwargs["markeredgecolor"] = "none"
+
+            # Looks weird if errorbars are present
+            if self.y_scatter is None:
+                kwargs["markerfacecolor"] = "none"
 
             if len(self.x) > 1000:
                 kwargs["rasterize"] = True
