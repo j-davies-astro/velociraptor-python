@@ -90,7 +90,7 @@ class VelociraptorUnits(object):
             )
             star_formation_units = (
                 self.units["velocity"] * self.units["mass"] / self.units["length"]
-            ).convert_to_units("Solar_Mass / Year")
+            ).to("Solar_Mass / Year")
 
             if not self.disregard_units:
                 # Extract units that may not be present in the file
@@ -136,6 +136,8 @@ class VelociraptorUnits(object):
             )
             self.comoving_box_volume = self.period ** 3
             self.physical_box_volume = self.box_length ** 3
+
+        print(self.units)
 
         # Unpack the dictionary to variables
         for name, unit in self.units.items():
