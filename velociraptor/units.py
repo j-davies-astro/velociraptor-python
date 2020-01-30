@@ -137,8 +137,6 @@ class VelociraptorUnits(object):
             self.comoving_box_volume = self.period ** 3
             self.physical_box_volume = self.box_length ** 3
 
-        print(self.units)
-
         # Unpack the dictionary to variables
         for name, unit in self.units.items():
             setattr(self, name, unit)
