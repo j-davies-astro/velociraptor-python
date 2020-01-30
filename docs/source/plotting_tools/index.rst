@@ -86,7 +86,7 @@ your own mass bins, you can use the alternative
 
    data = load("...properties")
    masses = data.masses.mass_200mean
-   box_volume = data.units.box_volume / (data.units.a**3)
+   box_volume = data.units.comoving_box_volume
 
    centers, mf, scatter = create_mass_function(
       masses=masses,

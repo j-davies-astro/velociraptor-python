@@ -59,15 +59,34 @@ class VelociraptorUnits(object):
             attributes = handle.attrs
 
             self.units["length"] = attributes["Length_unit_to_kpc"] * unyt.kpc
-            self.units["mass"] = attributes["Mass_unit_to_solarmass"] * unyt.msun
-            self.units["metallicity"] = (
-                attributes["Metallicity_unit_to_solar"] * unyt.dimensionless
-            )
-            self.units["age"] = attributes["Stellar_age_unit_to_yr"] * unyt.year
+            self.units["mass"] = attributes["Mass_unit_to_solarmass"] * unyt.Solar_Mass
             self.units["velocity"] = attributes["Velocity_to_kms"] * unyt.km / unyt.s
-            self.units["star_formation_rate"] = (
-                attributes["SFR_unit_to_solarmassperyear"] * unyt.msun / unyt.year
-            )
+
+            # Extract units that may not be present in the file
+            try:
+                metallicity_units = (
+                    attributes["Metallicity_unit_to_solar"] * unyt.dimensionless
+                )
+            except (AttributeError, KeyError):
+                metallicity_units = unyt.dimensionless
+
+            try:
+                stellar_age_units = attributes["Stellar_age_unit_to_yr"] * unyt.year
+            except (AttributeError, KeyError):
+                stellar_age_units = unyt.year
+
+            try:
+                star_formation_units = (
+                    attributes["SFR_unit_to_solarmassperyear"]
+                    * unyt.Solar_Mass
+                    / unyt.year
+                )
+            except (AttributeError, KeyError):
+                star_formation_units = unyt.Solar_Mass / unyt.year
+
+            self.units["metallicity"] = metallicity_units
+            self.units["age"] = stellar_age_units
+            self.units["star_formation_rate"] = star_formation_units
 
             self.scale_factor = attributes["Time"]
             self.a = self.scale_factor
@@ -77,8 +96,15 @@ class VelociraptorUnits(object):
             self.cosmological = bool(attributes["Cosmological_Sim"])
             self.comoving = bool(attributes["Comoving_or_Physical"])
 
-            self.period = attributes["Period"] * self.units["length"]
-            self.box_volume = self.period ** 3
+            # Period is comoving.
+            self.period = unyt.unyt_quantity(
+                attributes["Period"], units=self.units["length"]
+            )
+            self.box_length = unyt.unyt_quantity(
+                attributes["Period"] / self.a, units=self.units["length"]
+            )
+            self.comoving_box_volume = self.period ** 3
+            self.physical_box_volume = self.box_length ** 3
 
         # Unpack the dictionary to variables
         for name, unit in self.units.items():
