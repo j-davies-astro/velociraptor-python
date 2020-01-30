@@ -30,6 +30,8 @@ class VelociraptorLine(object):
     number_of_bins: int
     start: unyt_quantity
     end: unyt_quantity
+    lower: unyt_quantity
+    upper: unyt_quantity
     bins: unyt_array
     show_scatter: bool
     # Output: centers, values, scatter
@@ -100,6 +102,20 @@ class VelociraptorLine(object):
             self.end = unyt_quantity(0.0)
 
         try:
+            self.lower = unyt_quantity(
+                float(self.data["lower"]["value"]), units=self.data["lower"]["units"]
+            )
+        except KeyError:
+            self.lower = None
+
+        try:
+            self.upper = unyt_quantity(
+                float(self.data["upper"]["value"]), units=self.data["upper"]["units"]
+            )
+        except KeyError:
+            self.upper = None
+
+        try:
             self.show_scatter = bool(self.data["show_scatter"])
         except KeyError:
             self.show_scatter = True
@@ -133,7 +149,6 @@ class VelociraptorLine(object):
         x: unyt_array,
         y: unyt_array,
         box_volume: Union[None, unyt_quantity] = None,
-        y_limit: Union[None, List[unyt_quantity]] = None,
     ):
         """
         Creates the line!
@@ -152,11 +167,6 @@ class VelociraptorLine(object):
             have associated volume units. Generally this is given as a comoving
             quantity.
 
-        y_limit: Union[None, List[unyt_quantity]], optional
-            List of two unyt quantities. If this is provided, we restrict the
-            line binning between these values. Useful if you want to e.g.
-            not include zero values within the median line binning.
-
         Returns
         -------
 
@@ -169,13 +179,20 @@ class VelociraptorLine(object):
         self.bins.convert_to_units(x.units)
         self.output = None
 
-        if y_limit is not None:
-            mask = logical_and(y > y_limit[0], y < y_limit[1])
-            masked_x = x[mask]
-            masked_y = y[mask]
-        else:
-            masked_x = x
-            masked_y = y
+        masked_x = x
+        masked_y = y
+
+        if self.lower is not None:
+            self.lower.convert_to_units(y.units)
+            mask = masked_y > self.lower
+            masked_x = masked_x[mask]
+            masked_y = masked_y[mask]
+
+        if self.upper is not None:
+            self.upper.convert_to_units(y.units)
+            mask = masked_y < self.upper
+            masked_x = masked_x[mask]
+            masked_y = masked_y[mask]
 
         if self.median:
             self.output = lines.binned_median_line(
@@ -195,12 +212,7 @@ class VelociraptorLine(object):
         return self.output
 
     def plot_line(
-        self,
-        ax: Axes,
-        x: unyt_array,
-        y: unyt_array,
-        label: Union[str, None] = None,
-        y_limit: Union[None, List[unyt_quantity]] = None,
+        self, ax: Axes, x: unyt_array, y: unyt_array, label: Union[str, None] = None
     ):
         """
         Plot a line using these parameters on some axes, x against y.
@@ -221,12 +233,6 @@ class VelociraptorLine(object):
             Label associated with this data that will be included in the
             legend.
 
-        y_limit: Union[None, List[unyt_quantity]], optional
-            List of two unyt quantities. If this is provided, we restrict the
-            line binning between these values. Useful if you want to e.g.
-            not include zero values within the median line binning.
-
-
         Notes
         -----
 
@@ -237,7 +243,7 @@ class VelociraptorLine(object):
         if not self.plot:
             return
 
-        centers, heights, errors = self.create_line(x=x, y=y, y_limit=y_limit)
+        centers, heights, errors = self.create_line(x=x, y=y)
 
         errors = errors if self.show_scatter else None
 

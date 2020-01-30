@@ -43,6 +43,13 @@ This yaml file has the following format:
        end:
          value: end value
          units: end value units
+       # Restriction of binning vertically
+       lower:
+         value: lower value for median/mean line
+         units: lower value units
+       upper:
+         value: upper value for median/mean line
+         units: upper value units
      # Generic metadata for plot
      metadata:
        title: title for the plot, should you want one
