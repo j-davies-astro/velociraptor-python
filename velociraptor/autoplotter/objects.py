@@ -395,11 +395,9 @@ class VelociraptorPlot(object):
         """
 
         if self.median_line is not None:
-            self.median_line.plot_line(
-                ax=ax, x=x, y=y, label="Median", y_limit=self.y_lim
-            )
+            self.median_line.plot_line(ax=ax, x=x, y=y, label="Median")
         if self.mean_line is not None:
-            self.mean_line.plot_line(ax=ax, x=x, y=y, label="Mean", y_limit=self.y_lim)
+            self.mean_line.plot_line(ax=ax, x=x, y=y, label="Mean")
 
         return
 
@@ -412,7 +410,7 @@ class VelociraptorPlot(object):
 
         x = reduce(getattr, quantity.split("."), catalogue)
         # We give each dataset a custom name, that gets ruined when masking
-        # TODO: Fix this to be something more general.
+        # in versions of unyt less than 2.6.0
         name = x.name
 
         if self.structure_mask is not None:
@@ -497,9 +495,7 @@ class VelociraptorPlot(object):
         self.x_bins.convert_to_units(self.x_units)
 
         self.mass_function_line.create_line(
-            x=x,
-            y=None,
-            box_volume=catalogue.units.box_volume / (catalogue.units.a ** 3),
+            x=x, y=None, box_volume=catalogue.units.comoving_box_volume
         )
 
         self.mass_function_line.output[1].convert_to_units(self.y_units)

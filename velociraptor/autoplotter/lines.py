@@ -31,6 +31,7 @@ class VelociraptorLine(object):
     start: unyt_quantity
     end: unyt_quantity
     bins: unyt_array
+    show_scatter: bool
     # Output: centers, values, scatter
     output: Tuple[unyt_array]
 
@@ -98,6 +99,11 @@ class VelociraptorLine(object):
         except KeyError:
             self.end = unyt_quantity(0.0)
 
+        try:
+            self.show_scatter = bool(self.data["show_scatter"])
+        except KeyError:
+            self.show_scatter = True
+
         return
 
     def generate_bins(self):
@@ -143,7 +149,8 @@ class VelociraptorLine(object):
 
         box_volume: Union[None, unyt_quantity]
             Box volume for the simulation, required for mass functions. Should
-            have associated volume units.
+            have associated volume units. Generally this is given as a comoving
+            quantity.
 
         y_limit: Union[None, List[unyt_quantity]], optional
             List of two unyt quantities. If this is provided, we restrict the
@@ -218,12 +225,21 @@ class VelociraptorLine(object):
             List of two unyt quantities. If this is provided, we restrict the
             line binning between these values. Useful if you want to e.g.
             not include zero values within the median line binning.
+
+
+        Notes
+        -----
+
+        If self.show_scatter is set to false, this is plotted assuming the scatter
+        is zero.
         """
 
         if not self.plot:
             return
 
         centers, heights, errors = self.create_line(x=x, y=y, y_limit=y_limit)
+
+        errors = errors if self.show_scatter else None
 
         ax.errorbar(centers, heights, yerr=errors, label=label)
 

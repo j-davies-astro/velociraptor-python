@@ -35,6 +35,7 @@ This yaml file has the following format:
      line_type: 
        plot: true/false (true by default) actually plot this?
        log: true/false (true by default) use log bins?
+       show_scatter: true/false (true by default) show scatter, or just plot line?
        number_of_bins: number of bins for median line, different from number_of_bins above
        start: value to start binning at
          value: start value

@@ -12,6 +12,7 @@ import numpy as np
 from typing import Union, Callable, List, Dict
 
 from velociraptor.units import VelociraptorUnits
+from velociraptor.catalogue.derived import DerivedQuantities
 from velociraptor.catalogue.registration import global_registration_functions
 from velociraptor.exceptions import RegistrationDoesNotMatchError
 
@@ -362,3 +363,24 @@ class VelociraptorCatalogue(object):
             )
 
         return
+
+    def register_derived_quantities(self, registration_file_path: str) -> None:
+        """
+        Register any required derived quantities. These will
+        be available through `catalogue.derived_quantities.{your_names}`.
+
+        For more information on this feature, see the documentation of
+        :class:`velociraptor.catalogue.derived.DerivedQuantities`.
+
+        Parameters
+        ----------
+
+        registration_file_path: str
+            Path to the python source file that contains the code to
+            register the additional derived quantities.
+        """
+
+        self.derived_quantities = DerivedQuantities(registration_file_path, self)
+
+        return
+

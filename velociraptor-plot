@@ -74,6 +74,14 @@ parser.add_argument(
     help="Path to write the metadata to. If not supplied, no metadata is written.",
 )
 
+parser.add_argument(
+    "-r",
+    "--registration",
+    required=False,
+    default=None,
+    help="Path to python script file containing code to register derived quantities. Optional.",
+)
+
 if __name__ == "__main__":
     # Parse our lovely arguments and pass them to the velociraptor library
     from velociraptor.autoplotter.objects import AutoPlotter
@@ -104,7 +112,9 @@ if __name__ == "__main__":
     print_if_debug(f"Generating initial AutoPlotter instance for {args.config}.")
     auto_plotter = AutoPlotter(args.config)
     print_if_debug(f"Loading halo catalogue at {args.properties}.")
-    catalogue = load(args.properties)
+    if args.registration is not None:
+        print_if_debug(f"Using registration functions contained in {args.registration}.")
+    catalogue = load(args.properties, registration_file_path=args.registration)
     print_if_debug(f"Linking catalogue and AutoPlotter instance.")
     auto_plotter.link_catalogue(catalogue=catalogue)
 
