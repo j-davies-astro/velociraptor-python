@@ -79,8 +79,27 @@ parser.add_argument(
     "--registration",
     required=False,
     default=None,
-    help="Path to python script file containing code to register derived quantities. Optional.",
+    help=(
+        "Path to python script file containing code to "
+        "register derived quantities. Optional."
+    ),
 )
+
+# If this is truthy we "disregard_units", i.e. by default we
+# ignore the extra metadata present in the velociraptor catalogues.
+parser.add_argument(
+    "-u",
+    "--units",
+    required=False,
+    default=True,
+    action="store_false",
+    help=(
+        "If present, use all unit information in the file. "
+        "If not, the code converts everything from base units. "
+        "Default: use base units."
+    ),
+)
+
 
 if __name__ == "__main__":
     # Parse our lovely arguments and pass them to the velociraptor library
@@ -114,7 +133,11 @@ if __name__ == "__main__":
     print_if_debug(f"Loading halo catalogue at {args.properties}.")
     if args.registration is not None:
         print_if_debug(f"Using registration functions contained in {args.registration}.")
-    catalogue = load(args.properties, registration_file_path=args.registration)
+    catalogue = load(
+        args.properties,
+        disregard_units=args.units,
+        registration_file_path=args.registration
+    )
     print_if_debug(f"Linking catalogue and AutoPlotter instance.")
     auto_plotter.link_catalogue(catalogue=catalogue)
 

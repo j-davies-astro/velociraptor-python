@@ -239,7 +239,8 @@ class VelociraptorCatalogue(object):
 
     def __init__(
         self,
-        filename,
+        filename: str,
+        disregard_units: bool = False,
         extra_registration_functions: Union[None, Dict[str, Callable]] = None,
     ):
         """
@@ -247,18 +248,29 @@ class VelociraptorCatalogue(object):
         datasets. This class should never be instantiated manually and should
         always be handled through the generate_catalogue function.
 
-        Parameters:
-        
-        + filename: the filename of the catalogue
-        + registration_functions: the full list of registration functions used for
-                                  this catalogue
-        + units: the corresponding VelociraptorUnits instance
-        + valid_field_metadata: a list of VelociraptorFieldMetadata that correspond
-                                to the valid fields found within the file
-        + invalid_field_paths: a list of strings corresponding to invalid field
-                               paths within the velociraptor catalogue.
+        Parameters
+        ----------
+
+        filename: str
+            File path to the VELOCIraptor .properties file that you wish to open.
+
+        disregard_units: bool, optional
+            If ``True``, then disregard any additional units in the
+            VELOCIraptor catalogues, and instead base everything on
+            the 'base' units of velocity, length, and mass. In this
+            case metallicities are left dimensionless. If you are
+            using EAGLE data, you should set this to False, as the
+            star formation rate units are presented in non-internal
+            units.
+
+        extra_registration_functions:  Union[None, Dict[str, Callable]], optional
+            Any additional registration functions that you wish to use. This
+            should be a dictionary of strings pointing to callables, which
+            conform to the registration function API. This is an advanced
+            feature.
         """
         self.filename = filename
+        self.disregard_units = disregard_units
         self.extra_registration_functions = extra_registration_functions
 
         self.get_units()
@@ -283,7 +295,9 @@ class VelociraptorCatalogue(object):
         Gets the units instance from the file properties.
         """
 
-        self.units = VelociraptorUnits(self.filename)
+        self.units = VelociraptorUnits(
+            self.filename, disregard_units=self.disregard_units
+        )
 
         return self.units
 

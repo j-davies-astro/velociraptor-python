@@ -38,8 +38,30 @@ class VelociraptorUnits(object):
     period: unyt.unyt_quantity
     box_volume: unyt.unyt_quantity
 
-    def __init__(self, filename):
+    def __init__(self, filename: str, disregard_units: bool = False):
+        """
+        Creates an instance of the ``VelociraptorUnits`` Class.
+
+        Parameters
+        ----------
+
+        filename: str
+            Filename of the VELOCIraptor catalogue (i.e. .properties)
+            file that contains the unit metadata in its header.
+
+        disregard_units: bool, optional
+            If ``True``, then disregard any additional units in the
+            VELOCIraptor catalogues, and instead base everything on
+            the 'base' units of velocity, length, and mass. In this
+            case metallicities are left dimensionless. If you are
+            using EAGLE data, you should set this to False, as the
+            star formation rate units are presented in non-internal
+            units.
+
+        """
+
         self.filename = filename
+        self.disregard_units = disregard_units
 
         self.get_unit_dictionary()
 
@@ -62,27 +84,36 @@ class VelociraptorUnits(object):
             self.units["mass"] = attributes["Mass_unit_to_solarmass"] * unyt.Solar_Mass
             self.units["velocity"] = attributes["Velocity_to_kms"] * unyt.km / unyt.s
 
-            # Extract units that may not be present in the file
-            try:
-                metallicity_units = (
-                    attributes["Metallicity_unit_to_solar"] * unyt.dimensionless
-                )
-            except (AttributeError, KeyError):
-                metallicity_units = unyt.dimensionless
+            metallicity_units = unyt.dimensionless
+            stellar_age_units = (self.units["length"] / self.units["velocity"]).to(
+                "Year"
+            )
+            star_formation_units = (
+                self.units["velocity"] * self.units["mass"] / self.units["length"]
+            ).convert_to_units("Solar_Mass / Year")
 
-            try:
-                stellar_age_units = attributes["Stellar_age_unit_to_yr"] * unyt.year
-            except (AttributeError, KeyError):
-                stellar_age_units = unyt.year
+            if not self.disregard_units:
+                # Extract units that may not be present in the file
+                try:
+                    metallicity_units = (
+                        attributes["Metallicity_unit_to_solar"] * unyt.dimensionless
+                    )
+                except (AttributeError, KeyError):
+                    pass
 
-            try:
-                star_formation_units = (
-                    attributes["SFR_unit_to_solarmassperyear"]
-                    * unyt.Solar_Mass
-                    / unyt.year
-                )
-            except (AttributeError, KeyError):
-                star_formation_units = unyt.Solar_Mass / unyt.year
+                try:
+                    stellar_age_units = attributes["Stellar_age_unit_to_yr"] * unyt.year
+                except (AttributeError, KeyError):
+                    pass
+
+                try:
+                    star_formation_units = (
+                        attributes["SFR_unit_to_solarmassperyear"]
+                        * unyt.Solar_Mass
+                        / unyt.year
+                    )
+                except (AttributeError, KeyError):
+                    pass
 
             self.units["metallicity"] = metallicity_units
             self.units["age"] = stellar_age_units
