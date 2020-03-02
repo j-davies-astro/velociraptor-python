@@ -165,7 +165,7 @@ def registration_ids(
     Registers all quantities related to particle ids and halo ids (those beginning or ending with ID).
     """
 
-    if not field_path[:2] == "ID" or field_path[:-2] == "ID":
+    if not field_path[:2] == "ID" or field_path[-2:] == "ID":
         raise RegistrationDoesNotMatchError
 
     # As identifiers, all of these quantities are dimensionless
@@ -465,9 +465,33 @@ def registration_temperature(
     if not field_path[0] == "T":
         raise RegistrationDoesNotMatchError
 
-    raise RegistrationDoesNotMatchError
+    unit = unyt.K
 
-    return  # TODO
+    # Capture group 1: particle type
+    # Capture group 2: star forming?
+    match_string = "T_?([a-z]*)?_?(sf|nsf)?"
+    regex = cached_regex(match_string)
+    match = regex.match(field_path)
+
+    if match:
+        ptype = match.group(1)
+        star_forming = match.group(2)
+
+        full_name = "$T$"
+
+        if ptype:
+            full_name += " ("
+
+            cap_ptype = ptype[0].upper() + ptype[1:]
+
+            full_name += cap_ptype
+
+            if star_forming:
+                full_name += f", {star_forming.upper()}"
+
+            full_name += ")"
+
+    return unit, full_name, field_path.lower()
 
 
 def registration_structure_type(
@@ -493,9 +517,43 @@ def registration_velocities(
     if not field_path[0] == "V":
         raise RegistrationDoesNotMatchError
 
-    raise RegistrationDoesNotMatchError
+    unit = unit_system.velocity
 
-    return  # TODO
+    if field_path == "Vmax":
+        # Special case, handle here
+        full_name = "V_{\\rm max}"
+    else:
+        # Need to do a regex search
+        # Capture group 1: X, Y, Z
+        # Capture group 2: mbp or minpot? Could be empty.
+        # Capture group 4: gas/star.
+        match_string = "V(X|Y|Z)c([a-z]*)?(_([a-z]*))?"
+        regex = cached_regex(match_string)
+        match = regex.match(field_path)
+
+        if match:
+            coordinate = match.group(1)
+            ptype = match.group(4)
+            misc = match.group(2)
+
+            full_name = f"$V_{coordinate.lower()}$"
+
+            if ptype:
+                full_name += f" ({ptype})"
+
+            if misc:
+                if misc == "mbp":
+                    full_name = f"Most bound particle {full_name}"
+                elif misc == "minpot":
+                    full_name = f"Minimum potential {full_name}"
+                else:
+                    full_name = f"{misc} {full_name}"
+            else:
+                full_name = "CoM " + full_name
+        else:
+            raise RegistrationDoesNotMatchError
+        
+    return unit, full_name, field_path.lower()
 
 
 def registration_positions(
@@ -527,7 +585,7 @@ def registration_positions(
         full_name = f"${coordinate.lower()}$"
 
         if ptype:
-            full_name += " ({ptype})"
+            full_name += f" ({ptype})"
 
         if misc:
             if misc == "mbp":
@@ -537,7 +595,7 @@ def registration_positions(
             else:
                 full_name = f"{misc} {full_name}"
         else:
-            full_name = "Halo centre " + full_name
+            full_name = "CoM " + full_name
     else:
         raise RegistrationDoesNotMatchError
 
@@ -567,9 +625,38 @@ def registration_metallicity(
     if not field_path[:4] == "Zmet":
         raise RegistrationDoesNotMatchError
 
-    raise RegistrationDoesNotMatchError
+    unit = unit_system.metallicity
 
-    return  # TODO
+    # Need to do a regex search
+    # Capture group 1: gas/star.
+    # Capture group 2: star forming?
+    match_string = "Zmet_?([a-z]*)_?(sf|nsf)?"
+    regex = cached_regex(match_string)
+    match = regex.match(field_path)
+
+    if match:
+        ptype = match.group(1)
+        star_forming = match.group(2)
+
+        full_name = "Metallicity $Z"
+
+        if ptype:
+            if ptype == "gas":
+                full_name += "_g"
+            elif ptype == "star":
+                full_name += "_*"
+            
+            cap_ptype = ptype[0].upper() + ptype[1:]
+            full_name = f"{cap_ptype} {full_name}"
+
+        full_name += "$"
+
+        if star_forming:
+            full_name += f" ({star_forming.upper()})"
+    else:
+        raise RegistrationDoesNotMatchError
+        
+    return unit, full_name, field_path.lower()
 
 
 def registration_eigenvectors(
@@ -582,9 +669,27 @@ def registration_eigenvectors(
     if not field_path[:3] == "eig":
         raise RegistrationDoesNotMatchError
 
-    raise RegistrationDoesNotMatchError
+    unit = unit_system.length
 
-    return  # TODO
+    # Need to do a regex search
+    # Capture group 1: xy, etc.
+    # Capture group 2: gas/star.
+    match_string = "eig_([a-z][a-z])_?([a-z]*)?"
+    regex = cached_regex(match_string)
+    match = regex.match(field_path)
+
+    if match:
+        coordinate = match.group(1)
+        ptype = match.group(2)
+
+        full_name = f"$\\hat{{r}}_{{{{\\rm v}}, {coordinate.lower()}}}$"
+
+        if ptype:
+            full_name += f" ({ptype})"
+    else:
+        raise RegistrationDoesNotMatchError
+        
+    return unit, full_name, field_path.lower()
 
 
 def registration_veldisp(
@@ -597,9 +702,27 @@ def registration_veldisp(
     if not field_path[:7] == "veldisp":
         raise RegistrationDoesNotMatchError
 
-    raise RegistrationDoesNotMatchError
+    unit = unit_system.velocity
 
-    return  # TODO
+    # Need to do a regex search
+    # Capture group 1: xy, etc.
+    # Capture group 2: gas/star.
+    match_string = "veldisp_([a-z][a-z])_?([a-z]*)?"
+    regex = cached_regex(match_string)
+    match = regex.match(field_path)
+
+    if match:
+        coordinate = match.group(1)
+        ptype = match.group(2)
+
+        full_name = f"$\sigma_{{{{\\rm v}}, {coordinate.lower()}}}$"
+
+        if ptype:
+            full_name += f" ({ptype})"
+    else:
+        raise RegistrationDoesNotMatchError
+        
+    return unit, full_name, field_path.lower()
 
 
 def registration_stellar_age(

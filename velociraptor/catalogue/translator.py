@@ -58,7 +58,7 @@ def get_particle_property_name_conversion(name: str, ptype: str):
         "SFR_gas": "Gas SFR $\dot{\\rho}_*$",
         "Zmet_": "Metallicity $Z$",
         "Zmet_gas": "Gas Metallicity $Z_{\\rm g}$",
-        "Zmet_star": "Stellar Metallicity $Z_*$",
+        "Zmet_star": "Star Metallicity $Z_*$",
         "Zmet_bh": "Black Hole Metallicity $Z_{\\rm BH}$",
         "mass_": "Mass $M$",
         "mass_gas": "Gas Mass $M_{\\rm g}$",
