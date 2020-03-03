@@ -137,7 +137,7 @@ def registration_energies(
     Registers all energy related quantities (those beginning with E).
     """
 
-    if not field_path[0] == "E":
+    if not field_path[:2] in ["Ef", "Ek", "Ep", "En"]:
         raise RegistrationDoesNotMatchError
 
     if field_path[:5] == "Efrac":
@@ -738,6 +738,52 @@ def registration_stellar_age(
         raise RegistrationDoesNotMatchError
 
 
+def registration_element_mass_fractions(
+    field_path: str, unit_system: VelociraptorUnits
+) -> (unyt.Unit, str, str):
+    """
+    Registers the element mass fraction properties.
+
+    Hopefully this is changed in the future as this is a mess.
+    """
+
+    if not field_path[:20] == "ElementMassFractions":
+        raise RegistrationDoesNotMatchError
+
+    unit = unit_system.metallicity
+
+    # Need to do a regex search
+    # Capture group 1: index number
+    # Capture group 2: mass weighted?
+    # Capture group 3: units
+    # Capture group 4: particle typr
+    match_string = "ElementMassFractions_index_([0-9]+)_([a-zA-Z]+)_([a-zA-Z]+)_?([a-z]*)"
+    regex = cached_regex(match_string)
+    match = regex.match(field_path)
+
+    snake_case = "element"
+
+    if match:
+        index = match.group(1)
+        mass_weighted = match.group(2)
+        extracted_units = match.group(3)
+        ptype = match.group(4)
+
+        full_name = f"Element {index} Mass Fraction"
+        snake_case = f"{snake_case}_{index}"
+
+        if ptype:
+            cap_ptype = ptype[0].upper() + ptype[1:]
+            full_name = f"{cap_ptype} {full_name}"
+
+            snake_case += f"_{ptype}"
+        
+    else:
+        raise RegistrationDoesNotMatchError
+        
+    return unit, full_name, snake_case
+
+
 # TODO
 # lambda_B
 # n_bh
@@ -785,6 +831,7 @@ global_registration_functions = {
         "angular_momentum",
         "projected_apertures",
         "apertures",
+        "element_mass_fractions",
         "fail_all",
     ]
 }

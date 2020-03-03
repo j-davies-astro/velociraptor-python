@@ -19,6 +19,7 @@ complete!) below:
 + ``ids``: properties that are to do with IDs, such as Halo IDs or the most
   bound particle ID.
 + ``energies``: properties starting with ``E``
++ ``stellar_age``: the ``t_age`` property
 + ``rotational_support``: the ``kappa`` properties that describe rotational
   support
 + ``star_formation_rate``: properties starting with ``SFR``
@@ -38,6 +39,7 @@ complete!) below:
 + ``projected_apertures``: several projected apertures and the quantities
   associated with them
 + ``apertures``: properties measured within apertures
++ ``element_mass_fractions``: element mass fractions within the halo
 + ``fail_all``: a registration function that fails all tests, development
   only.
 
