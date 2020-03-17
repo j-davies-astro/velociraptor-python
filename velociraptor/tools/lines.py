@@ -15,18 +15,50 @@ def binned_mean_line(
     minimum_in_bin: int = 1,
 ):
     """
-    Get a mean line.
-    
-    Takes:
+    Gets a mean (y) line, binned in the x direction.
 
-    x, an array of values to bin
-    y, an array of values to find the mean in each bin of (and error)
-    x_bins, the bins to use
-    minimum_in_bin, the minimal number of values in each bin for it to be valid
+    Parameters
+    ----------
 
-    Returns:
+    x: unyt.unyt_array
+        Horizontal values, to be binned.
 
-    bin centers, mean, standard deviation
+    y: unyt.unyt_array
+        Vertical values, to have the mean calculated in the x-bins
+
+    x_bins: unyt.unyt_array
+        Horizontal bin edges. Must have the same units as x.
+
+    minimum_in_bin: int, optional
+        Minimum number of items in a bin to return that bin. If a bin has
+        fewer values than this, it is excluded from the return values.
+
+
+    Returns
+    -------
+
+    bin_centers: unyt.unyt_array
+        The centers of the bins (taken to be the linear mean of the bin edges).
+
+    means: unyt.unyt_array
+        Vertical mean values within the bins.
+
+    standard_deviation: unyt.unyt_array
+        Standard deviation within the bins, to be shown as scatter.
+
+
+    Notes
+    -----
+
+    The return types are such that you can pass this directly to `plt.errorbar`,
+    as follows:
+
+    .. code-block:: python
+
+        plt.errorbar(
+            *binned_mean_line(x, y, x_bins, 10)
+        )
+
     """
 
     assert (
@@ -61,23 +93,59 @@ def binned_median_line(
     x: unyt.unyt_array,
     y: unyt.unyt_array,
     x_bins: unyt.unyt_array,
-    percentiles: List[int] = [16, 86],
+    percentiles: List[int] = [16, 84],
     minimum_in_bin: int = 1,
 ):
     """
-    Get a median line with percentiles.
-    
-    Takes:
+    Gets a median (y) line, binned in the x direction.
 
-    x, an array of values to bin
-    y, an array of values to find the mean in each bin of (and error)
-    x_bins, the bins to use
-    percentiles, the percentiles to use to calculate the deviation between
-    minimum_in_bin, the minimal number of values in each bin for it to be valid
+    Parameters
+    ----------
 
-    Returns:
+    x: unyt.unyt_array
+        Horizontal values, to be binned.
 
-    bin centers, median, deviation, 
+    y: unyt.unyt_array
+        Vertical values, to have the median calculated in the x-bins
+
+    x_bins: unyt.unyt_array
+        Horizontal bin edges. Must have the same units as x.
+
+    percentiles: List[int], optional
+        Percentiles to return as the positive and negative errors. By
+        default these are 16 and 84th percentiles.
+
+    minimum_in_bin: int, optional
+        Minimum number of items in a bin to return that bin. If a bin has
+        fewer values than this, it is excluded from the return values.
+
+
+    Returns
+    -------
+
+    bin_centers: unyt.unyt_array
+        The centers of the bins (taken to be the linear mean of the bin edges).
+
+    medians: unyt.unyt_array
+        Vertical median values within the bins.
+
+    deviations: unyt.unyt_array
+        Deviation from median vertically using the ``percentiles`` defined above.
+        This has shape 2xN.
+
+
+    Notes
+    -----
+
+    The return types are such that you can pass this directly to `plt.errorbar`,
+    as follows:
+
+    .. code-block:: python
+
+        plt.errorbar(
+            *binned_median_line(x, y, x_bins, 10)
+        )
+
     """
 
     assert (
