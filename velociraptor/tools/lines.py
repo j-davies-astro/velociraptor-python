@@ -12,7 +12,7 @@ def binned_mean_line(
     x: unyt.unyt_array,
     y: unyt.unyt_array,
     x_bins: unyt.unyt_array,
-    minimum_in_bin: int = 1,
+    minimum_in_bin: int = 3,
 ):
     """
     Gets a mean (y) line, binned in the x direction.
@@ -32,6 +32,7 @@ def binned_mean_line(
     minimum_in_bin: int, optional
         Minimum number of items in a bin to return that bin. If a bin has
         fewer values than this, it is excluded from the return values.
+        Default: 3.
 
 
     Returns
@@ -94,7 +95,7 @@ def binned_median_line(
     y: unyt.unyt_array,
     x_bins: unyt.unyt_array,
     percentiles: List[int] = [16, 84],
-    minimum_in_bin: int = 1,
+    minimum_in_bin: int = 3,
 ):
     """
     Gets a median (y) line, binned in the x direction.
@@ -118,6 +119,7 @@ def binned_median_line(
     minimum_in_bin: int, optional
         Minimum number of items in a bin to return that bin. If a bin has
         fewer values than this, it is excluded from the return values.
+        Default: 3.
 
 
     Returns

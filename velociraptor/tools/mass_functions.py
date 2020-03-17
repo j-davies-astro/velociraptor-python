@@ -10,7 +10,7 @@ def create_mass_function_given_bins(
     masses: unyt.unyt_array,
     bins: unyt.unyt_array,
     box_volume: unyt.unyt_quantity,
-    minimum_in_bin: int = 1,
+    minimum_in_bin: int = 3,
 ):
     """
     Creates a mass function (with equal width bins in log M) for you to plot.
@@ -31,7 +31,7 @@ def create_mass_function_given_bins(
     minimum_in_bin: int, optional
         The number of objects in a bin for it to be classed as valid. Bins
         with a number of objects smaller than this are not returned. By default
-        this parameter takes a value of 1.
+        this parameter takes a value of 3.
 
 
     Returns
@@ -74,7 +74,7 @@ def create_mass_function(
     highest_mass: unyt.unyt_quantity,
     box_volume: unyt.unyt_quantity,
     n_bins: int = 25,
-    minimum_in_bin: int = 1,
+    minimum_in_bin: int = 3,
     return_bin_edges: bool = False,
 ):
     """
@@ -102,7 +102,7 @@ def create_mass_function(
     minimum_in_bin: int, optional
         The number of objects in a bin for it to be classed as valid. Bins
         with a number of objects smaller than this are not returned. By default
-        this parameter takes a value of 1.
+        this parameter takes a value of 3.
 
     return_bin_edges: bool, optional
         Return the bin edges used in the binning process? Default is False.
