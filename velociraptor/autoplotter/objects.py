@@ -239,14 +239,16 @@ class VelociraptorPlot(object):
                 self,
                 f"{coordinate}_bins",
                 unyt_array(
-                    logspace(log10(start), log10(end), self.number_of_bins),
+                    logspace(log10(start), log10(end), self.number_of_bins + 1),
                     units=start.units,
                 ),
             )
         else:
             # Can get away with this one without stripping
             setattr(
-                self, f"{coordinate}_bins", linspace(start, end, self.number_of_bins)
+                self,
+                f"{coordinate}_bins",
+                linspace(start, end, self.number_of_bins + 1),
             )
 
         return
