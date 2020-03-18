@@ -44,6 +44,9 @@ class VelociraptorPlot(object):
     # Plot limits for x/y
     x_lim: List[Union[unyt_quantity, None]]
     y_lim: List[Union[unyt_quantity, None]]
+    # Shading for x/y
+    x_shade: List[Union[unyt_quantity, None]]
+    y_shade: List[Union[unyt_quantity, None]]
     # override the axes?
     x_label_override: Union[None, str]
     y_label_override: Union[None, str]
@@ -142,6 +145,28 @@ class VelociraptorPlot(object):
             pass
 
         return
+
+    def _parse_coordinate_shade(self, coordinate: str) -> None:
+        """
+        Parses x and y's shade: below, above to a list.
+        """
+        setattr(self, f"{coordinate}_shade", [None, None])
+
+        try:
+            getattr(self, f"{coordinate}_shade")[0] = unyt_quantity(
+                float(self.data[coordinate]["shade"]["below"]),
+                units=self.data[coordinate]["units"],
+            )
+        except KeyError:
+            pass
+
+        try:
+            getattr(self, f"{coordinate}_shade")[1] = unyt_quantity(
+                float(self.data[coordinate]["shade"]["above"]),
+                units=self.data[coordinate]["units"],
+            )
+        except KeyError:
+            pass
 
     def _parse_coordinate_log(self, coordinate: str) -> None:
         """
@@ -263,6 +288,7 @@ class VelociraptorPlot(object):
             self._parse_coordinate_log(coordinate)
             self._parse_coordinate_limit(coordinate)
             self._parse_coordinate_label_override(coordinate)
+            self._parse_coordinate_shade(coordinate)
 
         self._parse_lines()
         self._parse_structure_type()
@@ -303,6 +329,7 @@ class VelociraptorPlot(object):
             self._parse_coordinate_log(coordinate)
             self._parse_coordinate_limit(coordinate)
             self._parse_coordinate_label_override(coordinate)
+            self._parse_coordinate_shade(coordinate)
 
         self._parse_number_of_bins()
         self._parse_coordinate_histogram_bin("x")
@@ -388,6 +415,29 @@ class VelociraptorPlot(object):
 
         except KeyError:
             pass
+
+        return
+
+    def _add_shading_to_axes(self, ax: Axes) -> None:
+        """
+        Adds any required shading.
+        """
+
+        common_args = dict(zorder=-10, alpha=0.3, color="grey", linewidth=0)
+
+        # First do horizontal
+        if self.x_shade[0] is not None:
+            ax.axvspan(self.x_lim[0], self.x_shade[0], **common_args)
+
+        if self.x_shade[1] is not None:
+            ax.axvspan(self.x_shade[1], self.x_lim[1], **common_args)
+
+        # Vertical
+        if self.y_shade[0] is not None:
+            ax.axhspan(self.y_lim[0], self.y_shade[0], **common_args)
+
+        if self.y_shade[1] is not None:
+            ax.axhspan(self.y_shade[1], self.y_lim[1], **common_args)
 
         return
 
@@ -526,6 +576,7 @@ class VelociraptorPlot(object):
         """
 
         fig, ax = getattr(self, f"_make_plot_{self.plot_type}")(catalogue=catalogue)
+        self._add_shading_to_axes(ax)
 
         for data in self.observational_data:
             data.plot_on_axes(ax, errorbar_kwargs=dict(zorder=-10))

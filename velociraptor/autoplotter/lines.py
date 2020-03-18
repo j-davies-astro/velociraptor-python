@@ -33,7 +33,8 @@ class VelociraptorLine(object):
     lower: unyt_quantity
     upper: unyt_quantity
     bins: unyt_array
-    show_scatter: bool
+    # Scatter can be: "none", "errorbar", or "shaded"
+    scatter: str
     # Output: centers, values, scatter
     output: Tuple[unyt_array]
 
@@ -116,9 +117,12 @@ class VelociraptorLine(object):
             self.upper = None
 
         try:
-            self.show_scatter = bool(self.data["show_scatter"])
+            self.scatter = str(self.data["scatter"])
         except KeyError:
-            self.show_scatter = True
+            self.scatter = "shaded"
+
+        if self.scatter not in ["none", "errorbar", "shaded"]:
+            self.scatter = "shaded"
 
         return
 
@@ -236,7 +240,7 @@ class VelociraptorLine(object):
         Notes
         -----
 
-        If self.show_scatter is set to false, this is plotted assuming the scatter
+        If self.scatter is set to "none", this is plotted assuming the scatter
         is zero.
         """
 
@@ -245,8 +249,28 @@ class VelociraptorLine(object):
 
         centers, heights, errors = self.create_line(x=x, y=y)
 
-        errors = errors if self.show_scatter else None
+        if self.scatter == "none":
+            ax.plot(centers, heights, label=label)
+        elif self.scatter == "errorbar":
+            ax.errorbar(centers, heights, yerr=errors, label=label)
+        elif self.scatter == "shaded":
+            line, = ax.plot(centers, heights, label=label)
 
-        ax.errorbar(centers, heights, yerr=errors, label=label)
+            # Deal with different + and -ve errors
+            if errors.size / errors.shape[0] > 1.0:
+                down, up = errors
+            else:
+                up = errors
+                down = errors
+
+            ax.fill_between(
+                centers,
+                heights - down,
+                heights + up,
+                color=line.get_color(),
+                alpha=0.3,
+                linewidth=0.0,
+            )
 
         return
+

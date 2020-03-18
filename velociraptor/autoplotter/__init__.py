@@ -23,6 +23,10 @@ This yaml file has the following format:
        # if hist or massfunc, in units above
        start_bin: number to start binning at (default is start)
        end_bin: number to end binning at (default is end)
+       # Shade below or above a value, to show you do not trust this region
+       shade:
+         below: number (in same units)
+         above: number
      # Vertical quantity - only need units for massfunction
      y:
        quantity: "quantity.name" (e.g. masses.mass_200crit)
@@ -31,11 +35,15 @@ This yaml file has the following format:
        end: vertical axis to end (in units above)
        log: true/false (true by default), do you want a log axis?
        label_override: override the label with your own choice
+       # Shade below or above a value, to show you do not trust this region
+       shade:
+         below: number (in same units)
+         above: number
      # Lines that you can plot on top - line_type can be median or mean
      line_type: 
        plot: true/false (true by default) actually plot this?
        log: true/false (true by default) use log bins?
-       show_scatter: true/false (true by default) show scatter, or just plot line?
+       scatter: "none", "errorbar", or "shaded". Defaults to shaded
        number_of_bins: number of bins for median line, different from number_of_bins above
        start: value to start binning at
          value: start value
