@@ -521,7 +521,7 @@ def registration_velocities(
 
     if field_path == "Vmax":
         # Special case, handle here
-        full_name = "V_{\\rm max}"
+        full_name = "$V_{\\rm max}$"
     else:
         # Need to do a regex search
         # Capture group 1: X, Y, Z
@@ -552,7 +552,7 @@ def registration_velocities(
                 full_name = "CoM " + full_name
         else:
             raise RegistrationDoesNotMatchError
-        
+
     return unit, full_name, field_path.lower()
 
 
@@ -645,7 +645,7 @@ def registration_metallicity(
                 full_name += "_g"
             elif ptype == "star":
                 full_name += "_*"
-            
+
             cap_ptype = ptype[0].upper() + ptype[1:]
             full_name = f"{cap_ptype} {full_name}"
 
@@ -655,7 +655,7 @@ def registration_metallicity(
             full_name += f" ({star_forming.upper()})"
     else:
         raise RegistrationDoesNotMatchError
-        
+
     return unit, full_name, field_path.lower()
 
 
@@ -688,7 +688,7 @@ def registration_eigenvectors(
             full_name += f" ({ptype})"
     else:
         raise RegistrationDoesNotMatchError
-        
+
     return unit, full_name, field_path.lower()
 
 
@@ -721,7 +721,7 @@ def registration_veldisp(
             full_name += f" ({ptype})"
     else:
         raise RegistrationDoesNotMatchError
-        
+
     return unit, full_name, field_path.lower()
 
 
@@ -757,7 +757,9 @@ def registration_element_mass_fractions(
     # Capture group 2: mass weighted?
     # Capture group 3: units
     # Capture group 4: particle typr
-    match_string = "ElementMassFractions_index_([0-9]+)_([a-zA-Z]+)_([a-zA-Z]+)_?([a-z]*)"
+    match_string = (
+        "ElementMassFractions_index_([0-9]+)_([a-zA-Z]+)_([a-zA-Z]+)_?([a-z]*)"
+    )
     regex = cached_regex(match_string)
     match = regex.match(field_path)
 
@@ -777,10 +779,10 @@ def registration_element_mass_fractions(
             full_name = f"{cap_ptype} {full_name}"
 
             snake_case += f"_{ptype}"
-        
+
     else:
         raise RegistrationDoesNotMatchError
-        
+
     return unit, full_name, snake_case
 
 
