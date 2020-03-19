@@ -26,8 +26,9 @@ parser.add_argument(
     required=True,
     help=(
         "Configuration .yml file. Required. Can also be supply a list "
-        "of parameters, like x.yml,y.yml,z.yml, all separated by commas."
+        "of parameters, like x.yml y.yml z.yml, all separated by spaces."
     ),
+    nargs="*",
 )
 
 parser.add_argument(
@@ -135,10 +136,8 @@ if __name__ == "__main__":
         print_if_debug(f"Applying matplotlib stylesheet at {args.stylesheet}.")
         style.use(args.stylesheet)
 
-    print_if_debug(
-        f"Generating initial AutoPlotter instance for {args.config.split(',')}."
-    )
-    auto_plotter = AutoPlotter(args.config.split(","))
+    print_if_debug(f"Generating initial AutoPlotter instance for {args.config}.")
+    auto_plotter = AutoPlotter(args.config)
     print_if_debug(f"Loading halo catalogue at {args.properties}.")
     if args.registration is not None:
         print_if_debug(
