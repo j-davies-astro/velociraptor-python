@@ -658,16 +658,21 @@ class AutoPlotter(object):
     """
 
     # Forward declarations
+    filename: Union[str, List[str]]
+    multiple_yaml_files: bool
     catalogue: VelociraptorCatalogue
     yaml: Dict[str, Union[Dict, str]]
     plots: List[VelociraptorPlot]
 
-    def __init__(self, filename: str) -> None:
+    def __init__(self, filename: Union[str, List[str]]) -> None:
         """
         Initialises the AutoPlotter object with the yaml filename.
         """
 
         self.filename = filename
+
+        self.multiple_yaml_files = isinstance(filename, list)
+
         self.load_yaml()
         self.parse_yaml()
 
@@ -678,8 +683,15 @@ class AutoPlotter(object):
         Loads the yaml data from file.
         """
 
-        with open(self.filename, "r") as handle:
-            self.yaml = safe_load(handle)
+        if not self.multiple_yaml_files:
+            with open(self.filename, "r") as handle:
+                self.yaml = safe_load(handle)
+        else:
+            self.yaml = {}
+
+            for filename in self.filename:
+                with open(filename, "r") as handle:
+                    self.yaml = {**self.yaml, **safe_load(handle)}
 
         return
 
