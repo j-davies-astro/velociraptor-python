@@ -12,6 +12,16 @@ This yaml file has the following format:
      type: scatter / histogram / 2dhistogram / massfunction
      select_structure_type: number of substructure to select (e.g. 10 is centrals)
      number_of_bins: number of bins in the (background) histogram or massfunc
+     legend_loc: Location of legend (string). One of:
+            "upper right",
+            "upper left",
+            "lower left",
+            "lower right",
+            "right",
+            "lower center",
+            "upper center",
+            "center",
+     redshift_loc: Location of z=x a=y string. Same vailidity as legend_loc.
      # Horizontal quantity
      x:
        quantity: "quantity.name" (e.g. masses.mass_200crit)

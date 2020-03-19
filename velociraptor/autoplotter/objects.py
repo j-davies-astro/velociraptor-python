@@ -18,6 +18,7 @@ from typing import Union, List, Dict, Tuple
 
 from os import path, mkdir
 from functools import reduce
+from collections import OrderedDict
 
 valid_plot_types = ["scatter", "2dhistogram", "massfunction"]
 valid_line_types = ["median", "mean", "mass_function"]
@@ -61,6 +62,9 @@ class VelociraptorPlot(object):
     # Select a specific strucutre type?
     select_structure_type: Union[None, int]
     structure_mask: Union[None, array]
+    # Where should the legend and z, a information be placed?
+    legend_loc: str
+    redshift_loc: str
     # Observational data
     observational_data: List[ObservationalData]
 
@@ -247,6 +251,58 @@ class VelociraptorPlot(object):
             self.number_of_bins = int(self.data["number_of_bins"])
         except KeyError:
             self.number_of_bins = 128
+
+        return
+
+    def _parse_loc(self) -> None:
+        """
+        Parses the legend and redshift location.
+        """
+
+        valid_locs = [
+            "upper right",
+            "upper left",
+            "lower left",
+            "lower right",
+            "right",
+            "lower center",
+            "upper center",
+            "center",
+        ]
+
+        try:
+            self.legend_loc = str(self.data["legend_loc"])
+            if self.legend_loc not in valid_locs:
+                raise AutoPlotterError(
+                    f"Choice of legend_loc {self.legend_loc} invalid. "
+                    f"Choose from one of {valid_locs}"
+                )
+        except KeyError:
+            self.legend_loc = "lower left"
+
+        try:
+            self.redshift_loc = str(self.data["redshift_loc"])
+        except KeyError:
+            # Set redshift based on legend. Note that repeated calls to
+            # `replace` would simply overwrite each other.
+
+            replacements = OrderedDict(
+                {
+                    "upper": "lower",
+                    "lower": "upper",
+                    "left": "right",
+                    "right": "left",
+                    "center": "right",
+                }
+            )
+
+            self.redshift_loc = " ".join(
+                [b for a, b in replacements.items() if a in self.legend_loc.split(" ")]
+            )
+
+            self.redshift_loc = (
+                "lower center" if self.redshift_loc == "left" else self.redshift_loc
+            )
 
         return
 
@@ -581,7 +637,12 @@ class VelociraptorPlot(object):
         for data in self.observational_data:
             data.plot_on_axes(ax, errorbar_kwargs=dict(zorder=-10))
 
-        plot.decorate_axes(ax=ax, catalogue=catalogue)
+        plot.decorate_axes(
+            ax=ax,
+            catalogue=catalogue,
+            legend_loc=self.legend_loc,
+            redshift_loc=self.redshift_loc,
+        )
 
         fig.savefig(f"{directory}/{self.filename}.{file_extension}")
 

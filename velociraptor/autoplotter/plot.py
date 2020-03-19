@@ -79,29 +79,50 @@ def mass_function(
 
 
 def decorate_axes(
-    ax: plt.Axes, catalogue: VelociraptorCatalogue, loc: str = "top left"
+    ax: plt.Axes,
+    catalogue: VelociraptorCatalogue,
+    legend_loc: str = "upper left",
+    redshift_loc: str = "lower right",
 ) -> None:
     """
     Decorates the axes with information about the redshift and
     scale-factor.
     """
 
-    legend = ax.legend()
+    markerfirst = "right" not in legend_loc
+
+    legend = ax.legend(loc=legend_loc, markerfirst=markerfirst)
 
     # First need to parse the 'loc' string
-    va, ha = loc.split(" ")
+    try:
+        va, ha = redshift_loc.split(" ")
+    except ValueError:
+        if redshift_loc == "right":
+            ha = "right"
+            va = "center"
+        elif redshift_loc == "center":
+            ha = "center"
+            va = "center"
 
-    if va == "bottom":
+    if va == "lower":
         y = 0.05
-    elif va == "top":
+        va = "bottom"
+    elif va == "upper":
         y = 0.95
+        va = "top"
+    elif va == "center":
+        y = 0.5
     else:
-        raise AttributeError(f"Unknown location string {loc}. Choose e.g. bottom right")
+        raise AttributeError(
+            f"Unknown redshift_location string {redshift_loc}. Choose e.g. lower right"
+        )
 
     if ha == "left":
         x = 0.05
     elif ha == "right":
         x = 0.95
+    elif ha == "center":
+        x = 0.5
 
     ax.text(
         x,
