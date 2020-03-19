@@ -35,8 +35,9 @@ class VelociraptorLine(object):
     bins: unyt_array
     # Scatter can be: "none", "errorbar", or "shaded"
     scatter: str
-    # Output: centers, values, scatter
-    output: Tuple[unyt_array]
+    # Output: centers, values, scatter - initialised here to prevent crashes
+    # in other code.
+    output: Tuple[unyt_array] = (unyt_array([]), unyt_array([]), unyt_array([]))
 
     def __init__(self, line_type: str, line_data: Dict[str, Union[Dict, str]]):
         """
