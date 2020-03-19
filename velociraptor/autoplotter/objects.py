@@ -346,6 +346,7 @@ class VelociraptorPlot(object):
             self._parse_coordinate_label_override(coordinate)
             self._parse_coordinate_shade(coordinate)
 
+        self._parse_loc()
         self._parse_lines()
         self._parse_structure_type()
 
@@ -389,6 +390,7 @@ class VelociraptorPlot(object):
 
         self._parse_number_of_bins()
         self._parse_coordinate_histogram_bin("x")
+        self._parse_loc()
         self._parse_structure_type()
 
         # A bit of a hacky workaround - improve this in the future
