@@ -9,7 +9,7 @@ import unyt
 from matplotlib.colors import Normalize, LogNorm
 from velociraptor import VelociraptorCatalogue
 from velociraptor.autoplotter.objects import VelociraptorLine
-from typing import Tuple
+from typing import Tuple, Union
 
 import velociraptor.tools as tools
 
@@ -81,8 +81,10 @@ def mass_function(
 def decorate_axes(
     ax: plt.Axes,
     catalogue: VelociraptorCatalogue,
+    comment: Union[str, None] = None,
     legend_loc: str = "upper left",
     redshift_loc: str = "lower right",
+    comment_loc: str = "lower left",
 ) -> None:
     """
     Decorates the axes with information about the redshift and
@@ -93,46 +95,44 @@ def decorate_axes(
 
     legend = ax.legend(loc=legend_loc, markerfirst=markerfirst)
 
-    # First need to parse the 'loc' string
-    try:
-        va, ha = redshift_loc.split(" ")
-    except ValueError:
-        if redshift_loc == "right":
-            ha = "right"
-            va = "center"
-        elif redshift_loc == "center":
-            ha = "center"
-            va = "center"
+    label_switch = {
+        redshift_loc: f"$z={catalogue.z:2.3f}$\n$a={catalogue.a:2.3f}$",
+        comment_loc: comment_loc,
+    }
 
-    if va == "lower":
-        y = 0.05
-        va = "bottom"
-    elif va == "upper":
-        y = 0.95
-        va = "top"
-    elif va == "center":
-        y = 0.5
-    else:
-        raise AttributeError(
-            f"Unknown redshift_location string {redshift_loc}. Choose e.g. lower right"
-        )
+    for loc, label in label_switch.items():
+        # First need to parse the 'loc' string
+        try:
+            va, ha = loc.split(" ")
+        except ValueError:
+            if loc == "right":
+                ha = "right"
+                va = "center"
+            elif loc == "center":
+                ha = "center"
+                va = "center"
 
-    if ha == "left":
-        x = 0.05
-    elif ha == "right":
-        x = 0.95
-    elif ha == "center":
-        x = 0.5
+        if va == "lower":
+            y = 0.05
+            va = "bottom"
+        elif va == "upper":
+            y = 0.95
+            va = "top"
+        elif va == "center":
+            y = 0.5
+        else:
+            raise AttributeError(
+                f"Unknown location string {loc}. Choose e.g. lower right"
+            )
 
-    ax.text(
-        x,
-        y,
-        f"$z={catalogue.z:2.3f}$\n$a={catalogue.a:2.3f}$",
-        ha=ha,
-        va=va,
-        transform=ax.transAxes,
-        multialignment=ha,
-    )
+        if ha == "left":
+            x = 0.05
+        elif ha == "right":
+            x = 0.95
+        elif ha == "center":
+            x = 0.5
+
+        ax.text(x, y, label, ha=ha, va=va, transform=ax.transAxes, multialignment=ha)
 
     return
 

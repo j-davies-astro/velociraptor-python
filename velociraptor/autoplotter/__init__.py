@@ -13,6 +13,7 @@ This yaml file has the following format:
      select_structure_type: number of substructure to select (e.g. 10 is centrals)
      selection_mask: "quantity.name" - a boolean quantity to select the items you wish to plot.
      number_of_bins: number of bins in the (background) histogram or massfunc
+     comment: "An extra string to be placed on the plot"
      legend_loc: Location of legend (string). One of:
             "upper right",
             "upper left",
@@ -23,6 +24,7 @@ This yaml file has the following format:
             "upper center",
             "center",
      redshift_loc: Location of z=x a=y string. Same vailidity as legend_loc.
+     comment_loc: Location of extra comment string. Same validity as legend_loc
      # Horizontal quantity
      x:
        quantity: "quantity.name" (e.g. masses.mass_200crit)

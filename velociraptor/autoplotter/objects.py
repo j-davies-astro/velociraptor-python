@@ -51,6 +51,7 @@ class VelociraptorPlot(object):
     # override the axes?
     x_label_override: Union[None, str]
     y_label_override: Union[None, str]
+    comment: Union[None, str]
     # plot median/mean line and give it properties
     mean_line: Union[None, VelociraptorLine]
     median_line: Union[None, VelociraptorLine]
@@ -66,6 +67,7 @@ class VelociraptorPlot(object):
     # Where should the legend and z, a information be placed?
     legend_loc: str
     redshift_loc: str
+    comment_loc: str
     # Observational data
     observational_data: List[ObservationalData]
 
@@ -267,6 +269,18 @@ class VelociraptorPlot(object):
 
         return
 
+    def _parse_comment(self) -> None:
+        """
+        Parse the extra text comment.
+        """
+
+        try:
+            self.comment = str(self.data["comment"])
+        except KeyError:
+            self.comment = None
+
+        return
+
     def _parse_loc(self) -> None:
         """
         Parses the legend and redshift location.
@@ -295,6 +309,11 @@ class VelociraptorPlot(object):
 
         try:
             self.redshift_loc = str(self.data["redshift_loc"])
+            if self.redshift_loc not in valid_locs:
+                raise AutoPlotterError(
+                    f"Choice of redshift_loc {self.redshift_loc} invalid. "
+                    f"Choose from one of {valid_locs}"
+                )
         except KeyError:
             # Set redshift based on legend. Note that repeated calls to
             # `replace` would simply overwrite each other.
@@ -315,6 +334,31 @@ class VelociraptorPlot(object):
 
             self.redshift_loc = (
                 "lower center" if self.redshift_loc == "left" else self.redshift_loc
+            )
+
+        try:
+            self.comment_loc = str(self.data["comment_loc"])
+            if self.comment_loc not in valid_locs:
+                raise AutoPlotterError(
+                    f"Choice of comment_loc {self.comment_loc} invalid. "
+                    f"Choose from one of {valid_locs}"
+                )
+        except KeyError:
+            # Set comment loc based on redshift label. Need to make sure that this does
+            # not overlap with the legend too!
+
+            replacements = OrderedDict({"left": "right", "right": "left"})
+
+            self.comment_loc = " ".join(
+                [
+                    b
+                    for a, b in replacements.items()
+                    if a in self.redshift_loc.split(" ")
+                ]
+            )
+
+            self.comment_loc = (
+                "upper center" if self.comment_loc == "left" else self.comment_loc
             )
 
         return
@@ -360,6 +404,7 @@ class VelociraptorPlot(object):
             self._parse_coordinate_shade(coordinate)
 
         self._parse_loc()
+        self._parse_comment()
         self._parse_lines()
         self._parse_structure_type()
         self._parse_selection_mask()
@@ -405,6 +450,7 @@ class VelociraptorPlot(object):
         self._parse_number_of_bins()
         self._parse_coordinate_histogram_bin("x")
         self._parse_loc()
+        self._parse_comment()
         self._parse_structure_type()
         self._parse_selection_mask()
 
@@ -672,8 +718,10 @@ class VelociraptorPlot(object):
         plot.decorate_axes(
             ax=ax,
             catalogue=catalogue,
+            comment=self.comment,
             legend_loc=self.legend_loc,
             redshift_loc=self.redshift_loc,
+            comment_loc=self.comment_loc,
         )
 
         fig.savefig(f"{directory}/{self.filename}.{file_extension}")
