@@ -12,7 +12,7 @@ import velociraptor.autoplotter.plot as plot
 from unyt import unyt_quantity, unyt_array
 from unyt.exceptions import UnitConversionError
 from numpy import log10, linspace, logspace, array
-from matplotlib.pyplot import Axes, Figure
+from matplotlib.pyplot import Axes, Figure, close
 from yaml import safe_load
 from typing import Union, List, Dict, Tuple
 
@@ -647,6 +647,9 @@ class VelociraptorPlot(object):
         )
 
         fig.savefig(f"{directory}/{self.filename}.{file_extension}")
+
+        # Delete the figure to cut down on memory consumption.
+        close(fig)
 
         return
 
