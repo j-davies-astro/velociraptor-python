@@ -122,7 +122,7 @@ def registration_projected_apertures(
         else:
             sf_in_name = ""
 
-        full_name = f"{sf_in_name}{name} (Projection {aperture}, {aperture_size} kpc)"
+        full_name = f"{sf_in_name}{name} (Proj. {aperture}, {aperture_size} kpc)"
         snake_case = field_path.lower().replace("aperture_", "")
 
         return unit, full_name, snake_case
