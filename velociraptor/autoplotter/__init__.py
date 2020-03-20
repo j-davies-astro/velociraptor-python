@@ -11,6 +11,7 @@ This yaml file has the following format:
      # Global plot quantities
      type: scatter / histogram / 2dhistogram / massfunction
      select_structure_type: number of substructure to select (e.g. 10 is centrals)
+     selection_mask: "quantity.name" - a boolean quantity to select the items you wish to plot.
      number_of_bins: number of bins in the (background) histogram or massfunc
      legend_loc: Location of legend (string). One of:
             "upper right",

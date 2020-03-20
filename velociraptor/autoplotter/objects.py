@@ -11,7 +11,7 @@ import velociraptor.autoplotter.plot as plot
 
 from unyt import unyt_quantity, unyt_array
 from unyt.exceptions import UnitConversionError
-from numpy import log10, linspace, logspace, array
+from numpy import log10, linspace, logspace, array, logical_and
 from matplotlib.pyplot import Axes, Figure, close
 from yaml import safe_load
 from typing import Union, List, Dict, Tuple
@@ -62,6 +62,7 @@ class VelociraptorPlot(object):
     # Select a specific strucutre type?
     select_structure_type: Union[None, int]
     structure_mask: Union[None, array]
+    selection_mask: Union[None, array]
     # Where should the legend and z, a information be placed?
     legend_loc: str
     redshift_loc: str
@@ -242,6 +243,18 @@ class VelociraptorPlot(object):
 
         return
 
+    def _parse_selection_mask(self) -> None:
+        """
+        Parses the selection mask selector.
+        """
+
+        try:
+            self.selection_mask = self.data["selection_mask"]
+        except KeyError:
+            self.selection_mask = None
+
+        return
+
     def _parse_number_of_bins(self) -> None:
         """
         Parses the number of bins.
@@ -349,6 +362,7 @@ class VelociraptorPlot(object):
         self._parse_loc()
         self._parse_lines()
         self._parse_structure_type()
+        self._parse_selection_mask()
 
         return
 
@@ -392,6 +406,7 @@ class VelociraptorPlot(object):
         self._parse_coordinate_histogram_bin("x")
         self._parse_loc()
         self._parse_structure_type()
+        self._parse_selection_mask()
 
         # A bit of a hacky workaround - improve this in the future
         # by combining this functionality properly into the
@@ -524,6 +539,21 @@ class VelociraptorPlot(object):
         name = x.name
 
         if self.structure_mask is not None:
+            x = x[self.structure_mask]
+            x.name = name
+        elif self.selection_mask is not None:
+            # Create mask
+            self.structure_mask = reduce(
+                getattr, self.selection_mask.split("."), catalogue
+            ).astype(bool)
+
+            if self.select_structure_type is not None:
+                self.structure_mask = logical_and(
+                    self.structure_mask,
+                    catalogue.structure_type.structuretype
+                    == self.select_structure_type,
+                )
+
             x = x[self.structure_mask]
             x.name = name
         elif self.select_structure_type is not None:
