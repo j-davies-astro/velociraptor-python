@@ -349,11 +349,11 @@ class VelociraptorPlot(object):
 
             replacements = OrderedDict(
                 {
+                    "upper": "upper",
+                    "lower": "lower",
                     "left": "right",
                     "right": "left",
                     "center": "center",
-                    "upper": "upper",
-                    "lower": "lower",
                 }
             )
 
