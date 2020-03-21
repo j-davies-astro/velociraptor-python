@@ -97,42 +97,45 @@ def decorate_axes(
 
     label_switch = {
         redshift_loc: f"$z={catalogue.z:2.3f}$\n$a={catalogue.a:2.3f}$",
-        comment_loc: comment_loc,
+        comment_loc: comment,
     }
 
     for loc, label in label_switch.items():
-        # First need to parse the 'loc' string
-        try:
-            va, ha = loc.split(" ")
-        except ValueError:
-            if loc == "right":
-                ha = "right"
-                va = "center"
-            elif loc == "center":
-                ha = "center"
-                va = "center"
+        if label is not None:
+            # First need to parse the 'loc' string
+            try:
+                va, ha = loc.split(" ")
+            except ValueError:
+                if loc == "right":
+                    ha = "right"
+                    va = "center"
+                elif loc == "center":
+                    ha = "center"
+                    va = "center"
 
-        if va == "lower":
-            y = 0.05
-            va = "bottom"
-        elif va == "upper":
-            y = 0.95
-            va = "top"
-        elif va == "center":
-            y = 0.5
-        else:
-            raise AttributeError(
-                f"Unknown location string {loc}. Choose e.g. lower right"
+            if va == "lower":
+                y = 0.05
+                va = "bottom"
+            elif va == "upper":
+                y = 0.95
+                va = "top"
+            elif va == "center":
+                y = 0.5
+            else:
+                raise AttributeError(
+                    f"Unknown location string {loc}. Choose e.g. lower right"
+                )
+
+            if ha == "left":
+                x = 0.05
+            elif ha == "right":
+                x = 0.95
+            elif ha == "center":
+                x = 0.5
+
+            ax.text(
+                x, y, label, ha=ha, va=va, transform=ax.transAxes, multialignment=ha
             )
-
-        if ha == "left":
-            x = 0.05
-        elif ha == "right":
-            x = 0.95
-        elif ha == "center":
-            x = 0.5
-
-        ax.text(x, y, label, ha=ha, va=va, transform=ax.transAxes, multialignment=ha)
 
     return
 
