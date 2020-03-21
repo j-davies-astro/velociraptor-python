@@ -347,7 +347,15 @@ class VelociraptorPlot(object):
             # Set comment loc based on redshift label. Need to make sure that this does
             # not overlap with the legend too!
 
-            replacements = OrderedDict({"left": "right", "right": "left"})
+            replacements = OrderedDict(
+                {
+                    "left": "right",
+                    "right": "left",
+                    "center": "center",
+                    "upper": "upper",
+                    "lower": "lower",
+                }
+            )
 
             self.comment_loc = " ".join(
                 [
