@@ -258,11 +258,15 @@ class VelociraptorLine(object):
             line, = ax.plot(centers, heights, label=label)
 
             # Deal with different + and -ve errors
-            if errors.size / errors.shape[0] > 1.0:
-                down, up = errors
+            if errors.shape[0]:
+                if errors.size / errors.shape[0] > 1.0:
+                    down, up = errors
+                else:
+                    up = errors
+                    down = errors
             else:
-                up = errors
-                down = errors
+                up = 0
+                down = 0
 
             ax.fill_between(
                 centers,
@@ -274,4 +278,3 @@ class VelociraptorLine(object):
             )
 
         return
-
