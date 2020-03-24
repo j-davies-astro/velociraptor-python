@@ -96,7 +96,7 @@ def decorate_axes(
     legend = ax.legend(loc=legend_loc, markerfirst=markerfirst)
 
     try:
-        fontsize = legend.get_texts[0].get_fontsize()
+        fontsize = legend.get_texts()[0].get_fontsize()
     except IndexError:
         fontsize = None
 
