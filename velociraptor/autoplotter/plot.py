@@ -100,7 +100,7 @@ def decorate_axes(
         comment_loc: comment,
     }
 
-    distance_from_edge: 0.025
+    distance_from_edge = 0.025
 
     for loc, label in label_switch.items():
         if label is not None:
