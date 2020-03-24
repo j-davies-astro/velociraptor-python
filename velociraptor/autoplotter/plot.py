@@ -95,6 +95,11 @@ def decorate_axes(
 
     legend = ax.legend(loc=legend_loc, markerfirst=markerfirst)
 
+    try:
+        fontsize = legend.get_texts[0].get_fontsize()
+    except IndexError:
+        fontsize = None
+
     label_switch = {
         redshift_loc: f"$z={catalogue.z:2.3f}$\n$a={catalogue.a:2.3f}$",
         comment_loc: comment,
@@ -136,7 +141,14 @@ def decorate_axes(
                 x = 0.5
 
             ax.text(
-                x, y, label, ha=ha, va=va, transform=ax.transAxes, multialignment=ha
+                x,
+                y,
+                label,
+                ha=ha,
+                va=va,
+                transform=ax.transAxes,
+                multialignment=ha,
+                fontsize=fontsize,
             )
 
     return
