@@ -100,6 +100,8 @@ def decorate_axes(
         comment_loc: comment,
     }
 
+    distance_from_edge: 0.025
+
     for loc, label in label_switch.items():
         if label is not None:
             # First need to parse the 'loc' string
@@ -114,10 +116,10 @@ def decorate_axes(
                     va = "center"
 
             if va == "lower":
-                y = 0.05
+                y = distance_from_edge
                 va = "bottom"
             elif va == "upper":
-                y = 0.95
+                y = 1.0 - distance_from_edge
                 va = "top"
             elif va == "center":
                 y = 0.5
@@ -127,9 +129,9 @@ def decorate_axes(
                 )
 
             if ha == "left":
-                x = 0.05
+                x = distance_from_edge
             elif ha == "right":
-                x = 0.95
+                x = 1.0 - distance_from_edge
             elif ha == "center":
                 x = 0.5
 
