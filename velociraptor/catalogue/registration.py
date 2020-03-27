@@ -753,12 +753,12 @@ def registration_element_mass_fractions(
     unit = unit_system.metallicity
 
     # Need to do a regex search
-    # Capture group 1: index number
-    # Capture group 2: mass weighted?
-    # Capture group 3: units
-    # Capture group 4: particle typr
+    # Capture group 1,2: index number - if not present default to 0
+    # Capture group 3: mass weighted?
+    # Capture group 4: units
+    # Capture group 5: particle typr
     match_string = (
-        "ElementMassFractions_index_([0-9]+)_([a-zA-Z]+)_([a-zA-Z]+)_?([a-z]*)"
+        "ElementMassFractions(_index_)?([0-9]*)_([a-zA-Z]+)_([a-zA-Z]+)_?([a-z]*)"
     )
     regex = cached_regex(match_string)
     match = regex.match(field_path)
@@ -766,10 +766,10 @@ def registration_element_mass_fractions(
     snake_case = "element"
 
     if match:
-        index = match.group(1)
-        mass_weighted = match.group(2)
-        extracted_units = match.group(3)
-        ptype = match.group(4)
+        index = match.group(2) if match.group(2) else 0
+        mass_weighted = match.group(3)
+        extracted_units = match.group(4)
+        ptype = match.group(5)
 
         full_name = f"Element {index} Mass Fraction"
         snake_case = f"{snake_case}_{index}"
@@ -784,6 +784,65 @@ def registration_element_mass_fractions(
         raise RegistrationDoesNotMatchError
 
     return unit, full_name, snake_case
+
+
+def registration_number(
+    field_path: str, unit_system: VelociraptorUnits
+) -> (unyt.Unit, str, str):
+    """
+    Registers the number of particles in each halo (n_{bh, gas, star} and npart).
+    """
+
+    if field_path[:2] == "n_":
+        unit = unyt.dimensionless
+        switch = {"bh": "Black Hole", "gas": "Gas", "star": "Star"}
+        snake_case = field_path[2:]
+        full_name = f"Number of {switch[snake_case]} Particles"
+
+    elif field_path == "npart":
+        unit = unyt.dimensionless
+        full_name = "Number of Particles"
+        snake_case = "part"
+
+    else:
+        raise RegistrationDoesNotMatchError
+
+    return unit, full_name, snake_case
+
+
+def registration_hydrogen_phase_fractions(
+    field_path: str, unit_system: VelociraptorUnits
+) -> (unyt.Unit, str, str):
+    """
+    Registers the phase fractions for hydrogen.
+    """
+
+    if field_path[:8] != "Hydrogen":
+        raise RegistrationDoesNotMatchError
+
+    unit = unyt.dimensionless
+
+    # Need to do a regex search
+    # Capture group 1: ionized
+    # Capture group 2: massweighted
+    # Capture group 3: units
+    # Capture group 4: particle type
+    match_string = "Hydrogen([a-zA-Z]+)Fractions_([a-zA-Z]+)_([a-zA-Z]+)_?([a-z]*)"
+    regex = cached_regex(match_string)
+    match = regex.match(field_path)
+
+    if match:
+        ionized = match.group(1)
+        mass_weighted = match.group(2)
+        extracted_units = match.group(3)
+        ptype = match.group(4)
+
+        full_name = f"Hydrogen {ionized} Fraction"
+        snake_case = ionized.lower()
+
+        return unit, full_name, snake_case
+    else:
+        raise RegistrationDoesNotMatchError
 
 
 # TODO
@@ -834,7 +893,8 @@ global_registration_functions = {
         "projected_apertures",
         "apertures",
         "element_mass_fractions",
+        "number",
+        "hydrogen_phase_fractions",
         "fail_all",
     ]
 }
-
