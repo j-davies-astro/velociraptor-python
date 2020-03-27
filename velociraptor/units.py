@@ -134,12 +134,11 @@ class VelociraptorUnits(object):
             self.box_length = unyt.unyt_quantity(
                 attributes["Period"] / self.a, units=self.units["length"]
             )
-            self.comoving_box_volume = self.period ** 3
-            self.physical_box_volume = self.box_length ** 3
+            self.comoving_box_volume = self.box_length ** 3
+            self.physical_box_volume = self.period ** 3
 
         # Unpack the dictionary to variables
         for name, unit in self.units.items():
             setattr(self, name, unit)
 
         return
-
