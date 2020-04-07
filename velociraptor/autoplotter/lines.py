@@ -259,7 +259,7 @@ class VelociraptorLine(object):
 
             # Deal with different + and -ve errors
             if errors.shape[0]:
-                if errors.size / errors.shape[0] > 1.0:
+                if errors.ndim > 1:
                     down, up = errors
                 else:
                     up = errors
