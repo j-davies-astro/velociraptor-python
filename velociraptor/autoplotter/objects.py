@@ -822,7 +822,7 @@ class AutoPlotter(object):
                     directory=directory,
                     file_extension=file_extension,
                 )
-            except AttributeError as e:
+            except (AttributeError, ValueError) as e:
                 print(f"Unable to create plot {plot.filename} due to exception: {e}.")
 
         return

@@ -6,6 +6,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import unyt
 
+from matplotlib import rcParams
+
 from matplotlib.colors import Normalize, LogNorm
 from velociraptor import VelociraptorCatalogue
 from velociraptor.autoplotter.objects import VelociraptorLine
@@ -23,7 +25,18 @@ def scatter_x_against_y(
 
     fig, ax = plt.subplots()
 
-    ax.scatter(x.value, y.value, s=1, edgecolor="none", alpha=0.5, zorder=-100)
+    kwargs = dict(edgecolor="none", zorder=-100)
+
+    # Need to "intelligently" size the markers
+    kwargs["s"] = (
+        rcParams["lines.markersize"]
+        * (6.0 - 5.0 * np.tanh(0.75 * np.log10(x.size) - 3.0))
+        / 11.0
+    )
+
+    kwargs["alpha"] = (5.5 - 4.5 * np.tanh(0.75 * np.log10(x.size) - 3.0)) / 10.0
+
+    ax.scatter(x.value, y.value, **kwargs)
 
     set_labels(ax=ax, x=x, y=y)
 
