@@ -83,9 +83,11 @@ def binned_mean_line(
 
             centers.append(0.5 * (x_bins[bin - 1].value + x_bins[bin].value))
 
-    means *= y.units
-    standard_deviations *= y.units
-    centers *= x.units
+    means = unyt.unyt_array(means, units=y.units, name=y.name)
+    standard_deviations = unyt.unyt_array(
+        standard_deviations, units=y.units, name=f"{y.name} ($sigma$)"
+    )
+    centers = unyt.unyt_array(centers, units=x.units, name=x.name)
 
     return centers, means, standard_deviations
 
@@ -171,12 +173,13 @@ def binned_median_line(
 
             centers.append(0.5 * (x_bins[bin - 1].value + x_bins[bin].value))
 
-    medians *= y.units
-    deviations *= y.units
+    medians = unyt.unyt_array(medians, units=y.units, name=y.name)
+    deviations = unyt.unyt_array(
+        deviations, units=y.units, name=f"{y.name} {percentiles} percentiles"
+    )
     # Percentiles actually gives us the values - we want to be able to use
     # matplotlib's errorbar function
     deviations = abs(deviations.T - medians)
-    centers *= x.units
+    centers = unyt.unyt_array(centers, units=x.units, name=x.name)
 
     return centers, medians, deviations
-

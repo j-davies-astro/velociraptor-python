@@ -5,6 +5,8 @@ Tools for creating mass functions!
 import unyt
 import numpy as np
 
+from velociraptor.tools.labels import get_mass_function_label_no_units
+
 
 def create_mass_function_given_bins(
     masses: unyt.unyt_array,
@@ -64,6 +66,9 @@ def create_mass_function_given_bins(
     error *= normalization_factor
 
     bin_centers = 0.5 * (bins[1:] + bins[:-1])
+
+    mass_function.name = get_mass_function_label_no_units("{}")
+    bin_centers.name = masses.name
 
     return bin_centers[valid_bins], mass_function[valid_bins], error[valid_bins]
 
@@ -141,4 +146,3 @@ def create_mass_function(
         return bin_centers, mass_function, error, bins
     else:
         return bin_centers, mass_function, error
-
