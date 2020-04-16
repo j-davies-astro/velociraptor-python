@@ -48,7 +48,9 @@ class VelociraptorPlot(object):
     # Shading for x/y
     x_shade: List[Union[unyt_quantity, None]]
     y_shade: List[Union[unyt_quantity, None]]
-    # override the axes?
+    # Labels for x and y axes (no units)
+    x_label: Union[None, str] = None
+    y_label: Union[None, str] = None
     x_label_override: Union[None, str]
     y_label_override: Union[None, str]
     comment: Union[None, str]
@@ -717,6 +719,19 @@ class VelociraptorPlot(object):
         plot type.
         """
 
+        self.x_label, self.y_label = plot.get_labels(
+            x=self.get_quantity_from_catalogue_with_mask(self.x, catalogue),
+            y=self.get_quantity_from_catalogue_with_mask(self.y, catalogue)
+            if self.mass_function_line is None
+            else self.y_units,
+            mass_function=self.mass_function_line is not None,
+        )
+
+        if self.x_label_override:
+            self.x_label = self.x_label_override
+        if self.y_label_override:
+            self.y_label = self.y_label_override
+
         fig, ax = getattr(self, f"_make_plot_{self.plot_type}")(catalogue=catalogue)
         self._add_shading_to_axes(ax)
 
@@ -731,6 +746,9 @@ class VelociraptorPlot(object):
             redshift_loc=self.redshift_loc,
             comment_loc=self.comment_loc,
         )
+
+        ax.set_xlabel(self.x_label)
+        ax.set_ylabel(self.y_label)
 
         fig.savefig(f"{directory}/{self.filename}.{file_extension}")
 
@@ -826,4 +844,3 @@ class AutoPlotter(object):
                 print(f"Unable to create plot {plot.filename} due to exception: {e}.")
 
         return
-

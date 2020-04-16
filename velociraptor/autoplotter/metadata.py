@@ -99,11 +99,7 @@ class VelociraptorPlotMetadata(object):
         Parses metadata: title.
         """
 
-        try:
-            self.title = self.metadata["metadata"]
-        except KeyError:
-            self.title = ""
-
+        self.title = self.metadata.get("title", "")
         self.filename = self.plot.filename
 
         return
@@ -115,10 +111,7 @@ class VelociraptorPlotMetadata(object):
         out to file too.
         """
 
-        try:
-            self.write_lines = bool(self.metadata["write_lines"])
-        except KeyError:
-            self.write_lines = True
+        self.write_lines = bool(self.metadata.get("write_lines", True))
 
         return
 
@@ -128,14 +121,12 @@ class VelociraptorPlotMetadata(object):
         plot.
         """
 
-        try:
-            self.metadata = self.plot.data["metadata"]
-        except KeyError:
-            self.metadata = {}
+        self.metadata = self.plot.data.get("metadata", {})
 
         self._parse_title()
         self._parse_line_write()
         self._parse_lines()
+        self._parse_labels()
 
         return
 
@@ -159,13 +150,33 @@ class VelociraptorPlotMetadata(object):
 
         return
 
+    def _parse_labels(self):
+        """
+        Parses the labels (without units).
+        """
+
+        self.x_quantity = self.plot.x
+        self.y_quantity = self.plot.y
+
+        self.x_label = self.plot.x_label
+        self.y_label = self.plot.y_label
+
+        return
+
     def to_dict(self):
         """
         Converts the contents of this into a dictionary, avoiding
         the use of __dict__.
         """
 
-        output = dict(title=self.title, filename=self.filename)
+        output = dict(
+            title=self.title,
+            filename=self.filename,
+            x_quantity=self.x_quantity,
+            y_quantity=self.y_quantity,
+            x_label=self.x_label,
+            y_label=self.y_label,
+        )
 
         if self.write_lines:
             output["lines"] = {line.line_type: line.to_dict() for line in self.lines}
@@ -218,4 +229,3 @@ class AutoPlotterMetadata(object):
             yaml.dump(metadata, stream=handle)
 
         return
-

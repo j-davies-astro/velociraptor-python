@@ -38,8 +38,6 @@ def scatter_x_against_y(
 
     ax.scatter(x.value, y.value, **kwargs)
 
-    set_labels(ax=ax, x=x, y=y)
-
     return fig, ax
 
 
@@ -63,8 +61,6 @@ def histogram_x_against_y(
 
     fig.colorbar(im, ax=ax, label="Number of haloes", pad=0.0)
 
-    set_labels(ax=ax, x=x, y=y)
-
     return fig, ax
 
 
@@ -80,13 +76,6 @@ def mass_function(
     centers, mass_function, error = mass_function.output
 
     ax.errorbar(centers, mass_function, error)
-
-    ax.set_xlabel(tools.get_full_label(x))
-    ax.set_ylabel(
-        tools.get_mass_function_label(
-            mass_function_sub_label="{}", mass_function_units=mass_function.units
-        )
-    )
 
     return fig, ax
 
@@ -167,12 +156,18 @@ def decorate_axes(
     return
 
 
-def set_labels(ax: plt.Axes, x: unyt.unyt_array, y: unyt.unyt_array) -> None:
+def get_labels(x: unyt.unyt_array, y: unyt.unyt_array, mass_function: bool) -> None:
     """
     Set the x and y labels for the axes.
     """
 
-    ax.set_xlabel(tools.get_full_label(x))
-    ax.set_ylabel(tools.get_full_label(y))
+    x_label = tools.get_full_label(x)
+    y_label = (
+        tools.get_mass_function_label(
+            mass_function_sub_label="{}", mass_function_units=y.units
+        )
+        if mass_function
+        else tools.get_full_label(y)
+    )
 
-    return
+    return x_label, y_label
