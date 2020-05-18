@@ -76,7 +76,7 @@ def get_particle_property_name_conversion(name: str, ptype: str):
         "veldisp_gas": "Gas Velocity Dispersion $\sigma_{\\rm g}}$",
         "veldisp_star": "Stellar Velocity Dispersion $\sigma_{*}$",
         "veldisp_bh": "Black Hole Velocity Dispersion $\sigma_{\\rm BH}$",
+        "SubgridMasses_aperture_total_solar_mass_bh": "Subgrid Black Hole Mass $M_{\\rm BH}$",
     }
 
     return key[combined_name]
-

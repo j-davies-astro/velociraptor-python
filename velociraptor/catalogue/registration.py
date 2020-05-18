@@ -845,13 +845,39 @@ def registration_hydrogen_phase_fractions(
         raise RegistrationDoesNotMatchError
 
 
+def registration_black_hole_masses(
+    field_path: str, unit_system: VelociraptorUnits
+) -> (unyt.Unit, str, str):
+    """
+    Sub-grid black hole property registrations.
+    """
+
+    if not field_path[:13] == "SubgridMasses" and field_path[-2:] == "bh":
+        raise RegistrationDoesNotMatchError
+
+    unit = unit_system.mass
+
+    # Need to do a regex search
+    # Capture group 1: average, min, max.
+    match_string = "SubgridMasses_([a-z]+)_solar_mass_bh"
+    regex = cached_regex(match_string)
+    match = regex.match(field_path)
+
+    if match:
+        minmax = match.group(1)
+
+        full_name = f"Subgrid Black Hole Mass ({minmax})"
+        snake_case = minmax.lower()
+
+        return unit, full_name, snake_case
+    else:
+        raise RegistrationDoesNotMatchError
+
+    return
+
+
 # TODO
 # lambda_B
-# n_bh
-# n_gas
-# n_star
-# npart
-# numSubStruct
 # q
 # q_gas
 # q_star
@@ -861,7 +887,6 @@ def registration_hydrogen_phase_fractions(
 # sigV
 # sigV_gas_nsf
 # sigV_gas_sf
-# tage_star
 
 
 # This must be placed at the bottom of the file so that we
@@ -895,6 +920,7 @@ global_registration_functions = {
         "element_mass_fractions",
         "number",
         "hydrogen_phase_fractions",
+        "black_hole_masses",
         "fail_all",
     ]
 }
