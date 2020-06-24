@@ -21,7 +21,7 @@ from functools import reduce
 from collections import OrderedDict
 
 valid_plot_types = ["scatter", "2dhistogram", "massfunction"]
-valid_line_types = ["median", "mean", "mass_function"]
+valid_line_types = ["median", "mean", "mass_function", "histogram"]
 
 matplotlib_support.label_style = "[]"
 
@@ -60,6 +60,7 @@ class VelociraptorPlot(object):
     mean_line: Union[None, VelociraptorLine]
     median_line: Union[None, VelociraptorLine]
     mass_function_line: Union[None, VelociraptorLine]
+    histogram_line: Union[None, VelociraptorLine]
     # Binning for x, y axes.
     number_of_bins: int
     x_bins: unyt_array
@@ -440,13 +441,9 @@ class VelociraptorPlot(object):
 
         return
 
-    def _parse_massfunction(self) -> None:
+    def _parse_common_histogramtype(self) -> None:
         """
-        Parses the required variables for producing a mass function
-        plot.
-
-        TODO: Re-write the mass function in a better way to be the
-        same as other lines.
+        Common parsing between histogram and mass function.
         """
 
         self._parse_coordinate_quantity("x")
@@ -465,6 +462,19 @@ class VelociraptorPlot(object):
         self._parse_comment()
         self._parse_structure_type()
         self._parse_selection_mask()
+
+        return
+
+    def _parse_massfunction(self) -> None:
+        """
+        Parses the required variables for producing a mass function
+        plot.
+
+        TODO: Re-write the mass function in a better way to be the
+        same as other lines.
+        """
+
+        self._parse_common_histogramtype()
 
         # A bit of a hacky workaround - improve this in the future
         # by combining this functionality properly into the
@@ -488,7 +498,18 @@ class VelociraptorPlot(object):
         """
 
         # Same as mass function, unsurprisingly!
-        self._parse_massfunction()
+        self._parse_common_histogramtype()
+
+        self.histogram_line = VelociraptorLine(
+            line_type="mass_function",
+            line_data=dict(
+                plot=True,
+                log=self.x_log,
+                number_of_bins=self.number_of_bins,
+                start=dict(value=self.x_lim[0].value, units=self.x_lim[0].units),
+                end=dict(value=self.x_lim[1].value, units=self.x_lim[1].units),
+            ),
+        )
 
         return
 
@@ -700,6 +721,37 @@ class VelociraptorPlot(object):
         fig, ax = plot.mass_function(
             x=x, x_bins=self.x_bins, mass_function=self.mass_function_line
         )
+
+        if self.x_log:
+            ax.set_xscale("log")
+        if self.y_log:
+            ax.set_yscale("log")
+
+        ax.set_xlim(*self.x_lim)
+        ax.set_ylim(*self.y_lim)
+
+        return fig, ax
+
+    def _make_plot_histogram(
+        self, catalogue: VelociraptorCatalogue
+    ) -> Tuple[Figure, Axes]:
+        """
+        Make histogram plot and return the figure and axes.
+        """
+
+        x = self.get_quantity_from_catalogue_with_mask(self.x, catalogue)
+        x.convert_to_units(self.x_units)
+
+        self.x_bins.convert_to_units(self.x_units)
+
+        self.histogram_line.create_line(
+            x=x, y=None, box_volume=catalogue.units.comoving_box_volume
+        )
+
+        self.histogram_line.output[1].convert_to_units(self.y_units)
+        self.histogram_line.output[2].convert_to_units(self.y_units)
+
+        fig, ax = plot.histogram(x=x, x_bins=self.x_bins, histogram=self.histogram_line)
 
         if self.x_log:
             ax.set_xscale("log")

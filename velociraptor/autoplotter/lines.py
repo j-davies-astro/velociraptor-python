@@ -9,6 +9,7 @@ from matplotlib.pyplot import Axes
 
 import velociraptor.tools.lines as lines
 from velociraptor.tools.mass_functions import create_mass_function_given_bins
+from velociraptor.tools.histogram import create_histogram_given_bins
 
 
 class VelociraptorLine(object):
@@ -24,6 +25,7 @@ class VelociraptorLine(object):
     median: bool
     mean: bool
     mass_function: bool
+    histogram: bool
     # Create bins in logspace?
     log: bool
     # Binning properties
@@ -211,6 +213,10 @@ class VelociraptorLine(object):
             self.output = create_mass_function_given_bins(
                 masked_x, self.bins, box_volume=box_volume
             )
+        elif self.histogram:
+            self.output = create_histogram_given_bins(
+                masked_x, self.bins, box_volume=box_volume
+            )
         else:
             self.output = None
 
@@ -250,7 +256,7 @@ class VelociraptorLine(object):
 
         centers, heights, errors = self.create_line(x=x, y=y)
 
-        if self.scatter == "none":
+        if self.scatter == "none" or errors is None:
             ax.plot(centers, heights, label=label)
         elif self.scatter == "errorbar":
             ax.errorbar(centers, heights, yerr=errors, label=label)

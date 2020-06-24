@@ -80,6 +80,22 @@ def mass_function(
     return fig, ax
 
 
+def histogram(
+    x: unyt.unyt_array, x_bins: unyt.unyt_array, histogram: VelociraptorLine
+) -> Tuple[plt.Figure, plt.Axes]:
+    """
+    Creates a plot of x as a mass function, binned with x_bins.
+    """
+
+    fig, ax = plt.subplots()
+
+    centers, mass_function, _ = histogram.output
+
+    ax.plot(centers, mass_function)
+
+    return fig, ax
+
+
 def decorate_axes(
     ax: plt.Axes,
     catalogue: VelociraptorCatalogue,
