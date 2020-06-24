@@ -52,12 +52,12 @@ def create_histogram_given_bins(
 
     bins.convert_to_units(masses.units)
 
-    histogram, _ = np.histogram(masses, bins)
+    histogram = unyt.unyt_array(np.histogram(masses, bins)[0], units="dimensionless")
     valid_bins = histogram >= minimum_in_bin
 
     bin_centers = 0.5 * (bins[1:] + bins[:-1])
 
-    histogram.name = get_mass_function_label_no_units("Number of Haloes")
+    histogram.name = "Number of Haloes"
     bin_centers.name = masses.name
 
     return bin_centers[valid_bins], histogram[valid_bins], None
@@ -128,7 +128,7 @@ def create_histogram(
         * masses.units
     )
 
-    bin_centers, mass_function = create_histogram_given_bins(
+    bin_centers, mass_function, _ = create_histogram_given_bins(
         masses=masses, bins=bins, box_volume=box_volume, minimum_in_bin=minimum_in_bin
     )
 

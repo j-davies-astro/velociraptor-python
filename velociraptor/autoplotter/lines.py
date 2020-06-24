@@ -11,6 +11,8 @@ import velociraptor.tools.lines as lines
 from velociraptor.tools.mass_functions import create_mass_function_given_bins
 from velociraptor.tools.histogram import create_histogram_given_bins
 
+valid_line_types = ["median", "mean", "mass_function", "histogram"]
+
 
 class VelociraptorLine(object):
     """
@@ -62,7 +64,7 @@ class VelociraptorLine(object):
         """
 
         # TODO: Use centralised metadata for this list.
-        for line_type in ["median", "mean", "mass_function"]:
+        for line_type in valid_line_types:
             setattr(self, line_type, self.line_type == line_type)
 
         return

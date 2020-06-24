@@ -3,7 +3,7 @@ Main objects for holding information relating to the autoplotter.
 """
 
 from velociraptor import VelociraptorCatalogue
-from velociraptor.autoplotter.lines import VelociraptorLine
+from velociraptor.autoplotter.lines import VelociraptorLine, valid_line_types
 from velociraptor.exceptions import AutoPlotterError
 from velociraptor.observations.objects import ObservationalData
 
@@ -20,8 +20,7 @@ from os import path, mkdir
 from functools import reduce
 from collections import OrderedDict
 
-valid_plot_types = ["scatter", "2dhistogram", "massfunction"]
-valid_line_types = ["median", "mean", "mass_function", "histogram"]
+valid_plot_types = ["scatter", "2dhistogram", "massfunction", "histogram"]
 
 matplotlib_support.label_style = "[]"
 
@@ -111,15 +110,13 @@ class VelociraptorPlot(object):
         """
 
         try:
-            setattr(
-                self,
-                f"{coordinate}_units",
-                unyt_quantity(1.0, units=self.data[coordinate]["units"]),
+            units = unyt_quantity(
+                1.0, self.data[coordinate].get("units", "dimensionless")
             )
         except KeyError:
-            raise AutoPlotterError(
-                f"You must provide a {coordinate} units to plot for {self.filename}"
-            )
+            units = unyt_quantity(1.0, units="dimensionless")
+
+        setattr(self, f"{coordinate}_units", units)
 
         return
 
@@ -501,7 +498,7 @@ class VelociraptorPlot(object):
         self._parse_common_histogramtype()
 
         self.histogram_line = VelociraptorLine(
-            line_type="mass_function",
+            line_type="histogram",
             line_data=dict(
                 plot=True,
                 log=self.x_log,
@@ -749,7 +746,6 @@ class VelociraptorPlot(object):
         )
 
         self.histogram_line.output[1].convert_to_units(self.y_units)
-        self.histogram_line.output[2].convert_to_units(self.y_units)
 
         fig, ax = plot.histogram(x=x, x_bins=self.x_bins, histogram=self.histogram_line)
 
@@ -875,7 +871,9 @@ class AutoPlotter(object):
 
         return
 
-    def create_plots(self, directory: str, file_extension: str = "pdf"):
+    def create_plots(
+        self, directory: str, file_extension: str = "pdf", debug: bool = False
+    ):
         """
         Creates and saves the plots in a directory.
         """
@@ -893,5 +891,11 @@ class AutoPlotter(object):
                 )
             except (AttributeError, ValueError) as e:
                 print(f"Unable to create plot {plot.filename} due to exception: {e}.")
+                if debug:
+                    import sys, traceback
+
+                    _, _, exc_traceback = sys.exc_info()
+                    print("Traceback:")
+                    traceback.print_tb(exc_traceback, limit=10, file=sys.stdout)
 
         return
