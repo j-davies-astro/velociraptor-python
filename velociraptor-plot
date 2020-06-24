@@ -158,7 +158,9 @@ if __name__ == "__main__":
     if args.debug:
         auto_plotter.plots = tqdm(auto_plotter.plots, desc="Creating figures")
 
-    auto_plotter.create_plots(directory=args.output, file_extension=args.file_type)
+    auto_plotter.create_plots(
+        directory=args.output, file_extension=args.file_type, debug=args.debug
+    )
 
     if args.metadata:
         print_if_debug("Creating AutoPlotterMetadata instance.")

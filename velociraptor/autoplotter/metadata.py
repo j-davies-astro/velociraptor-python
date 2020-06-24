@@ -60,10 +60,15 @@ class VelociraptorLineMetadata(object):
             centers_units=str(self.centers.units),
             values=self.values.value.tolist(),
             values_units=str(self.values.units),
-            scatter=self.scatter.value.tolist(),
-            scatter_units=str(self.scatter.units),
             line_type=self.line_type,
         )
+
+        try:
+            output["scatter"] = self.scatter.value.tolist()
+            output["scatter_units"] = str(self.scatter.units)
+        except (TypeError, AttributeError):
+            output["scatter"] = [0.0] * len(self.centers)
+            output["scatter_units"] = "dimensionless"
 
         return output
 
