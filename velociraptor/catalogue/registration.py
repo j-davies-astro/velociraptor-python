@@ -875,6 +875,53 @@ def registration_black_hole_masses(
 
     return
 
+def registration_species_mass_fractions(
+    field_path: str, unit_system: VelociraptorUnits
+) -> (unyt.Unit, str, str):
+    """
+    Registers the species mass fraction properties.
+
+    Hopefully this is changed in the future as this is a mess.
+    """
+
+    if not field_path[:20] == "SpeciesMassFractions":
+        raise RegistrationDoesNotMatchError
+
+    unit = unyt.dimensionless
+
+    # Need to do a regex search
+    # Capture group 1,2: index number - if not present default to 0
+    # Capture group 3: mass weighted?
+    # Capture group 4: units
+    # Capture group 5: particle type
+    match_string = (
+        "SpeciesMassFractions(_index_)?([0-9]*)_([a-zA-Z]+)_([a-zA-Z]+)_?([a-z]*)"
+    )
+    regex = cached_regex(match_string)
+    match = regex.match(field_path)
+
+    snake_case = "species"
+
+    if match:
+        index = match.group(2) if match.group(2) else 0
+        mass_weighted = match.group(3)
+        extracted_units = match.group(4)
+        ptype = match.group(5)
+
+        full_name = f"Species {index} Mass Fraction"
+        snake_case = f"{snake_case}_{index}"
+
+        if ptype:
+            cap_ptype = ptype[0].upper() + ptype[1:]
+            full_name = f"{cap_ptype} {full_name}"
+
+            snake_case += f"_{ptype}"
+
+    else:
+        raise RegistrationDoesNotMatchError
+
+    return unit, full_name, snake_case
+
 
 # TODO
 # lambda_B
@@ -921,6 +968,7 @@ global_registration_functions = {
         "number",
         "hydrogen_phase_fractions",
         "black_hole_masses",
+        "species_mass_fractions",
         "fail_all",
     ]
 }
