@@ -15,6 +15,7 @@ from velociraptor.autoplotter.lines import VelociraptorLine
 from typing import List, Dict
 
 import yaml
+from unyt import unyt_array
 
 
 class VelociraptorLineMetadata(object):
@@ -40,7 +41,11 @@ class VelociraptorLineMetadata(object):
         Parse the line to x and y arrays.
         """
 
-        self.centers, self.values, self.scatter, self.additional_x, self.additional_y = self.line.output
+        self.centers, self.values, self.scatter = self.line.output[:3]
+        if len(self.line.output) == 5:
+            self.additional_x, self.additional_y = self.line.output[3:]
+        else:
+            self.additional_x, self.additional_y = unyt_array([]), unyt_array([])
         self.line_type = self.line.line_type
 
         return

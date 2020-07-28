@@ -213,13 +213,13 @@ class VelociraptorLine(object):
                 x=masked_x, y=masked_y, x_bins=self.bins,
                 return_additional=True)
         elif self.mass_function:
-            self.output = *create_mass_function_given_bins(
+            self.output = create_mass_function_given_bins(
                 masked_x, self.bins, box_volume=box_volume
-            ), unyt_array([]), unyt_array([])
+            )
         elif self.histogram:
-            self.output = *create_histogram_given_bins(
+            self.output = create_histogram_given_bins(
                 masked_x, self.bins, box_volume=box_volume
-            ), unyt_array([]), unyt_array([])
+            )
         else:
             self.output = None
 
@@ -257,7 +257,7 @@ class VelociraptorLine(object):
         if not self.plot:
             return
 
-        centers, heights, errors, additional_x, additional_y = self.create_line(x=x, y=y)
+        centers, heights, errors, *_ = self.create_line(x=x, y=y)
 
         if self.scatter == "none" or errors is None:
             ax.plot(centers, heights, label=label)
