@@ -39,9 +39,11 @@ class VelociraptorLine(object):
     bins: unyt_array
     # Scatter can be: "none", "errorbar", or "shaded"
     scatter: str
-    # Output: centers, values, scatter, additional_x, additional_y - initialised here to prevent crashes
+    # Output: centers, values, scatter, additional_x (optional), additional_y (optional)
+    # - initialised here to prevent crashes
     # in other code.
-    output: Tuple[unyt_array] = (unyt_array([]), unyt_array([]), unyt_array([]), unyt_array([]), unyt_array([]))
+    output: Tuple[unyt_array] = (unyt_array([]), unyt_array([]), unyt_array([]),
+                                 unyt_array([]), unyt_array([]))
 
     def __init__(self, line_type: str, line_data: Dict[str, Union[Dict, str]]):
         """
@@ -180,9 +182,10 @@ class VelociraptorLine(object):
         -------
 
         output: Tuple[unyt_array]
-            A five-length tuple of unyt arrays that takes the following
-            form: (bin centers, vertical values, vertical scatter, additional_x
-            [optional] additional_y [optional]).
+            A five-length (mean, median lines) or three-length (mass_function,
+            histogram) tuple of unyt arrays that takes the following form:
+            (bin centers, vertical values, vertical scatter, additional_x [optional]
+            additional_y [optional]).
 
         """
 

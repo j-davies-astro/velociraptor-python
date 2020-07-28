@@ -101,8 +101,8 @@ def binned_mean_line(
             centers.append(0.5 * (x_bins[bin - 1].value + x_bins[bin].value))
 
         # If the number of data points in the bin is less than minimum_in_bin,
-        # save these data points
-        elif minimum_in_bin > indicies_in_this_bin.sum() > 0:
+        # save these data points if needed
+        elif (minimum_in_bin > indicies_in_this_bin.sum() > 0) and return_additional:
             for x_point, y_point in zip(x[indicies_in_this_bin].value, y[indicies_in_this_bin].value):
                 additional_x.append(x_point)
                 additional_y.append(y_point)
@@ -220,8 +220,8 @@ def binned_median_line(
             centers.append(0.5 * (x_bins[bin - 1].value + x_bins[bin].value))
 
         # If the number of data points in the bin is less than minimum_in_bin,
-        # save these data points
-        elif minimum_in_bin > indicies_in_this_bin.sum() > 0:
+        # save these data points if needed
+        elif (minimum_in_bin > indicies_in_this_bin.sum() > 0) and return_additional:
             for x_point, y_point in zip(x[indicies_in_this_bin].value, y[indicies_in_this_bin].value):
                 additional_x.append(x_point)
                 additional_y.append(y_point)
