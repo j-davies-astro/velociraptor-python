@@ -226,20 +226,20 @@ def binned_median_line(
                 additional_x.append(x_point)
                 additional_y.append(y_point)
 
-        medians = unyt.unyt_array(medians, units=y.units, name=y.name)
+    medians = unyt.unyt_array(medians, units=y.units, name=y.name)
 
-        # Percentiles actually gives us the values - we want to be able to use
-        # matplotlib's errorbar function
-        deviations = unyt.unyt_array(
-            abs(np.array(deviations).T - medians.value),
-            units=y.units,
-            name=f"{y.name} {percentiles} percentiles",
-        )
-        centers = unyt.unyt_array(centers, units=x.units, name=x.name)
+    # Percentiles actually gives us the values - we want to be able to use
+    # matplotlib's errorbar function
+    deviations = unyt.unyt_array(
+        abs(np.array(deviations).T - medians.value),
+        units=y.units,
+        name=f"{y.name} {percentiles} percentiles",
+    )
+    centers = unyt.unyt_array(centers, units=x.units, name=x.name)
 
-        if not return_additional:
-            return centers, medians, deviations
-        else:
-            additional_x = unyt.unyt_array(additional_x, units=x.units)
-            additional_y = unyt.unyt_array(additional_y, units=y.units)
-            return centers, medians, deviations, additional_x, additional_y
+    if not return_additional:
+        return centers, medians, deviations
+    else:
+        additional_x = unyt.unyt_array(additional_x, units=x.units)
+        additional_y = unyt.unyt_array(additional_y, units=y.units)
+        return centers, medians, deviations, additional_x, additional_y
