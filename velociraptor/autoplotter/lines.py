@@ -39,6 +39,10 @@ class VelociraptorLine(object):
     bins: unyt_array
     # Scatter can be: "none", "errorbar", or "shaded"
     scatter: str
+    # Boolean. If true, for mean and median lines makes the function create_line
+    # return x and y data points that lie in the bins where the number of data points
+    # is smaller than the minimum value required to compute the mean (or median)
+    return_additional: bool
     # Output: centers, values, scatter, additional_x (optional), additional_y (optional)
     # - initialised here to prevent crashes
     # in other code.

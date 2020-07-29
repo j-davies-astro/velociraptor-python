@@ -101,7 +101,7 @@ def binned_mean_line(
             centers.append(0.5 * (x_bins[bin - 1].value + x_bins[bin].value))
 
         # If the number of data points in the bin is less than minimum_in_bin,
-        # save these data points if needed
+        # collect these data points if needed
         elif (minimum_in_bin > indicies_in_this_bin.sum() > 0) and return_additional:
             for x_point, y_point in zip(x[indicies_in_this_bin].value, y[indicies_in_this_bin].value):
                 additional_x.append(x_point)
@@ -116,8 +116,8 @@ def binned_mean_line(
     if not return_additional:
         return centers, means, standard_deviations
     else:
-        additional_x = unyt.unyt_array(additional_x, units=x.units)
-        additional_y = unyt.unyt_array(additional_y, units=y.units)
+        additional_x = unyt.unyt_array(additional_x, units=x.units, name=x.name)
+        additional_y = unyt.unyt_array(additional_y, units=y.units, name=y.name)
         return centers, means, standard_deviations, additional_x, additional_y
 
 
@@ -220,7 +220,7 @@ def binned_median_line(
             centers.append(0.5 * (x_bins[bin - 1].value + x_bins[bin].value))
 
         # If the number of data points in the bin is less than minimum_in_bin,
-        # save these data points if needed
+        # collect these data points if needed
         elif (minimum_in_bin > indicies_in_this_bin.sum() > 0) and return_additional:
             for x_point, y_point in zip(x[indicies_in_this_bin].value, y[indicies_in_this_bin].value):
                 additional_x.append(x_point)
@@ -235,11 +235,12 @@ def binned_median_line(
         units=y.units,
         name=f"{y.name} {percentiles} percentiles",
     )
+
     centers = unyt.unyt_array(centers, units=x.units, name=x.name)
 
     if not return_additional:
         return centers, medians, deviations
     else:
-        additional_x = unyt.unyt_array(additional_x, units=x.units)
-        additional_y = unyt.unyt_array(additional_y, units=y.units)
+        additional_x = unyt.unyt_array(additional_x, units=x.units, name=x.name)
+        additional_y = unyt.unyt_array(additional_y, units=y.units, name=y.name)
         return centers, medians, deviations, additional_x, additional_y
