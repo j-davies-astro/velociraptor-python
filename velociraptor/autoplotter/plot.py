@@ -73,7 +73,7 @@ def mass_function(
 
     fig, ax = plt.subplots()
 
-    centers, mass_function, error = mass_function.output
+    centers, mass_function, error, *_ = mass_function.output
 
     ax.errorbar(centers, mass_function, error)
 
@@ -89,7 +89,7 @@ def histogram(
 
     fig, ax = plt.subplots()
 
-    centers, mass_function, _ = histogram.output
+    centers, mass_function, *_ = histogram.output
 
     ax.plot(centers, mass_function)
 

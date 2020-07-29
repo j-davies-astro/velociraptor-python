@@ -91,8 +91,9 @@ def binned_mean_line(
 
     for bin in range(1, len(x_bins)):
         indicies_in_this_bin = hist == bin
+        number_of_items_in_bin = indicies_in_this_bin.sum()
 
-        if indicies_in_this_bin.sum() >= minimum_in_bin:
+        if number_of_items_in_bin >= minimum_in_bin:
             y_values_in_this_bin = y[indicies_in_this_bin].value
 
             means.append(np.mean(y_values_in_this_bin))
@@ -102,22 +103,21 @@ def binned_mean_line(
 
         # If the number of data points in the bin is less than minimum_in_bin,
         # collect these data points if needed
-        elif (minimum_in_bin > indicies_in_this_bin.sum() > 0) and return_additional:
-            for x_point, y_point in zip(x[indicies_in_this_bin].value, y[indicies_in_this_bin].value):
-                additional_x.append(x_point)
-                additional_y.append(y_point)
+        elif number_of_items_in_bin > 0 and return_additional:
+            additional_x += list(x[indicies_in_this_bin].value)
+            additional_y += list(y[indicies_in_this_bin].value)
 
     means = unyt.unyt_array(means, units=y.units, name=y.name)
     standard_deviations = unyt.unyt_array(
         standard_deviations, units=y.units, name=f"{y.name} ($sigma$)"
     )
     centers = unyt.unyt_array(centers, units=x.units, name=x.name)
+    additional_x = unyt.unyt_array(additional_x, units=x.units, name=x.name)
+    additional_y = unyt.unyt_array(additional_y, units=y.units, name=y.name)
 
     if not return_additional:
         return centers, means, standard_deviations
     else:
-        additional_x = unyt.unyt_array(additional_x, units=x.units, name=x.name)
-        additional_y = unyt.unyt_array(additional_y, units=y.units, name=y.name)
         return centers, means, standard_deviations, additional_x, additional_y
 
 
@@ -210,8 +210,9 @@ def binned_median_line(
 
     for bin in range(1, len(x_bins)):
         indicies_in_this_bin = hist == bin
+        number_of_items_in_bin = indicies_in_this_bin.sum()
 
-        if indicies_in_this_bin.sum() >= minimum_in_bin:
+        if number_of_items_in_bin >= minimum_in_bin:
             y_values_in_this_bin = y[indicies_in_this_bin].value
 
             medians.append(np.median(y_values_in_this_bin))
@@ -221,13 +222,11 @@ def binned_median_line(
 
         # If the number of data points in the bin is less than minimum_in_bin,
         # collect these data points if needed
-        elif (minimum_in_bin > indicies_in_this_bin.sum() > 0) and return_additional:
-            for x_point, y_point in zip(x[indicies_in_this_bin].value, y[indicies_in_this_bin].value):
-                additional_x.append(x_point)
-                additional_y.append(y_point)
+        elif number_of_items_in_bin > 0 and return_additional:
+            additional_x += list(x[indicies_in_this_bin].value)
+            additional_y += list(y[indicies_in_this_bin].value)
 
     medians = unyt.unyt_array(medians, units=y.units, name=y.name)
-
     # Percentiles actually gives us the values - we want to be able to use
     # matplotlib's errorbar function
     deviations = unyt.unyt_array(
@@ -235,12 +234,11 @@ def binned_median_line(
         units=y.units,
         name=f"{y.name} {percentiles} percentiles",
     )
-
     centers = unyt.unyt_array(centers, units=x.units, name=x.name)
+    additional_x = unyt.unyt_array(additional_x, units=x.units, name=x.name)
+    additional_y = unyt.unyt_array(additional_y, units=y.units, name=y.name)
 
     if not return_additional:
         return centers, medians, deviations
     else:
-        additional_x = unyt.unyt_array(additional_x, units=x.units, name=x.name)
-        additional_y = unyt.unyt_array(additional_y, units=y.units, name=y.name)
         return centers, medians, deviations, additional_x, additional_y

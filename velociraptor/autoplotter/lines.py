@@ -39,14 +39,8 @@ class VelociraptorLine(object):
     bins: unyt_array
     # Scatter can be: "none", "errorbar", or "shaded"
     scatter: str
-    # Boolean. If true, for mean and median lines makes the function create_line
-    # return x and y data points that lie in the bins where the number of data points
-    # is smaller than the minimum value required to compute the mean (or median)
-    # Default: True.
-    return_additional: bool = True
     # Output: centers, values, scatter, additional_x (optional), additional_y (optional)
-    # - initialised here to prevent crashes
-    # in other code.
+    # - initialised here to prevent crashes in other code.
     output: Tuple[unyt_array] = (unyt_array([]), unyt_array([]), unyt_array([]),
                                  unyt_array([]), unyt_array([]))
 
@@ -215,19 +209,19 @@ class VelociraptorLine(object):
         if self.median:
             self.output = lines.binned_median_line(
                 x=masked_x, y=masked_y, x_bins=self.bins,
-                return_additional=self.return_additional)
+                return_additional=True)
         elif self.mean:
             self.output = lines.binned_mean_line(
                 x=masked_x, y=masked_y, x_bins=self.bins,
-                return_additional=self.return_additional)
+                return_additional=True)
         elif self.mass_function:
-            self.output = create_mass_function_given_bins(
+            self.output = *create_mass_function_given_bins(
                 masked_x, self.bins, box_volume=box_volume
-            )
+            ), unyt_array([], units=masked_x.units), unyt_array([], units="dimensionless")
         elif self.histogram:
-            self.output = create_histogram_given_bins(
+            self.output = *create_histogram_given_bins(
                 masked_x, self.bins, box_volume=box_volume
-            )
+            ), unyt_array([], units=masked_x.units), unyt_array([], units="dimensionless")
         else:
             self.output = None
 
@@ -265,7 +259,7 @@ class VelociraptorLine(object):
         if not self.plot:
             return
 
-        centers, heights, errors, *_ = self.create_line(x=x, y=y)
+        centers, heights, errors, additional_x, additional_y = self.create_line(x=x, y=y)
 
         if self.scatter == "none" or errors is None:
             ax.plot(centers, heights, label=label)

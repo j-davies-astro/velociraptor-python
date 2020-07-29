@@ -41,11 +41,7 @@ class VelociraptorLineMetadata(object):
         Parse the line to x and y arrays.
         """
 
-        self.centers, self.values, self.scatter = self.line.output[:3]
-        try:
-            self.additional_x, self.additional_y = self.line.output[3:]
-        except ValueError:
-            self.additional_x, self.additional_y = unyt_array([]), unyt_array([])
+        self.centers, self.values, self.scatter, self.additional_x, self.additional_y = self.line.output
         self.line_type = self.line.line_type
 
         return
