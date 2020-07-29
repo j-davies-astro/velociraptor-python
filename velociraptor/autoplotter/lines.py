@@ -39,9 +39,10 @@ class VelociraptorLine(object):
     bins: unyt_array
     # Scatter can be: "none", "errorbar", or "shaded"
     scatter: str
-    # Output: centers, values, scatter - initialised here to prevent crashes
-    # in other code.
-    output: Tuple[unyt_array] = (unyt_array([]), unyt_array([]), unyt_array([]))
+    # Output: centers, values, scatter, additional_x (optional), additional_y (optional)
+    # - initialised here to prevent crashes in other code.
+    output: Tuple[unyt_array] = (unyt_array([]), unyt_array([]), unyt_array([]),
+                                 unyt_array([]), unyt_array([]))
 
     def __init__(self, line_type: str, line_data: Dict[str, Union[Dict, str]]):
         """
@@ -180,8 +181,10 @@ class VelociraptorLine(object):
         -------
 
         output: Tuple[unyt_array]
-            A three-length tuple of unyt arrays that takes the following form:
-            (bin centers, vertical values, vertical scatter).
+            A five-length (mean, median lines) or three-length (mass_function,
+            histogram) tuple of unyt arrays that takes the following form:
+            (bin centers, vertical values, vertical scatter, additional_x [optional]
+            additional_y [optional]).
 
         """
 
@@ -205,20 +208,20 @@ class VelociraptorLine(object):
 
         if self.median:
             self.output = lines.binned_median_line(
-                x=masked_x, y=masked_y, x_bins=self.bins
-            )
+                x=masked_x, y=masked_y, x_bins=self.bins,
+                return_additional=True)
         elif self.mean:
             self.output = lines.binned_mean_line(
-                x=masked_x, y=masked_y, x_bins=self.bins
-            )
+                x=masked_x, y=masked_y, x_bins=self.bins,
+                return_additional=True)
         elif self.mass_function:
-            self.output = create_mass_function_given_bins(
+            self.output = *create_mass_function_given_bins(
                 masked_x, self.bins, box_volume=box_volume
-            )
+            ), unyt_array([], units=masked_x.units), unyt_array([], units="dimensionless")
         elif self.histogram:
-            self.output = create_histogram_given_bins(
+            self.output = *create_histogram_given_bins(
                 masked_x, self.bins, box_volume=box_volume
-            )
+            ), unyt_array([], units=masked_x.units), unyt_array([], units="dimensionless")
         else:
             self.output = None
 
@@ -256,7 +259,7 @@ class VelociraptorLine(object):
         if not self.plot:
             return
 
-        centers, heights, errors = self.create_line(x=x, y=y)
+        centers, heights, errors, additional_x, additional_y = self.create_line(x=x, y=y)
 
         if self.scatter == "none" or errors is None:
             ax.plot(centers, heights, label=label)
