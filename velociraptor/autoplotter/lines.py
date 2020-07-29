@@ -42,7 +42,8 @@ class VelociraptorLine(object):
     # Boolean. If true, for mean and median lines makes the function create_line
     # return x and y data points that lie in the bins where the number of data points
     # is smaller than the minimum value required to compute the mean (or median)
-    return_additional: bool
+    # Default: True.
+    return_additional: bool = True
     # Output: centers, values, scatter, additional_x (optional), additional_y (optional)
     # - initialised here to prevent crashes
     # in other code.
@@ -214,11 +215,11 @@ class VelociraptorLine(object):
         if self.median:
             self.output = lines.binned_median_line(
                 x=masked_x, y=masked_y, x_bins=self.bins,
-                return_additional=True)
+                return_additional=self.return_additional)
         elif self.mean:
             self.output = lines.binned_mean_line(
                 x=masked_x, y=masked_y, x_bins=self.bins,
-                return_additional=True)
+                return_additional=self.return_additional)
         elif self.mass_function:
             self.output = create_mass_function_given_bins(
                 masked_x, self.bins, box_volume=box_volume
