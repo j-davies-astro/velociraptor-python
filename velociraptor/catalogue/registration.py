@@ -859,7 +859,8 @@ def registration_black_hole_masses(
 
     # Need to do a regex search
     # Capture group 1: average, min, max.
-    match_string = "SubgridMasses_([a-z]+)_solar_mass_bh"
+    # Capture group 2: optional _solar_mass part - backwards compat.
+    match_string = "SubgridMasses_([a-z]+)(_solar_mass|)_bh"
     regex = cached_regex(match_string)
     match = regex.match(field_path)
 
