@@ -74,6 +74,7 @@ class VelociraptorPlot(object):
     comment_loc: str
     # Observational data
     observational_data: List[ObservationalData]
+    observational_data_redshift_bracketing: List[List[float]]
 
     def __init__(self, filename: str, data: Dict[str, Union[Dict, str]]):
         """
@@ -538,6 +539,7 @@ class VelociraptorPlot(object):
         """
 
         self.observational_data = []
+        self.observational_data_redshift_bracketing = []
 
         try:
             obs_data = self.data["observational_data"]
@@ -561,6 +563,13 @@ class VelociraptorPlot(object):
                         )
 
                     self.observational_data.append(obs_data_instance)
+
+                    minimum_redshift = data.get("minimum_redshift", -1e9)
+                    maximum_redshift = data.get("maximum_redshift", 1e9)
+
+                    bracket = [minimum_redshift, maximum_redshift]
+
+                    self.observational_data_redshift_bracketing.append(bracket)
 
         except KeyError:
             pass
@@ -776,8 +785,11 @@ class VelociraptorPlot(object):
             fig, ax = getattr(self, f"_make_plot_{self.plot_type}")(catalogue=catalogue)
             self._add_shading_to_axes(ax)
 
-            for data in self.observational_data:
-                data.plot_on_axes(ax, errorbar_kwargs=dict(zorder=-10))
+            for data, bracket in zip(
+                self.observational_data, self.observational_data_redshift_bracketing
+            ):
+                if bracket[0] < catalogue.z and bracket[1] > catalogue.z:
+                    data.plot_on_axes(ax, errorbar_kwargs=dict(zorder=-10))
 
             plot.decorate_axes(
                 ax=ax,

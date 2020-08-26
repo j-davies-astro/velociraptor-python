@@ -77,6 +77,8 @@ This yaml file has the following format:
      # Comparison data to plot on top
      observational_data:
        - filename: filename of data to plot on this plot (use ObservationalData written to disk)
+         minimum_redshift: minimal redshift for this data; below this it won't be plotted
+         maximum_redshift: maximum redshift fort his data; above this it won't be plotted
        - filename: second filename for observational data
        - filename: ... you can plot as many of these as you'd like
 """
