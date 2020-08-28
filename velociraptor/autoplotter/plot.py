@@ -73,9 +73,14 @@ def mass_function(
 
     fig, ax = plt.subplots()
 
-    centers, mass_function, error, *_ = mass_function.output
-
-    ax.errorbar(centers, mass_function, error)
+    if mass_function.adaptive_mass_function:
+        centers, mass_function, error, *_ = mass_function.output
+        ax.errorbar(
+            centers, mass_function, yerr=error, xerr=abs(x_bins - centers), fmt=".",
+        )
+    else:
+        centers, mass_function, error, *_ = mass_function.output
+        ax.errorbar(centers, mass_function, error)
 
     return fig, ax
 
