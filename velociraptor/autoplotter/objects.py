@@ -20,7 +20,13 @@ from os import path, mkdir
 from functools import reduce
 from collections import OrderedDict
 
-valid_plot_types = ["scatter", "2dhistogram", "massfunction", "histogram"]
+valid_plot_types = [
+    "scatter",
+    "2dhistogram",
+    "massfunction",
+    "histogram",
+    "adaptivemassfunction",
+]
 
 matplotlib_support.label_style = "[]"
 
@@ -490,6 +496,33 @@ class VelociraptorPlot(object):
 
         return
 
+    def _parse_adaptivemassfunction(self) -> None:
+        """
+        Parses the required variables for producing a mass function
+        plot.
+
+        TODO: Re-write the mass function in a better way to be the
+        same as other lines.
+        """
+
+        self._parse_common_histogramtype()
+
+        # A bit of a hacky workaround - improve this in the future
+        # by combining this functionality properly into the
+        # VelociraptorLine methods.
+        self.mass_function_line = VelociraptorLine(
+            line_type="adaptive_mass_function",
+            line_data=dict(
+                plot=True,
+                log=self.x_log,
+                number_of_bins=self.number_of_bins,
+                start=dict(value=self.x_lim[0].value, units=self.x_lim[0].units),
+                end=dict(value=self.x_lim[1].value, units=self.x_lim[1].units),
+            ),
+        )
+
+        return
+
     def _parse_histogram(self) -> None:
         """
         Parses the required variables for producing a 1D histogram plot.
@@ -715,11 +748,11 @@ class VelociraptorPlot(object):
         x = self.get_quantity_from_catalogue_with_mask(self.x, catalogue)
         x.convert_to_units(self.x_units)
 
-        self.x_bins.convert_to_units(self.x_units)
-
         self.mass_function_line.create_line(
             x=x, y=None, box_volume=catalogue.units.comoving_box_volume
         )
+
+        self.x_bins = self.mass_function_line.bins
 
         self.mass_function_line.output[1].convert_to_units(self.y_units)
         self.mass_function_line.output[2].convert_to_units(self.y_units)
@@ -737,6 +770,14 @@ class VelociraptorPlot(object):
         ax.set_ylim(*self.y_lim)
 
         return fig, ax
+
+    def _make_plot_adaptivemassfunction(
+        self, catalogue: VelociraptorCatalogue
+    ) -> Tuple[Figure, Axes]:
+        """
+        Makes the _adaptive_ mass function plot. Same as mass function.
+        """
+        return self._make_plot_massfunction(catalogue=catalogue)
 
     def _make_plot_histogram(
         self, catalogue: VelociraptorCatalogue

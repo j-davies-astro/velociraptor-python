@@ -41,7 +41,13 @@ class VelociraptorLineMetadata(object):
         Parse the line to x and y arrays.
         """
 
-        self.centers, self.values, self.scatter, self.additional_x, self.additional_y = self.line.output
+        (
+            self.centers,
+            self.values,
+            self.scatter,
+            self.additional_x,
+            self.additional_y,
+        ) = self.line.output
         self.line_type = self.line.line_type
 
         return
@@ -66,6 +72,8 @@ class VelociraptorLineMetadata(object):
             additional_points_x_units=str(self.additional_x.units),
             additional_points_y=self.additional_y.value.tolist(),
             additional_points_y_units=str(self.additional_y.units),
+            bins_x=self.line.bins.value.tolist(),
+            bins_x_units=str(self.line.bins.units),
         )
 
         try:

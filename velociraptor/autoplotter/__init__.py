@@ -9,7 +9,7 @@ This yaml file has the following format:
 
    output_filename:
      # Global plot quantities
-     type: scatter / histogram / 2dhistogram / massfunction
+     type: scatter / histogram / 2dhistogram / massfunction / adaptivemassfunction
      select_structure_type: number of substructure to select (e.g. 10 is centrals)
      selection_mask: "quantity.name" - a boolean quantity to select the items you wish to plot.
      number_of_bins: number of bins in the (background) histogram or massfunc
@@ -56,7 +56,7 @@ This yaml file has the following format:
      line_type: 
        plot: true/false (true by default) actually plot this?
        log: true/false (true by default) use log bins?
-       scatter: "none", "errorbar", or "shaded". Defaults to shaded
+       scatter: "none", "errorbar", "errorbar_both", or "shaded". Defaults to shaded
        number_of_bins: number of bins for median line, different from number_of_bins above
        start: value to start binning at
          value: start value

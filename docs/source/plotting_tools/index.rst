@@ -95,3 +95,25 @@ your own mass bins, you can use the alternative
       box_volume=box_volume,
       n_bins=25
    )
+
+We also provide an adaptive mass function plotting code; this allows for
+variable bin widths and is useful in the case where you have very few data
+points. It is called through
+:func:`velociraptor.tools.mass_functions.create_adaptive_mass_function` and
+has the same parameters as ``create_mass_function`` except that ``n_bins`` is
+now ``base_n_bins``. The algorithm works as follows:
+
+1. Attempt to use the standard binning scheme based on fixed-width bins,
+   by trawling the data from left (low :math:`M_*`) to right (high :math:`M_*`).
+2. If you have passed more than :math:`n` items by the time you get to the next
+   bin (standard is 0.2 dex in :math:`M_*`)$, create the bin as normal and plot
+   the point as the median mass value.
+3. If not, continue until you have at least :math:`n` items in the bin. Once you
+   do, call this a new 'bin' with the right edge of the bin being the value
+   you just found. Place the point at the median value of :math:`M_*` in this bin.
+4. The highest mass value within a given bin becomes the right edge of that
+   bin and hence the left edge of the next bin.
+5. Once you have reached the end of the data, attempt to make one final
+   bin with the leftovers.
+
+By default _n_ = 3.

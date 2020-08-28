@@ -8,10 +8,19 @@ from typing import Dict, Union, Tuple, List
 from matplotlib.pyplot import Axes
 
 import velociraptor.tools.lines as lines
-from velociraptor.tools.mass_functions import create_mass_function_given_bins
+from velociraptor.tools.mass_functions import (
+    create_mass_function_given_bins,
+    create_adaptive_mass_function,
+)
 from velociraptor.tools.histogram import create_histogram_given_bins
 
-valid_line_types = ["median", "mean", "mass_function", "histogram"]
+valid_line_types = [
+    "median",
+    "mean",
+    "mass_function",
+    "histogram",
+    "adaptive_mass_function",
+]
 
 
 class VelociraptorLine(object):
@@ -28,6 +37,7 @@ class VelociraptorLine(object):
     mean: bool
     mass_function: bool
     histogram: bool
+    adaptive_mass_function: bool
     # Create bins in logspace?
     log: bool
     # Binning properties
@@ -41,8 +51,13 @@ class VelociraptorLine(object):
     scatter: str
     # Output: centers, values, scatter, additional_x, additional_y - initialised here
     # to prevent crashes in other code.
-    output: Tuple[unyt_array] = (unyt_array([]), unyt_array([]), unyt_array([]),
-                                 unyt_array([]), unyt_array([]))
+    output: Tuple[unyt_array] = (
+        unyt_array([]),
+        unyt_array([]),
+        unyt_array([]),
+        unyt_array([]),
+        unyt_array([]),
+    )
 
     def __init__(self, line_type: str, line_data: Dict[str, Union[Dict, str]]):
         """
@@ -134,7 +149,8 @@ class VelociraptorLine(object):
 
     def generate_bins(self):
         """
-        Generates the required bins.
+        Generates the required bins. Note these are not used in the ``adaptive_mass_function``
+        case.
         """
 
         # Assert these are in the same units just in case
@@ -208,24 +224,43 @@ class VelociraptorLine(object):
 
         if self.median:
             self.output = lines.binned_median_line(
-                x=masked_x, y=masked_y, x_bins=self.bins,
-                return_additional=True)
+                x=masked_x, y=masked_y, x_bins=self.bins, return_additional=True
+            )
         elif self.mean:
             self.output = lines.binned_mean_line(
-                x=masked_x, y=masked_y, x_bins=self.bins,
-                return_additional=True)
+                x=masked_x, y=masked_y, x_bins=self.bins, return_additional=True
+            )
         elif self.mass_function:
             mass_function_output = create_mass_function_given_bins(
-                masked_x, self.bins, box_volume=box_volume)
-            self.output = *mass_function_output, \
-                          unyt_array([], units=mass_function_output[0].units), \
-                          unyt_array([], units=mass_function_output[1].units)
+                masked_x, self.bins, box_volume=box_volume
+            )
+            self.output = (
+                *mass_function_output,
+                unyt_array([], units=mass_function_output[0].units),
+                unyt_array([], units=mass_function_output[1].units),
+            )
         elif self.histogram:
             histogram_output = create_histogram_given_bins(
-                masked_x, self.bins, box_volume=box_volume)
-            self.output = *histogram_output, \
-                          unyt_array([], units=histogram_output[0].units), \
-                          unyt_array([], units=histogram_output[1].units)
+                masked_x, self.bins, box_volume=box_volume
+            )
+            self.output = (
+                *histogram_output,
+                unyt_array([], units=histogram_output[0].units),
+                unyt_array([], units=histogram_output[1].units),
+            )
+        elif self.adaptive_mass_function:
+            *mass_function_output, self.bins = create_adaptive_mass_function(
+                masked_x,
+                lowest_mass=self.start,
+                highest_mass=self.end,
+                box_volume=box_volume,
+                return_bin_edges=True,
+            )
+            self.output = (
+                *mass_function_output,
+                unyt_array([], units=mass_function_output[0].units),
+                unyt_array([], units=mass_function_output[1].units),
+            )
         else:
             self.output = None
 
@@ -263,14 +298,25 @@ class VelociraptorLine(object):
         if not self.plot:
             return
 
-        centers, heights, errors, additional_x, additional_y = self.create_line(x=x, y=y)
+        centers, heights, errors, additional_x, additional_y = self.create_line(
+            x=x, y=y
+        )
 
         if self.scatter == "none" or errors is None:
             ax.plot(centers, heights, label=label)
         elif self.scatter == "errorbar":
             ax.errorbar(centers, heights, yerr=errors, label=label)
+        elif self.scatter == "errorbar_both":
+            ax.errorbar(
+                centers,
+                heights,
+                yerr=errors,
+                xerr=abs(self.bins - centers),
+                label=label,
+                fmt=".",  # Do not plot as a line.
+            )
         elif self.scatter == "shaded":
-            line, = ax.plot(centers, heights, label=label)
+            (line,) = ax.plot(centers, heights, label=label)
 
             # Deal with different + and -ve errors
             if errors.shape[0]:
