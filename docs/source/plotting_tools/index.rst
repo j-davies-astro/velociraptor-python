@@ -116,4 +116,4 @@ now ``base_n_bins``. The algorithm works as follows:
 5. Once you have reached the end of the data, attempt to make one final
    bin with the leftovers.
 
-By default _n_ = 3.
+By default :math:`n = 3`.
