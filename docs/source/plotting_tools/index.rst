@@ -114,6 +114,7 @@ now ``base_n_bins``. The algorithm works as follows:
 4. The highest mass value within a given bin becomes the right edge of that
    bin and hence the left edge of the next bin.
 5. Once you have reached the end of the data, attempt to make one final
-   bin with the leftovers.
+   bin with the leftovers. If there is only one item in the final bin, we extend
+   the previous bin to include it.
 
 By default :math:`n = 3`.

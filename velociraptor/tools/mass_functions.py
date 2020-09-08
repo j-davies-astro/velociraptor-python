@@ -256,11 +256,18 @@ def create_adaptive_mass_function(
             pass
 
     # Clean up the last bin? We're gonna miss the largest N galaxies..
-    if current_bin_count > 0:
-        # We can do something!
+    if current_bin_count > 1:
+        # We can create a novel bin!
         bin_edges_right.append(mass)
         bin_medians.append(np.median(sorted_masses[current_lower_index : index + 1]))
         number_in_bin.append(current_bin_count)
+    elif current_bin_count == 1:
+        # Extend the previous bin (otherwise error is consistent with zero)
+        bin_edges_right[-1] = mass
+        number_in_bin[-1] += 1
+        bin_medians[-1] = np.median(sorted_masses[-number_in_bin[-1] :])
+        # We don't need the next bin now.
+        bin_edges_left = bin_edges_left[:-1]
     else:
         # This bin doesn't exist anyway, boo...
         bin_edges_left = bin_edges_left[:-1]
