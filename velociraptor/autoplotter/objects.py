@@ -81,13 +81,20 @@ class VelociraptorPlot(object):
     # Observational data
     observational_data: List[ObservationalData]
     observational_data_redshift_bracketing: List[List[float]]
+    observational_data_directory: str
 
-    def __init__(self, filename: str, data: Dict[str, Union[Dict, str]]):
+    def __init__(
+        self,
+        filename: str,
+        data: Dict[str, Union[Dict, str]],
+        observational_data_directory: str,
+    ):
         """
         Initialise the plot object variables.
         """
         self.filename = filename
         self.data = data
+        self.observational_data_directory = observational_data_directory
 
         self._parse_data()
 
@@ -584,7 +591,7 @@ class VelociraptorPlot(object):
                     )
                 else:
                     obs_data_instance = ObservationalData()
-                    obs_data_instance.load(data["filename"])
+                    obs_data_instance.load(f"{self.observational_data_directory}/{data['filename']}")
 
                     try:
                         obs_data_instance.x.convert_to_units(self.x_units)
@@ -870,15 +877,39 @@ class AutoPlotter(object):
     catalogue: VelociraptorCatalogue
     yaml: Dict[str, Union[Dict, str]]
     plots: List[VelociraptorPlot]
+    # Directory containing the observational data.
+    observational_data_directory: str
+    # Whether or not the plots were created successfully.
+    created_successfully: List[bool]
 
-    def __init__(self, filename: Union[str, List[str]]) -> None:
+    def __init__(
+        self,
+        filename: Union[str, List[str]],
+        observational_data_directory: Union[None, str] = None,
+    ) -> None:
         """
-        Initialises the AutoPlotter object with the yaml filename.
+        Initialises the AutoPlotter object with the yaml filename(s).
+
+        Parameters
+        ----------
+
+        filename: str, List[str]
+            Filename(s) of the autoplotter config yaml files you wish to use
+
+        observational_data_directory: str, optional
+            Directory containing the observational data to take all paths
+            provided under the observational_data section relative to. By
+            default this is just ".".
         """
 
         self.filename = filename
 
         self.multiple_yaml_files = isinstance(filename, list)
+        self.observational_data_directory = (
+            observational_data_directory
+            if observational_data_directory is not None
+            else "."
+        )
 
         self.load_yaml()
         self.parse_yaml()
@@ -935,15 +966,20 @@ class AutoPlotter(object):
         if not path.exists(directory):
             mkdir(directory)
 
+        self.created_successfully = []
+
         for plot in self.plots:
             try:
                 plot.make_plot(
                     catalogue=self.catalogue,
                     directory=directory,
                     file_extension=file_extension,
+                    observational_data_directory=self.observational_data_directory,
                 )
+                self.created_successfully.append(True)
             except (AttributeError, ValueError) as e:
                 print(f"Unable to create plot {plot.filename} due to exception: {e}.")
+                self.created_successfully.append(False)
                 if debug:
                     import sys, traceback
 
