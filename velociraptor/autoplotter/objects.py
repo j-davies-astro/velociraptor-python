@@ -586,15 +586,17 @@ class VelociraptorPlot(object):
             obs_data = self.data["observational_data"]
 
             for data in obs_data:
-                if not path.exists(data["filename"]):
+                observational_data_file_path = (
+                    f"{self.observational_data_directory}/{data['filename']}"
+                )
+
+                if not path.exists(observational_data_file_path):
                     raise AutoPlotterError(
                         f"Unable to find file at {data['filename']}."
                     )
                 else:
                     obs_data_instance = ObservationalData()
-                    obs_data_instance.load(
-                        f"{self.observational_data_directory}/{data['filename']}"
-                    )
+                    obs_data_instance.load(observational_data_file_path)
 
                     try:
                         obs_data_instance.x.convert_to_units(self.x_units)
@@ -760,9 +762,9 @@ class VelociraptorPlot(object):
 
         # A bit of an odd line but we want to get whichever one is defined
         mass_function_line = getattr(
-            self, "mass_function_line", getattr(
-                self, "adaptive_mass_function_line", None
-            )
+            self,
+            "mass_function_line",
+            getattr(self, "adaptive_mass_function_line", None),
         )
 
         mass_function_line.create_line(
