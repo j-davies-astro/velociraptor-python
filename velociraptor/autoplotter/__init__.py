@@ -74,6 +74,8 @@ This yaml file has the following format:
      # Generic metadata for plot
      metadata:
        title: title for the plot, should you want one
+       caption: caption for the plot
+       section: section the plot 'lives in' for pipeline usage.
      # Comparison data to plot on top
      observational_data:
        - filename: filename of data to plot on this plot (use ObservationalData written to disk)
