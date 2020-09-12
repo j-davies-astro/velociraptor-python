@@ -65,6 +65,7 @@ class VelociraptorPlot(object):
     mean_line: Union[None, VelociraptorLine]
     median_line: Union[None, VelociraptorLine]
     mass_function_line: Union[None, VelociraptorLine]
+    adaptive_mass_function_line: Union[None, VelociraptorLine]
     histogram_line: Union[None, VelociraptorLine]
     # Binning for x, y axes.
     number_of_bins: int
@@ -517,7 +518,7 @@ class VelociraptorPlot(object):
         # A bit of a hacky workaround - improve this in the future
         # by combining this functionality properly into the
         # VelociraptorLine methods.
-        self.mass_function_line = VelociraptorLine(
+        self.adaptive_mass_function_line = VelociraptorLine(
             line_type="adaptive_mass_function",
             line_data=dict(
                 plot=True,
@@ -757,17 +758,24 @@ class VelociraptorPlot(object):
         x = self.get_quantity_from_catalogue_with_mask(self.x, catalogue)
         x.convert_to_units(self.x_units)
 
-        self.mass_function_line.create_line(
+        # A bit of an odd line but we want to get whichever one is defined
+        mass_function_line = getattr(
+            self, "mass_function_line", getattr(
+                self, "adaptive_mass_function_line", None
+            )
+        )
+
+        mass_function_line.create_line(
             x=x, y=None, box_volume=catalogue.units.comoving_box_volume
         )
 
-        self.x_bins = self.mass_function_line.bins
+        self.x_bins = mass_function_line.bins
 
-        self.mass_function_line.output[1].convert_to_units(self.y_units)
-        self.mass_function_line.output[2].convert_to_units(self.y_units)
+        mass_function_line.output[1].convert_to_units(self.y_units)
+        mass_function_line.output[2].convert_to_units(self.y_units)
 
         fig, ax = plot.mass_function(
-            x=x, x_bins=self.x_bins, mass_function=self.mass_function_line
+            x=x, x_bins=self.x_bins, mass_function=mass_function_line
         )
 
         if self.x_log:
