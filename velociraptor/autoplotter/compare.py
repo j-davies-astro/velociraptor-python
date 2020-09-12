@@ -74,7 +74,8 @@ def recreate_instances(
     config: Union[str, List[str]],
     paths: Union[str, List[str]],
     names: Union[str, List[str]],
-    observational_data_directory: Optional[str],
+    observational_data_directory: Optional[str] = None,
+    file_extension: Optional[str] = None,
 ) -> Tuple[AutoPlotter, Dict[str, Dict]]:
     """
     Recreates instances of required objects for passing to
@@ -96,6 +97,9 @@ def recreate_instances(
     observational_data_directory: str, optional
         Optional path to the top-level observational data directory.
 
+    file_extension: str, optional
+        File extension that the figures should be referred to with.
+
     Returns
     -------
 
@@ -112,6 +116,10 @@ def recreate_instances(
     auto_plotter = AutoPlotter(
         config, observational_data_directory=observational_data_directory
     )
+
+    file_extension = file_extension if file_extension is not None else "png"
+
+    auto_plotter.file_extension = file_extension
 
     auto_plotter_metadata = AutoPlotterMetadata(auto_plotter=auto_plotter)
 
