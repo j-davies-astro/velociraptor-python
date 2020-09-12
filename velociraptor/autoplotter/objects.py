@@ -591,7 +591,9 @@ class VelociraptorPlot(object):
                     )
                 else:
                     obs_data_instance = ObservationalData()
-                    obs_data_instance.load(f"{self.observational_data_directory}/{data['filename']}")
+                    obs_data_instance.load(
+                        f"{self.observational_data_directory}/{data['filename']}"
+                    )
 
                     try:
                         obs_data_instance.x.convert_to_units(self.x_units)
@@ -940,7 +942,8 @@ class AutoPlotter(object):
         """
 
         self.plots = [
-            VelociraptorPlot(filename, plot) for filename, plot in self.yaml.items()
+            VelociraptorPlot(filename, plot, self.observational_data_directory)
+            for filename, plot in self.yaml.items()
         ]
 
         return
@@ -962,6 +965,8 @@ class AutoPlotter(object):
         Creates and saves the plots in a directory.
         """
 
+        self.file_extension = file_extension
+
         # Try to create the directory
         if not path.exists(directory):
             mkdir(directory)
@@ -974,7 +979,6 @@ class AutoPlotter(object):
                     catalogue=self.catalogue,
                     directory=directory,
                     file_extension=file_extension,
-                    observational_data_directory=self.observational_data_directory,
                 )
                 self.created_successfully.append(True)
             except (AttributeError, ValueError) as e:

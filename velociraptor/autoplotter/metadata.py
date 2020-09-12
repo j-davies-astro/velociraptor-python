@@ -101,6 +101,10 @@ class VelociraptorPlotMetadata(object):
     lines: List[VelociraptorLineMetadata]
     # Fancy name for the plot
     title: str
+    # Section plot lives in
+    section: str
+    # Caption for the plot
+    caption: str
 
     def __init__(self, plot: VelociraptorPlot):
         """
@@ -112,12 +116,14 @@ class VelociraptorPlotMetadata(object):
 
         return
 
-    def _parse_title(self):
+    def _parse_metadata_section_from_file(self):
         """
         Parses metadata: title.
         """
 
         self.title = self.metadata.get("title", "")
+        self.caption = self.metadata.get("caption", "")
+        self.section = self.metadata.get("section", "")
         self.filename = self.plot.filename
 
         return
@@ -141,7 +147,7 @@ class VelociraptorPlotMetadata(object):
 
         self.metadata = self.plot.data.get("metadata", {})
 
-        self._parse_title()
+        self._parse_metadata_section_from_file()
         self._parse_line_write()
         self._parse_lines()
         self._parse_labels()
@@ -189,6 +195,8 @@ class VelociraptorPlotMetadata(object):
 
         output = dict(
             title=self.title,
+            section=self.section,
+            caption=self.caption,
             filename=self.filename,
             x_quantity=self.x_quantity,
             y_quantity=self.y_quantity,
@@ -221,6 +229,7 @@ class AutoPlotterMetadata(object):
 
         self.auto_plotter = auto_plotter
         self.plots = auto_plotter.plots
+        self.file_extension = auto_plotter.file_extension
 
         self._generate_plotter_metadata()
 
