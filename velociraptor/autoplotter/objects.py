@@ -65,6 +65,7 @@ class VelociraptorPlot(object):
     mean_line: Union[None, VelociraptorLine]
     median_line: Union[None, VelociraptorLine]
     mass_function_line: Union[None, VelociraptorLine]
+    adaptive_mass_function_line: Union[None, VelociraptorLine]
     histogram_line: Union[None, VelociraptorLine]
     # Binning for x, y axes.
     number_of_bins: int
@@ -81,13 +82,20 @@ class VelociraptorPlot(object):
     # Observational data
     observational_data: List[ObservationalData]
     observational_data_redshift_bracketing: List[List[float]]
+    observational_data_directory: str
 
-    def __init__(self, filename: str, data: Dict[str, Union[Dict, str]]):
+    def __init__(
+        self,
+        filename: str,
+        data: Dict[str, Union[Dict, str]],
+        observational_data_directory: str,
+    ):
         """
         Initialise the plot object variables.
         """
         self.filename = filename
         self.data = data
+        self.observational_data_directory = observational_data_directory
 
         self._parse_data()
 
@@ -510,7 +518,7 @@ class VelociraptorPlot(object):
         # A bit of a hacky workaround - improve this in the future
         # by combining this functionality properly into the
         # VelociraptorLine methods.
-        self.mass_function_line = VelociraptorLine(
+        self.adaptive_mass_function_line = VelociraptorLine(
             line_type="adaptive_mass_function",
             line_data=dict(
                 plot=True,
@@ -578,13 +586,17 @@ class VelociraptorPlot(object):
             obs_data = self.data["observational_data"]
 
             for data in obs_data:
-                if not path.exists(data["filename"]):
+                observational_data_file_path = (
+                    f"{self.observational_data_directory}/{data['filename']}"
+                )
+
+                if not path.exists(observational_data_file_path):
                     raise AutoPlotterError(
                         f"Unable to find file at {data['filename']}."
                     )
                 else:
                     obs_data_instance = ObservationalData()
-                    obs_data_instance.load(data["filename"])
+                    obs_data_instance.load(observational_data_file_path)
 
                     try:
                         obs_data_instance.x.convert_to_units(self.x_units)
@@ -700,14 +712,6 @@ class VelociraptorPlot(object):
         fig, ax = plot.scatter_x_against_y(x, y)
         self._add_lines_to_axes(ax=ax, x=x, y=y)
 
-        if self.x_log:
-            ax.set_xscale("log")
-        if self.y_log:
-            ax.set_yscale("log")
-
-        ax.set_xlim(*self.x_lim)
-        ax.set_ylim(*self.y_lim)
-
         return fig, ax
 
     def _make_plot_2dhistogram(
@@ -728,14 +732,6 @@ class VelociraptorPlot(object):
         fig, ax = plot.histogram_x_against_y(x, y, self.x_bins, self.y_bins)
         self._add_lines_to_axes(ax=ax, x=x, y=y)
 
-        if self.x_log:
-            ax.set_xscale("log")
-        if self.y_log:
-            ax.set_yscale("log")
-
-        ax.set_xlim(*self.x_lim)
-        ax.set_ylim(*self.y_lim)
-
         return fig, ax
 
     def _make_plot_massfunction(
@@ -748,26 +744,25 @@ class VelociraptorPlot(object):
         x = self.get_quantity_from_catalogue_with_mask(self.x, catalogue)
         x.convert_to_units(self.x_units)
 
-        self.mass_function_line.create_line(
+        # A bit of an odd line but we want to get whichever one is defined
+        mass_function_line = getattr(
+            self,
+            "mass_function_line",
+            getattr(self, "adaptive_mass_function_line", None),
+        )
+
+        mass_function_line.create_line(
             x=x, y=None, box_volume=catalogue.units.comoving_box_volume
         )
 
-        self.x_bins = self.mass_function_line.bins
+        self.x_bins = mass_function_line.bins
 
-        self.mass_function_line.output[1].convert_to_units(self.y_units)
-        self.mass_function_line.output[2].convert_to_units(self.y_units)
+        mass_function_line.output[1].convert_to_units(self.y_units)
+        mass_function_line.output[2].convert_to_units(self.y_units)
 
         fig, ax = plot.mass_function(
-            x=x, x_bins=self.x_bins, mass_function=self.mass_function_line
+            x=x, x_bins=self.x_bins, mass_function=mass_function_line
         )
-
-        if self.x_log:
-            ax.set_xscale("log")
-        if self.y_log:
-            ax.set_yscale("log")
-
-        ax.set_xlim(*self.x_lim)
-        ax.set_ylim(*self.y_lim)
 
         return fig, ax
 
@@ -799,14 +794,6 @@ class VelociraptorPlot(object):
 
         fig, ax = plot.histogram(x=x, x_bins=self.x_bins, histogram=self.histogram_line)
 
-        if self.x_log:
-            ax.set_xscale("log")
-        if self.y_log:
-            ax.set_yscale("log")
-
-        ax.set_xlim(*self.x_lim)
-        ax.set_ylim(*self.y_lim)
-
         return fig, ax
 
     def make_plot(
@@ -817,13 +804,14 @@ class VelociraptorPlot(object):
         plot type.
         """
 
-        if self.x_label_override is not None:
-            self.x_label = self.x_label_override
-        if self.y_label_override is not None:
-            self.y_label = self.y_label_override
-
         with matplotlib_support:
             fig, ax = getattr(self, f"_make_plot_{self.plot_type}")(catalogue=catalogue)
+            if self.x_log:
+                ax.set_xscale("log")
+            if self.y_log:
+                ax.set_yscale("log")
+
+            
             self._add_shading_to_axes(ax)
 
             for data, bracket in zip(
@@ -831,6 +819,15 @@ class VelociraptorPlot(object):
             ):
                 if bracket[0] < catalogue.z and bracket[1] > catalogue.z:
                     data.plot_on_axes(ax, errorbar_kwargs=dict(zorder=-10))
+
+            try:
+                ax.set_xlim(*self.x_lim)
+                ax.set_ylim(*self.y_lim)
+            except:
+                # If we have an empty plot those lines will make us crash!
+                # Hopefully, waiting until after the observational data will
+                # help us in this regard.
+                pass
 
             plot.decorate_axes(
                 ax=ax,
@@ -870,15 +867,39 @@ class AutoPlotter(object):
     catalogue: VelociraptorCatalogue
     yaml: Dict[str, Union[Dict, str]]
     plots: List[VelociraptorPlot]
+    # Directory containing the observational data.
+    observational_data_directory: str
+    # Whether or not the plots were created successfully.
+    created_successfully: List[bool]
 
-    def __init__(self, filename: Union[str, List[str]]) -> None:
+    def __init__(
+        self,
+        filename: Union[str, List[str]],
+        observational_data_directory: Union[None, str] = None,
+    ) -> None:
         """
-        Initialises the AutoPlotter object with the yaml filename.
+        Initialises the AutoPlotter object with the yaml filename(s).
+
+        Parameters
+        ----------
+
+        filename: str, List[str]
+            Filename(s) of the autoplotter config yaml files you wish to use
+
+        observational_data_directory: str, optional
+            Directory containing the observational data to take all paths
+            provided under the observational_data section relative to. By
+            default this is just ".".
         """
 
         self.filename = filename
 
         self.multiple_yaml_files = isinstance(filename, list)
+        self.observational_data_directory = (
+            observational_data_directory
+            if observational_data_directory is not None
+            else "."
+        )
 
         self.load_yaml()
         self.parse_yaml()
@@ -909,7 +930,8 @@ class AutoPlotter(object):
         """
 
         self.plots = [
-            VelociraptorPlot(filename, plot) for filename, plot in self.yaml.items()
+            VelociraptorPlot(filename, plot, self.observational_data_directory)
+            for filename, plot in self.yaml.items()
         ]
 
         return
@@ -931,9 +953,13 @@ class AutoPlotter(object):
         Creates and saves the plots in a directory.
         """
 
+        self.file_extension = file_extension
+
         # Try to create the directory
         if not path.exists(directory):
             mkdir(directory)
+
+        self.created_successfully = []
 
         for plot in self.plots:
             try:
@@ -942,8 +968,10 @@ class AutoPlotter(object):
                     directory=directory,
                     file_extension=file_extension,
                 )
+                self.created_successfully.append(True)
             except (AttributeError, ValueError) as e:
                 print(f"Unable to create plot {plot.filename} due to exception: {e}.")
+                self.created_successfully.append(False)
                 if debug:
                     import sys, traceback
 
