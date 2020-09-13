@@ -116,11 +116,13 @@ def decorate_axes(
 
     markerfirst = "right" not in legend_loc
 
-    legend = ax.legend(loc=legend_loc, markerfirst=markerfirst)
-
-    try:
+    if len(ax.get_legend_handles_labels()[0]):
+        # Only create the legend if we have handles available to plot,
+        # otherwise we get a warning from matplotlib printed to the
+        # console.
+        legend = ax.legend(loc=legend_loc, markerfirst=markerfirst)
         fontsize = legend.get_texts()[0].get_fontsize()
-    except IndexError:
+    else:
         fontsize = None
 
     label_switch = {
