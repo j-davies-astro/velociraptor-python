@@ -712,14 +712,6 @@ class VelociraptorPlot(object):
         fig, ax = plot.scatter_x_against_y(x, y)
         self._add_lines_to_axes(ax=ax, x=x, y=y)
 
-        if self.x_log:
-            ax.set_xscale("log")
-        if self.y_log:
-            ax.set_yscale("log")
-
-        ax.set_xlim(*self.x_lim)
-        ax.set_ylim(*self.y_lim)
-
         return fig, ax
 
     def _make_plot_2dhistogram(
@@ -739,14 +731,6 @@ class VelociraptorPlot(object):
 
         fig, ax = plot.histogram_x_against_y(x, y, self.x_bins, self.y_bins)
         self._add_lines_to_axes(ax=ax, x=x, y=y)
-
-        if self.x_log:
-            ax.set_xscale("log")
-        if self.y_log:
-            ax.set_yscale("log")
-
-        ax.set_xlim(*self.x_lim)
-        ax.set_ylim(*self.y_lim)
 
         return fig, ax
 
@@ -780,14 +764,6 @@ class VelociraptorPlot(object):
             x=x, x_bins=self.x_bins, mass_function=mass_function_line
         )
 
-        if self.x_log:
-            ax.set_xscale("log")
-        if self.y_log:
-            ax.set_yscale("log")
-
-        ax.set_xlim(*self.x_lim)
-        ax.set_ylim(*self.y_lim)
-
         return fig, ax
 
     def _make_plot_adaptivemassfunction(
@@ -818,14 +794,6 @@ class VelociraptorPlot(object):
 
         fig, ax = plot.histogram(x=x, x_bins=self.x_bins, histogram=self.histogram_line)
 
-        if self.x_log:
-            ax.set_xscale("log")
-        if self.y_log:
-            ax.set_yscale("log")
-
-        ax.set_xlim(*self.x_lim)
-        ax.set_ylim(*self.y_lim)
-
         return fig, ax
 
     def make_plot(
@@ -843,6 +811,12 @@ class VelociraptorPlot(object):
 
         with matplotlib_support:
             fig, ax = getattr(self, f"_make_plot_{self.plot_type}")(catalogue=catalogue)
+            if self.x_log:
+                ax.set_xscale("log")
+            if self.y_log:
+                ax.set_yscale("log")
+
+            
             self._add_shading_to_axes(ax)
 
             for data, bracket in zip(
@@ -850,6 +824,15 @@ class VelociraptorPlot(object):
             ):
                 if bracket[0] < catalogue.z and bracket[1] > catalogue.z:
                     data.plot_on_axes(ax, errorbar_kwargs=dict(zorder=-10))
+
+            try:
+                ax.set_xlim(*self.x_lim)
+                ax.set_ylim(*self.y_lim)
+            except:
+                # If we have an empty plot those lines will make us crash!
+                # Hopefully, waiting until after the observational data will
+                # help us in this regard.
+                pass
 
             plot.decorate_axes(
                 ax=ax,
