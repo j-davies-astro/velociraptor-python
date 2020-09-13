@@ -804,11 +804,6 @@ class VelociraptorPlot(object):
         plot type.
         """
 
-        if self.x_label_override is not None:
-            self.x_label = self.x_label_override
-        if self.y_label_override is not None:
-            self.y_label = self.y_label_override
-
         with matplotlib_support:
             fig, ax = getattr(self, f"_make_plot_{self.plot_type}")(catalogue=catalogue)
             if self.x_log:
