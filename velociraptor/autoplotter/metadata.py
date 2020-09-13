@@ -105,6 +105,8 @@ class VelociraptorPlotMetadata(object):
     section: str
     # Caption for the plot
     caption: str
+    # Should this be shown in a webpage or just created?
+    show_on_webpage: bool
 
     def __init__(self, plot: VelociraptorPlot):
         """
@@ -124,6 +126,7 @@ class VelociraptorPlotMetadata(object):
         self.title = self.metadata.get("title", "")
         self.caption = self.metadata.get("caption", "")
         self.section = self.metadata.get("section", "")
+        self.show_on_webpage = self.metadata.get("show_on_webpage", True)
         self.filename = self.plot.filename
 
         return
@@ -197,6 +200,7 @@ class VelociraptorPlotMetadata(object):
             title=self.title,
             section=self.section,
             caption=self.caption,
+            show_on_webpage=self.show_on_webpage,
             filename=self.filename,
             x_quantity=self.x_quantity,
             y_quantity=self.y_quantity,
