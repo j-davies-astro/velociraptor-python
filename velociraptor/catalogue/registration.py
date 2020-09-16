@@ -969,7 +969,7 @@ global_registration_functions = {
         "number",
         "hydrogen_phase_fractions",
         "black_hole_masses",
-        "species_mass_fractions",
+        "species_fractions",
         "fail_all",
     ]
 }
