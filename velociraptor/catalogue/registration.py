@@ -876,7 +876,7 @@ def registration_black_hole_masses(
 
     return
 
-def registration_species_mass_fractions(
+def registration_species_fractions(
     field_path: str, unit_system: VelociraptorUnits
 ) -> (unyt.Unit, str, str):
     """
@@ -885,7 +885,7 @@ def registration_species_mass_fractions(
     Hopefully this is changed in the future as this is a mess.
     """
 
-    if not field_path[:20] == "SpeciesMassFractions":
+    if not field_path[:16] == "SpeciesFractions":
         raise RegistrationDoesNotMatchError
 
     unit = unyt.dimensionless
@@ -896,7 +896,7 @@ def registration_species_mass_fractions(
     # Capture group 4: units
     # Capture group 5: particle type
     match_string = (
-        "SpeciesMassFractions(_index_)?([0-9]*)_([a-zA-Z]+)_([a-zA-Z]+)_?([a-z]*)"
+        "SpeciesFractions(_index_)?([0-9]*)_([a-zA-Z]+)_([a-zA-Z]+)_?([a-z]*)"
     )
     regex = cached_regex(match_string)
     match = regex.match(field_path)
@@ -909,7 +909,7 @@ def registration_species_mass_fractions(
         extracted_units = match.group(4)
         ptype = match.group(5)
 
-        full_name = f"Species {index} Mass Fraction"
+        full_name = f"Species {index} Fraction"
         snake_case = f"{snake_case}_{index}"
 
         if ptype:
