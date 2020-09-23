@@ -39,7 +39,7 @@ def get_aperture_unit(unit_name: str, unit_system: VelociraptorUnits):
         "veldisp": unit_system.velocity,
     }
 
-    return key[corrected_name]
+    return key.get(corrected_name, None)
 
 
 def get_particle_property_name_conversion(name: str, ptype: str):
@@ -64,10 +64,12 @@ def get_particle_property_name_conversion(name: str, ptype: str):
         "mass_gas": "Gas Mass $M_{\\rm g}$",
         "mass_star": "Stellar Mass $M_*$",
         "mass_bh": "Black Hole Mass $M_{\\rm BH}$",
+        "mass_interloper": "Mass of Interlopers",
         "npart_": "Number of Particles $N$",
         "npart_gas": "Number of Gas Particles $N_{\\rm g}$",
         "npart_star": "Number of Stellar Particles $N_*$",
         "npart_bh": "Black Hole Mass $N_{\\rm BH}$",
+        "npart_interloper": "Number of Interlopers",
         "rhalfmass_": "Half-mass Radius $R_{50}$",
         "rhalfmass_gas": "Gas Half-mass Radius $R_{50, {\\rm g}}$",
         "rhalfmass_star": "Stellar Half-mass Radius $R_{50, *}$",
@@ -79,4 +81,4 @@ def get_particle_property_name_conversion(name: str, ptype: str):
         "SubgridMasses_aperture_total_solar_mass_bh": "Subgrid Black Hole Mass $M_{\\rm BH}$",
     }
 
-    return key[combined_name]
+    return key.get(combined_name, corrected_name)
