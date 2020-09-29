@@ -59,6 +59,9 @@ To extract properties, you need to instantiate a
 Here, we have the values of ``M_200crit`` stored in kgs, correctly applied
 based on the unit metadata in the file.
 
+There is also full unit information available in the ``data.units`` object, with
+an ``astropy`` cosmology object provided as ``data.units.cosmology``.
+
 Creating your first plot
 ------------------------
 
