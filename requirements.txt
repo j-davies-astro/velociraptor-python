@@ -1,6 +1,7 @@
 numpy
 h5py
 pytest
+astropy
 unyt
 tqdm
 pyyaml
