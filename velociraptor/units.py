@@ -7,6 +7,12 @@ the master VelociraptorUnits class.
 import unyt
 import h5py
 
+from astropy.cosmology.core import Cosmology
+from astropy.cosmology import wCDM, FlatLambdaCDM
+
+
+
+
 
 class VelociraptorUnits(object):
     """
@@ -37,6 +43,7 @@ class VelociraptorUnits(object):
     star_formation_rate: unyt.unyt_quantity
     period: unyt.unyt_quantity
     box_volume: unyt.unyt_quantity
+    cosmology: Cosmology
 
     def __init__(self, filename: str, disregard_units: bool = False):
         """
@@ -126,6 +133,7 @@ class VelociraptorUnits(object):
 
             self.cosmological = bool(attributes["Cosmological_Sim"])
             self.comoving = bool(attributes["Comoving_or_Physical"])
+            self.cosmology = self.load_cosmology(handle)
 
             # Period is comoving.
             self.period = unyt.unyt_quantity(
@@ -142,3 +150,59 @@ class VelociraptorUnits(object):
             setattr(self, name, unit)
 
         return
+
+    def load_cosmology(self, handle: h5py.File) -> Cosmology:
+        """
+        Save the (astropy) cosmology to a HDF5 dataset.
+
+        Parameters
+        ----------
+
+        handle: h5py.File
+            h5py file handle for the catalogue file.
+
+        Returns
+        -------
+
+        astropy.cosmology.Cosmology:
+            Astropy cosmology instance extracted from the HDF5 file.
+            Also sets ``self.cosmology``.
+        
+        """
+
+        try:
+            group = handle["Configuration"].attrs
+        except:
+            return None
+
+        # Note that some of these are unused - commented out if not.
+        H0 = 100.0 * float(group["h_val"])
+        w_of_DE = float(group["w_of_DE"])
+        Omega_DE = float(group["Omega_DE"])
+        # Omega_Lambda = float(group["Omega_Lambda"])
+        Omega_b = float(group["Omega_b"])
+        # Omega_cdm = float(group["Omega_cdm"])
+        # Omega_k = float(group["Omega_k"])
+        Omega_m = float(group["Omega_m"])
+        # Omega_nu = float(group["Omega_nu"])
+        # Omega_r = float(group["Omega_r"])
+
+        if w_of_DE != -1.0:
+            cosmology = wCDM(
+                H0=H0,
+                Om0=Omega_m,
+                Ode0=Omega_DE,
+                w0=w_of_DE,
+                Ob0=Omega_b,
+            )
+        else:
+            # No EoS
+            cosmology = FlatLambdaCDM(
+                H0=H0,
+                Om0=Omega_m,
+                Ob0=Omega_b,
+            )
+
+        self.cosmology = cosmology
+
+        return cosmology
