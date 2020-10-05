@@ -785,6 +785,52 @@ def registration_element_mass_fractions(
 
     return unit, full_name, snake_case
 
+def registration_dust_mass_fractions(
+    field_path: str, unit_system: VelociraptorUnits
+) -> (unyt.Unit, str, str):
+    """
+    Registers the dust mass fraction properties.
+
+    Hopefully this is changed in the future as this is a mess.
+    """
+
+    if not field_path[:17] == "DustMassFractions":
+        raise RegistrationDoesNotMatchError
+
+    unit = unit_system.metallicity
+
+    # Need to do a regex search
+    # Capture group 1,2: index number - if not present default to 0
+    # Capture group 3: mass weighted?
+    # Capture group 4: units
+    # Capture group 5: particle typr
+    match_string = (
+        "DustMassFractions(_index_)?([0-9]*)_([a-zA-Z]+)_([a-zA-Z]+)_?([a-z]*)"
+    )
+    regex = cached_regex(match_string)
+    match = regex.match(field_path)
+
+    snake_case = "dust"
+    if match:
+        index = match.group(2) if match.group(2) else 0
+        mass_weighted = match.group(3)
+        extracted_units = match.group(4)
+        ptype = match.group(5)
+
+        full_name = f"Dust {index} Mass Fraction"
+        snake_case = f"{snake_case}_{index}"
+
+        if ptype:
+            cap_ptype = ptype[0].upper() + ptype[1:]
+            full_name = f"{cap_ptype} {full_name}"
+
+            snake_case += f"_{ptype}"
+
+    else:
+        raise RegistrationDoesNotMatchError
+
+    return unit, full_name, snake_case
+
 
 def registration_number(
     field_path: str, unit_system: VelociraptorUnits
@@ -888,6 +934,7 @@ def registration_species_fractions(
     if not field_path[:16] == "SpeciesFractions":
         raise RegistrationDoesNotMatchError
 
+
     unit = unyt.dimensionless
 
     # Need to do a regex search
@@ -966,6 +1013,7 @@ global_registration_functions = {
         "projected_apertures",
         "apertures",
         "element_mass_fractions",
+        "dust_mass_fractions",
         "number",
         "hydrogen_phase_fractions",
         "black_hole_masses",
