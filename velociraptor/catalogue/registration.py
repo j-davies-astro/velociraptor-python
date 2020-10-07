@@ -1002,7 +1002,7 @@ def registration_spherical_overdensities(
             sf_in_name = ""
 
         full_name = f"{sf_in_name}{name} ({aperture_size} \\rho_{{\\rm crit}})"
-        snake_case = field_path.lower().replace("SO_", "")
+        snake_case = field_path.lower().replace("so_", "")
 
         return unit, full_name, snake_case
     else:
