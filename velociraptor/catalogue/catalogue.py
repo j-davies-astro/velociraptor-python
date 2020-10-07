@@ -296,7 +296,7 @@ class VelociraptorCatalogue(object):
         """
 
         return (
-            f"Velociraptor catalogue at {self.filename}."
+            f"Velociraptor catalogue at {self.filename}. "
             "Contains the following field collections: "
             f"{', '.join(self.valid_field_metadata.keys())}"
         )
