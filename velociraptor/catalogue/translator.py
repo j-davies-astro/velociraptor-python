@@ -28,7 +28,7 @@ def get_aperture_unit(unit_name: str, unit_system: VelociraptorUnits):
     """
 
     # Correct any typos
-    corrected_name = typo_correct(unit_name).tolower()
+    corrected_name = typo_correct(unit_name).lower()
 
     key = {
         "sfr": unit_system.star_formation_rate,
@@ -55,7 +55,7 @@ def get_particle_property_name_conversion(name: str, ptype: str):
 
     corrected_name = typo_correct(name)
 
-    combined_name = f"{corrected_name}_{ptype}".tolower()
+    combined_name = f"{corrected_name}_{ptype}".lower()
 
     key = {
         "sfr_": "SFR $\dot{\\rho}_*$",
