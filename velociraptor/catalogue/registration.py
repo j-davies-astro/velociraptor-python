@@ -970,6 +970,45 @@ def registration_species_fractions(
 
     return unit, full_name, snake_case
 
+def registration_spherical_overdensities(
+    field_path: str, unit_system: VelociraptorUnits
+) -> (unyt.Unit, str, str):
+    """
+    Registers SO aperture values by searching them with regex.
+    """
+
+    # Capture group 1: quantity
+    # Capture group 2: particle type
+    # Capture group 3: sf / nsf
+    # Capture group 4: size of aperture
+
+    match_string = "SO_([^_]*)_([a-zA-Z]*)?_?([a-zA-Z]*)?_?([0-9]*)_rhocrit"
+    regex = cached_regex(match_string)
+
+    match = regex.match(field_path)
+
+    if match:
+        quantity = match.group(1)
+        ptype = match.group(2)
+        star_forming = match.group(3)
+        aperture_size = int(match.group(4))
+
+        unit = get_aperture_unit(quantity, unit_system)
+        name = get_particle_property_name_conversion(quantity, ptype)
+
+        if star_forming:
+            sf_in_name = f"{star_forming.upper()} "
+        else:
+            sf_in_name = ""
+
+        full_name = f"{sf_in_name}{name} ({aperture_size} \\rho_{{\\rm crit}})"
+        snake_case = field_path.lower().replace("SO_", "")
+
+        return unit, full_name, snake_case
+    else:
+        raise RegistrationDoesNotMatchError
+
+
 
 # TODO
 # lambda_B
@@ -997,6 +1036,7 @@ global_registration_functions = {
         "ids",
         "energies",
         "stellar_age",
+        "spherical_overdensities",
         "rotational_support",
         "star_formation_rate",
         "masses",
