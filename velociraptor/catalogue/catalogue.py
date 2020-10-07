@@ -40,8 +40,6 @@ class VelociraptorFieldMetadata(object):
     # The registartion function that matched with this field
     corresponding_registration_function_name: Union[str, None]
     corresponding_registration_function: Union[Callable, None]
-    # The valid paths contained within
-    valid_sub_paths: List[str]
 
     def __init__(
         self,
@@ -70,12 +68,6 @@ class VelociraptorFieldMetadata(object):
         self.register_field_properties()
 
         return
-
-    def __str__(self):
-        return f"Contains the following fields: {' '.join(self.valid_sub_paths)}"
-
-    def __repr__(self):
-        return str(self)
 
     def register_field_properties(self):
         """
@@ -180,7 +172,10 @@ def generate_sub_catalogue(
     """
 
     # This creates a _copy_ of the _class_, not object.
-    this_sub_catalogue_bases = (object, __VelociraptorSubCatalogue)
+    this_sub_catalogue_bases = (
+        __VelociraptorSubCatalogue,
+        object,
+    )
     this_sub_catalogue_dict = {}
 
     valid_sub_paths = []
@@ -202,10 +197,6 @@ def generate_sub_catalogue(
 
         this_sub_catalogue_dict[f"_{metadata.snake_case}"] = None
 
-    this_sub_catalogue_dict["valid_sub_paths"] = valid_sub_paths 
-    #this_sub_catalogue_dict["__str__"] = __VelociraptorSubCatalogue.__str__
-    #this_sub_catalogue_dict["__repr__"] = __VelociraptorSubCatalogue.__repr__
-
     ThisSubCatalogue = type(
         f"Dynamic_{registration_name}_VelociraptorCatalogue",
         this_sub_catalogue_bases,
@@ -214,6 +205,7 @@ def generate_sub_catalogue(
 
     # Finally, we can actually create an instance of our new class.
     catalogue = ThisSubCatalogue(filename=filename)
+    catalogue.valid_sub_paths = valid_sub_paths
 
     return catalogue
 
@@ -228,10 +220,19 @@ class __VelociraptorSubCatalogue(object):
     This is called in VelociraptorCatalogue.
     """
 
+    # The valid paths contained within
+    valid_sub_paths: List[str]
+
     def __init__(self, filename):
         self.filename = filename
 
         return
+
+    def __str__(self):
+        return f"Contains the following fields: {', '.join(self.valid_sub_paths)}"
+
+    def __repr__(self):
+        return str(self)
 
 
 class VelociraptorCatalogue(object):
@@ -294,7 +295,14 @@ class VelociraptorCatalogue(object):
         the memory location.
         """
 
-        return f"Velociraptor catalogue at {self.filename}."
+        return (
+            f"Velociraptor catalogue at {self.filename}."
+            "Contains the following field collections: "
+            f"{', '.join(self.valid_field_metadata.keys())}"
+        )
+
+    def __repr__(self):
+        return str(self)
 
     def get_units(self):
         """
