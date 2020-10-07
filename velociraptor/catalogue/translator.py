@@ -28,15 +28,19 @@ def get_aperture_unit(unit_name: str, unit_system: VelociraptorUnits):
     """
 
     # Correct any typos
-    corrected_name = typo_correct(unit_name)
+    corrected_name = typo_correct(unit_name).lower()
 
     key = {
-        "SFR": unit_system.star_formation_rate,
-        "Zmet": unit_system.metallicity,
+        "sfr": unit_system.star_formation_rate,
+        "zmet": unit_system.metallicity,
         "mass": unit_system.mass,
         "npart": unyt.dimensionless,
         "rhalfmass": unit_system.length,
         "veldisp": unit_system.velocity,
+        "r": unit_system.length,
+        "lx": unit_system.length * unit_system.velocity,
+        "ly": unit_system.length * unit_system.velocity,
+        "lz": unit_system.length * unit_system.velocity,
     }
 
     return key.get(corrected_name, None)
@@ -51,15 +55,15 @@ def get_particle_property_name_conversion(name: str, ptype: str):
 
     corrected_name = typo_correct(name)
 
-    combined_name = f"{corrected_name}_{ptype}"
+    combined_name = f"{corrected_name}_{ptype}".lower()
 
     key = {
-        "SFR_": "SFR $\dot{\\rho}_*$",
-        "SFR_gas": "Gas SFR $\dot{\\rho}_*$",
-        "Zmet_": "Metallicity $Z$",
-        "Zmet_gas": "Gas Metallicity $Z_{\\rm g}$",
-        "Zmet_star": "Star Metallicity $Z_*$",
-        "Zmet_bh": "Black Hole Metallicity $Z_{\\rm BH}$",
+        "sfr_": "SFR $\dot{\\rho}_*$",
+        "sfr_gas": "Gas SFR $\dot{\\rho}_*$",
+        "zmet_": "Metallicity $Z$",
+        "zmet_gas": "Gas Metallicity $Z_{\\rm g}$",
+        "zmet_star": "Star Metallicity $Z_*$",
+        "zmet_bh": "Black Hole Metallicity $Z_{\\rm BH}$",
         "mass_": "Mass $M$",
         "mass_gas": "Gas Mass $M_{\\rm g}$",
         "mass_star": "Stellar Mass $M_*$",
@@ -74,11 +78,12 @@ def get_particle_property_name_conversion(name: str, ptype: str):
         "rhalfmass_gas": "Gas Half-mass Radius $R_{50, {\\rm g}}$",
         "rhalfmass_star": "Stellar Half-mass Radius $R_{50, *}$",
         "rhalfmass_bh": "Black Hole Half-mass Radius $R_{50, {\\rm BH}}$",
+        "r_": "Radius $R_{\\rm SO}$",
         "veldisp_": "Velocity Dispersion $\sigma$",
         "veldisp_gas": "Gas Velocity Dispersion $\sigma_{\\rm g}}$",
         "veldisp_star": "Stellar Velocity Dispersion $\sigma_{*}$",
         "veldisp_bh": "Black Hole Velocity Dispersion $\sigma_{\\rm BH}$",
-        "SubgridMasses_aperture_total_solar_mass_bh": "Subgrid Black Hole Mass $M_{\\rm BH}$",
+        "subgridmasses_aperture_total_solar_mass_bh": "Subgrid Black Hole Mass $M_{\\rm BH}$",
     }
 
     return key.get(combined_name, corrected_name)
