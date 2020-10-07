@@ -40,6 +40,8 @@ class VelociraptorFieldMetadata(object):
     # The registartion function that matched with this field
     corresponding_registration_function_name: Union[str, None]
     corresponding_registration_function: Union[Callable, None]
+    # The valid paths contained within
+    valid_sub_paths: List[str]
 
     def __init__(
         self,
@@ -68,6 +70,12 @@ class VelociraptorFieldMetadata(object):
         self.register_field_properties()
 
         return
+
+    def __str__(self):
+        return f"Contains the following fields: {' '.join(self.valid_sub_paths)}"
+
+    def __repr__(self):
+        return str(self)
 
     def register_field_properties(self):
         """
@@ -169,42 +177,40 @@ def generate_sub_catalogue(
     So, here, we initialise the metadata, create a _copy_ of the
     __VelociraptorSubCatlaogue class, and then add all of our properties
     to that _class_ before instantiating it with the metadata.
-
-    This is thanks to the very helpful StackOverflow answer here:
-    https://stackoverflow.com/questions/1325673/how-to-add-property-to-a-class-dynamically    
     """
 
     # This creates a _copy_ of the _class_, not object.
+    this_sub_catalogue_bases = (object, __VelociraptorSubCatalogue)
+    this_sub_catalogue_dict = {}
+
+    valid_sub_paths = []
+
+    for metadata in field_metadata:
+        valid_sub_paths.append(metadata.snake_case)
+
+        this_sub_catalogue_dict[metadata.snake_case] = property(
+            generate_getter(
+                filename,
+                metadata.snake_case,
+                metadata.path,
+                metadata.name,
+                metadata.unit,
+            ),
+            generate_setter(metadata.snake_case),
+            generate_deleter(metadata.snake_case),
+        )
+
+        this_sub_catalogue_dict[f"_{metadata.snake_case}"] = None
+
+    this_sub_catalogue_dict["valid_sub_paths"] = valid_sub_paths 
+    #this_sub_catalogue_dict["__str__"] = __VelociraptorSubCatalogue.__str__
+    #this_sub_catalogue_dict["__repr__"] = __VelociraptorSubCatalogue.__repr__
+
     ThisSubCatalogue = type(
         f"Dynamic_{registration_name}_VelociraptorCatalogue",
-        __VelociraptorSubCatalogue.__bases__,
-        dict(__VelociraptorSubCatalogue.__dict__),
+        this_sub_catalogue_bases,
+        this_sub_catalogue_dict,
     )
-
-    # Using our full list of registration functions we can
-    # find all of the valid datasets:
-
-    # Now we can generate our local datasets for the valid paths.
-    for metadata in field_metadata:
-        # First set our fake objects internally to none
-        setattr(ThisSubCatalogue, f"_{metadata.snake_case}", None)
-
-        # Now set the getters, setters, and deleters.
-        setattr(
-            ThisSubCatalogue,
-            metadata.snake_case,
-            property(
-                generate_getter(
-                    filename,
-                    metadata.snake_case,
-                    metadata.path,
-                    metadata.name,
-                    metadata.unit,
-                ),
-                generate_setter(metadata.snake_case),
-                generate_deleter(metadata.snake_case),
-            ),
-        )
 
     # Finally, we can actually create an instance of our new class.
     catalogue = ThisSubCatalogue(filename=filename)
