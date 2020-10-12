@@ -171,9 +171,11 @@ def behroozi_2019_raw(z, Mhalo):
 
     The data is taken from https://www.peterbehroozi.com/data.html
 
-    This function is a median fit to the raw data for centrals (i.e. excluding satellites)
+    This function is a median fit to the raw data for centrals (i.e. excluding
+    satellites)
 
-    The stellar mass is the true stellar mass (i.e. w/o observational corrections)
+    The stellar mass is the true stellar mass (i.e. w/o observational corrections and
+    excluding intrahalo light)
 
     The halo mass is the peak halo mass that follows the Bryan & Norman (1998)
     spherical overdensity definition
