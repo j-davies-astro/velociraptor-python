@@ -171,8 +171,7 @@ def behroozi_2019_raw(z, Mhalo):
 
     The data is taken from https://www.peterbehroozi.com/data.html
 
-    This function is a Median Fit to the raw data including both satellites and
-    centrals.
+    This function is a median fit to the raw data for centrals (i.e. excluding satellites)
 
     The stellar mass is the true stellar mass (i.e. w/o observational corrections)
 
@@ -185,26 +184,25 @@ def behroozi_2019_raw(z, Mhalo):
     Mhalo_log = np.log10(Mhalo)
 
     params = {
-        "EFF_0": -1.430476,
-        "EFF_0_A": 1.795813,
-        "EFF_0_A2": 1.359576,
-        "EFF_0_Z": -0.2156067,
-        "M_1": 12.04003,
-        "M_1_A": 4.675185,
-        "M_1_A2": 4.513113,
-        "M_1_Z": -0.7444014,
-        "ALPHA": 1.973063,
-        "ALPHA_A": -2.3534,
-        "ALPHA_A2": -1.783277,
-        "ALPHA_Z": 0.1860354,
-        "BETA": 0.4732459,
-        "BETA_A": -0.8842523,
-        "BETA_Z": -0.486104,
-        "DELTA": 0.4067526,
-        "GAMMA": -1.087851,
-        "GAMMA_A": -3.241419,
-        "GAMMA_Z": -1.078538,
-        "CHI2": 1.149615e02,
+        "EFF_0": -1.431495,
+        "EFF_0_A": 1.75703,
+        "EFF_0_A2": 1.350451,
+        "EFF_0_Z": -0.217846,
+        "M_1": 12.07402,
+        "M_1_A": 4.599896,
+        "M_1_A2": 4.423389,
+        "M_1_Z": -0.7324986,
+        "ALPHA": 1.973839,
+        "ALPHA_A": -2.468417,
+        "ALPHA_A2": -1.816299,
+        "ALPHA_Z": 0.18208,
+        "BETA": 0.4702271,
+        "BETA_A": -0.8751643,
+        "BETA_Z": -0.486642,
+        "DELTA": 0.3822958,
+        "GAMMA": -1.160189,
+        "GAMMA_A": -3.633671,
+        "GAMMA_Z": -1.2189,
     }
 
     a = 1.0 / (1.0 + z)
