@@ -184,41 +184,35 @@ def behroozi_2019_raw(z, Mhalo):
 
     Mhalo_log = np.log10(Mhalo)
 
-    param_list = [
-        -1.430476,
-        1.795813,
-        1.359576,
-        -0.2156067,
-        12.04003,
-        4.675185,
-        4.513113,
-        -0.7444014,
-        1.973063,
-        -2.3534,
-        -1.783277,
-        0.1860354,
-        0.4732459,
-        -0.8842523,
-        -0.486104,
-        0.4067526,
-        -1.087851,
-        -3.241419,
-        -1.078538,
-        1.149615e02,
-    ]
-
-    names = (
-        "EFF_0 EFF_0_A EFF_0_A2 EFF_0_Z M_1 M_1_A M_1_A2 M_1_Z ALPHA ALPHA_A "
-        "ALPHA_A2 ALPHA_Z BETA BETA_A BETA_Z DELTA GAMMA GAMMA_A GAMMA_Z CHI2".split(
-            " "
-        )
-    )
-    params = dict(zip(names, param_list))
+    params = {
+        "EFF_0": -1.430476,
+        "EFF_0_A": 1.795813,
+        "EFF_0_A2": 1.359576,
+        "EFF_0_Z": -0.2156067,
+        "M_1": 12.04003,
+        "M_1_A": 4.675185,
+        "M_1_A2": 4.513113,
+        "M_1_Z": -0.7444014,
+        "ALPHA": 1.973063,
+        "ALPHA_A": -2.3534,
+        "ALPHA_A2": -1.783277,
+        "ALPHA_Z": 0.1860354,
+        "BETA": 0.4732459,
+        "BETA_A": -0.8842523,
+        "BETA_Z": -0.486104,
+        "DELTA": 0.4067526,
+        "GAMMA": -1.087851,
+        "GAMMA_A": -3.241419,
+        "GAMMA_Z": -1.078538,
+        "CHI2": 1.149615e02,
+    }
 
     a = 1.0 / (1.0 + z)
     a1 = a - 1.0
     lna = np.log(a)
+
     zparams = {}
+
     zparams["m_1"] = (
         params["M_1"]
         + a1 * params["M_1_A"]
@@ -252,4 +246,4 @@ def behroozi_2019_raw(z, Mhalo):
         + zparams["gamma"] * np.exp(-0.5 * (dm2 * dm2))
     )
 
-    return 10. ** logmstar
+    return 10.0 ** logmstar

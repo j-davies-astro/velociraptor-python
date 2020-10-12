@@ -570,7 +570,7 @@ class ObservationalData(object):
             kwargs["zorder"] = line_zorder
 
         # Make both the data name and redshift appear in the legend
-        data_label = self.citation + " ($z={:.1f}$)".format(self.redshift)
+        data_label = f"{self.citation} ($z={self.redshift:.1f}$)"
 
         axes.errorbar(
             self.x,
