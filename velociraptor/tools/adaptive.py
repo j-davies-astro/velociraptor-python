@@ -53,7 +53,7 @@ def create_adaptive_bins(
     -------
 
     bin_centers: unyt.unyt_array
-        The centers of the bins (taken to be the linear mean of the bin edges).
+        The centers of the bins (taken to be the median of the items in the bin).
 
     bin_edges: unyt.unyt_array, optional
         Bin edges that were used in the binning process.
@@ -72,17 +72,19 @@ def create_adaptive_bins(
     )
 
     if logarithmic:
-        sorted_values = np.log10(sorted_values[mask])
+        sorted_values = np.log10(sorted_values[mask].value)
 
         minimal_bin_width = (
-            np.log10(highest_value) - np.log10(lowest_value)
+            np.log10(highest_value.value) - np.log10(lowest_value.value)
         ) / base_n_bins
     else:
         minimal_bin_width = ((highest_value - lowest_value) / base_n_bins).value
         sorted_values = sorted_values.value
 
     number_in_bin = []
-    bin_edges_left = [np.log10(lowest_value) if logarithmic else lowest_value.value]
+    bin_edges_left = [
+        np.log10(lowest_value.value) if logarithmic else lowest_value.value
+    ]
     bin_edges_right = []
     bin_medians = []
 
@@ -98,7 +100,9 @@ def create_adaptive_bins(
             continue
         elif current_bin_count > minimum_in_bin:
             # Let's just end this here
-            bin_medians.append(np.median(values[current_lower_index : index + 1]))
+            bin_medians.append(
+                np.median(sorted_values[current_lower_index : index + 1])
+            )
 
             # The new bin edge lives half way in between our current value and the
             # next value, if it exists.
@@ -143,15 +147,20 @@ def create_adaptive_bins(
     else:
         bin_edges_left = bin_edges_left[:-1]
 
-    bin_centers = unyt.unyt_array(
-        [10 ** x for x in bin_medians], units=values.units, name=values.name
-    )
+    if logarithmic:
+        bin_centers = unyt.unyt_array(
+            [10 ** x for x in bin_medians], units=values.units, name=values.name
+        )
 
-    bin_edges = (
-        unyt.unyt_array(
-            10 ** np.array([bin_edges_left, bin_edges_right]), units=values.units
-        ),
-    )
+        bin_edges = unyt.unyt_array(
+            10 ** np.array([*bin_edges_left, bin_edges_right[-1]]), units=values.units,
+        )
+    else:
+        bin_centers = unyt.unyt_array(bin_medians, units=values.units, name=values.name)
+
+        bin_edges = unyt.unyt_array(
+            np.array([*bin_edges_left, bin_edges_right[-1]]), units=values.units
+        )
 
     return bin_centers, bin_edges
 

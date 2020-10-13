@@ -526,6 +526,7 @@ class VelociraptorPlot(object):
                 number_of_bins=self.number_of_bins,
                 start=dict(value=self.x_lim[0].value, units=self.x_lim[0].units),
                 end=dict(value=self.x_lim[1].value, units=self.x_lim[1].units),
+                adaptive=True,
             ),
         )
 
@@ -811,7 +812,6 @@ class VelociraptorPlot(object):
             if self.y_log:
                 ax.set_yscale("log")
 
-            
             self._add_shading_to_axes(ax)
 
             for data, bracket in zip(
