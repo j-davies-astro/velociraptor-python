@@ -164,3 +164,88 @@ def behroozi_raw(z, Mhalo):
     logmstar = np.log10(eps * m1) + f - f0
     return 10.0 ** logmstar
 
+
+def behroozi_2019_raw(z, Mhalo):
+    """
+    Stellar mass-halo mass relation from Behroozi +2019.
+
+    The data is taken from https://www.peterbehroozi.com/data.html
+
+    This function is a median fit to the raw data for centrals (i.e. excluding
+    satellites)
+
+    The stellar mass is the true stellar mass (i.e. w/o observational corrections)
+
+    The fitting function does not include the intrahalo light contribution to the
+    stellar mass
+
+    The halo mass is the peak halo mass that follows the Bryan & Norman (1998)
+    spherical overdensity definition
+
+    Provided by Evgenii Chaikin.
+    """
+
+    Mhalo_log = np.log10(Mhalo)
+
+    params = {
+        "EFF_0": -1.431495,
+        "EFF_0_A": 1.75703,
+        "EFF_0_A2": 1.350451,
+        "EFF_0_Z": -0.217846,
+        "M_1": 12.07402,
+        "M_1_A": 4.599896,
+        "M_1_A2": 4.423389,
+        "M_1_Z": -0.7324986,
+        "ALPHA": 1.973839,
+        "ALPHA_A": -2.468417,
+        "ALPHA_A2": -1.816299,
+        "ALPHA_Z": 0.18208,
+        "BETA": 0.4702271,
+        "BETA_A": -0.8751643,
+        "BETA_Z": -0.486642,
+        "DELTA": 0.3822958,
+        "GAMMA": -1.160189,
+        "GAMMA_A": -3.633671,
+        "GAMMA_Z": -1.2189,
+    }
+
+    a = 1.0 / (1.0 + z)
+    a1 = a - 1.0
+    lna = np.log(a)
+
+    zparams = {}
+
+    zparams["m_1"] = (
+        params["M_1"]
+        + a1 * params["M_1_A"]
+        - lna * params["M_1_A2"]
+        + z * params["M_1_Z"]
+    )
+    zparams["sm_0"] = (
+        zparams["m_1"]
+        + params["EFF_0"]
+        + a1 * params["EFF_0_A"]
+        - lna * params["EFF_0_A2"]
+        + z * params["EFF_0_Z"]
+    )
+    zparams["alpha"] = (
+        params["ALPHA"]
+        + a1 * params["ALPHA_A"]
+        - lna * params["ALPHA_A2"]
+        + z * params["ALPHA_Z"]
+    )
+    zparams["beta"] = params["BETA"] + a1 * params["BETA_A"] + z * params["BETA_Z"]
+    zparams["delta"] = params["DELTA"]
+    zparams["gamma"] = 10 ** (
+        params["GAMMA"] + a1 * params["GAMMA_A"] + z * params["GAMMA_Z"]
+    )
+
+    dm = Mhalo_log - zparams["m_1"]
+    dm2 = dm / zparams["delta"]
+    logmstar = (
+        zparams["sm_0"]
+        - np.log10(10 ** (-zparams["alpha"] * dm) + 10 ** (-zparams["beta"] * dm))
+        + zparams["gamma"] * np.exp(-0.5 * (dm2 * dm2))
+    )
+
+    return 10.0 ** logmstar

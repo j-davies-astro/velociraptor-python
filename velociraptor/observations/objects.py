@@ -539,7 +539,7 @@ class ObservationalData(object):
         else:
             kwargs = {}
 
-        # Ensure correct units throughout, in case somebody chagned them
+        # Ensure correct units throughout, in case somebody changed them
         if self.x_scatter is not None:
             self.x_scatter.convert_to_units(self.x.units)
 
@@ -569,13 +569,16 @@ class ObservationalData(object):
         elif self.plot_as == "line":
             kwargs["zorder"] = line_zorder
 
+        # Make both the data name and redshift appear in the legend
+        data_label = f"{self.citation} ($z={self.redshift:.1f}$)"
+
         axes.errorbar(
             self.x,
             self.y,
             yerr=self.y_scatter,
             xerr=self.x_scatter,
             **kwargs,
-            label=self.citation
+            label=data_label
         )
 
         return
