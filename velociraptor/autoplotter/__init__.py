@@ -58,6 +58,7 @@ This yaml file has the following format:
        log: true/false (true by default) use log bins?
        scatter: "none", "errorbar", "errorbar_both", or "shaded". Defaults to shaded
        number_of_bins: number of bins for median line, different from number_of_bins above
+       adaptive: use adaptive binning?
        start: value to start binning at
          value: start value
          units: start value units

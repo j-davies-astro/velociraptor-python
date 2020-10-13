@@ -13,6 +13,7 @@ from velociraptor.tools.mass_functions import (
     create_adaptive_mass_function,
 )
 from velociraptor.tools.histogram import create_histogram_given_bins
+from velociraptor.tools.adaptive import create_adaptive_bins
 
 valid_line_types = [
     "median",
@@ -46,7 +47,9 @@ class VelociraptorLine(object):
     end: unyt_quantity
     lower: unyt_quantity
     upper: unyt_quantity
-    bins: unyt_array
+    # Use adaptive binning?
+    adaptive: bool
+    bins: unyt_array = None
     # Scatter can be: "none", "errorbar", or "shaded"
     scatter: str
     # Output: centers, values, scatter, additional_x, additional_y - initialised here
@@ -70,8 +73,6 @@ class VelociraptorLine(object):
         self.data = line_data
         self._parse_data()
 
-        self.generate_bins()
-
         return
 
     def _parse_line_type(self):
@@ -90,24 +91,14 @@ class VelociraptorLine(object):
         Parse the line data from the dictionary and set defaults.
         """
 
-        try:
-            self.plot = bool(self.data["plot"])
-        except KeyError:
-            self.plot = True  # Otherwise why would they include this section?
+        self.plot = bool(self.data.get("plot", True))
+        self.log = bool(self.data.get("log", True))
+        self.number_of_bins = int(self.data.get("number_of_bins", 25))
+        self.scatter = str(self.data.get("scatter", "shaded"))
+        self.adaptive = bool(self.data.get("adaptive", False))
 
-        if not self.plot:
-            # Why bother parsing if we are not going to use this line?
-            return
-
-        try:
-            self.log = bool(self.data["log"])
-        except KeyError:
-            self.log = True
-
-        try:
-            self.number_of_bins = int(self.data["number_of_bins"])
-        except KeyError:
-            self.number_of_bins = 25
+        if self.scatter not in ["none", "errorbar", "shaded"]:
+            self.scatter = "shaded"
 
         try:
             self.start = unyt_quantity(
@@ -137,36 +128,45 @@ class VelociraptorLine(object):
         except KeyError:
             self.upper = None
 
-        try:
-            self.scatter = str(self.data["scatter"])
-        except KeyError:
-            self.scatter = "shaded"
-
-        if self.scatter not in ["none", "errorbar", "shaded"]:
-            self.scatter = "shaded"
-
         return
 
-    def generate_bins(self):
+    def generate_bins(self, values=None):
         """
-        Generates the required bins. Note these are not used in the ``adaptive_mass_function``
-        case.
+        Generates the required bins. If we request adaptive bins, this is a little
+        more complicated and requires the values along the horizontal axis.
         """
 
-        # Assert these are in the same units just in case
-        self.start.convert_to_units(self.end.units)
+        if values is not None and self.adaptive:
+            self.end.convert_to_units(values.units)
+            self.start.convert_to_units(self.end.units)
 
-        if self.log:
-            # Need to strip units, unfortunately
-            self.bins = unyt_array(
-                logspace(
-                    log10(self.start.value), log10(self.end.value), self.number_of_bins
-                ),
-                units=self.start.units,
+            bin_centers, bin_edges = create_adaptive_bins(
+                values=values,
+                lowest_value=self.start,
+                highest_value=self.end,
+                base_n_bins=self.number_of_bins,
+                logarithmic=self.log,
+                stretch_final_bin="mass_function" in self.line_type,
             )
+
+            self.bins = bin_edges
         else:
-            # Can get away with this one without stripping
-            self.bins = linspace(self.start, self.end, self.number_of_bins)
+            # Assert these are in the same units just in case
+            self.start.convert_to_units(self.end.units)
+
+            if self.log:
+                # Need to strip units, unfortunately
+                self.bins = unyt_array(
+                    logspace(
+                        log10(self.start.value),
+                        log10(self.end.value),
+                        self.number_of_bins,
+                    ),
+                    units=self.start.units,
+                )
+            else:
+                # Can get away with this one without stripping
+                self.bins = linspace(self.start, self.end, self.number_of_bins)
 
         return
 
@@ -204,7 +204,11 @@ class VelociraptorLine(object):
 
         """
 
-        self.bins.convert_to_units(x.units)
+        if self.bins is None:
+            self.generate_bins(values=x)
+        else:
+            self.bins.convert_to_units(x.units)
+
         self.output = None
 
         masked_x = x
