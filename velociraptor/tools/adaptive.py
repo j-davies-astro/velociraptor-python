@@ -223,9 +223,19 @@ def create_adaptive_bins(
                 name=values.name,
             )
     except IndexError:
-        # We weren't able to generate _any_ bins!
-        bin_centers = unyt.unyt_array([], units=values.units, name=values.name)
-        bin_edges = unyt.unyt_array([], units=values.units, name=values.name)
+        # We weren't able to generate _any_ bins! In this case, it's probably
+        # safest to just return a set of bins that are non-dynamic.
+        if logarithmic:
+            edges = np.logspace(
+                np.log10(lowest_value.value), np.log10(highest_value.value), base_n_bins
+            )
+        else:
+            edges = np.linspace(lowest_value.value, highest_value.value, base_n_bins)
+
+        centers = 0.5 * (edges[:-1] + edges[1:])
+
+        bin_centers = unyt.unyt_array(centers, units=values.units, name=values.name)
+        bin_edges = unyt.unyt_array(edges, units=values.units, name=values.name)
 
     if this_hash:
         adaptive_bin_cache[this_hash] = (bin_centers, bin_edges)
