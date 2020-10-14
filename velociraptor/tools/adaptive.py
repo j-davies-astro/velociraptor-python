@@ -6,6 +6,31 @@ import numpy as np
 import unyt
 
 
+adaptive_bin_cache = {}
+
+
+def adaptive_bin_hash(
+    values,
+    lowest_value,
+    highest_value,
+    base_n_bins,
+    minimum_in_bin,
+    logarithmic,
+    stretch_final_bin,
+):
+    """
+    Hash for adaptive binning. Note that this can raise AttributeError
+    in the case where the array is unhashable.
+    """
+
+    this_hash = (
+        f"{values.size}{values.name}{lowest_value}{highest_value}"
+        f"{base_n_bins}{minimum_in_bin}{logarithmic}{stretch_final_bin}"
+    )
+
+    return this_hash
+
+
 def create_adaptive_bins(
     values: unyt.unyt_array,
     lowest_value: unyt.unyt_quantity,
@@ -58,7 +83,36 @@ def create_adaptive_bins(
     bin_edges: unyt.unyt_array, optional
         Bin edges that were used in the binning process.
 
+    Notes
+    -----
+
+    Caches the output as this procedure can be very expensive, and will be
+    repeated several times.
+
     """
+
+    # First we check in the cache to see if we have already performed
+    # the binning procedure.
+    try:
+        this_hash = adaptive_bin_hash(
+            values=values,
+            lowest_value=lowest_value,
+            highest_value=highest_value,
+            base_n_bins=base_n_bins,
+            minimum_in_bin=minimum_in_bin,
+            logarithmic=logarithmic,
+            stretch_final_bin=stretch_final_bin,
+        )
+    except AttributeError:
+        this_hash = False
+
+    if this_hash:
+        try:
+            return adaptive_bin_cache[this_hash]
+        except:
+            # Not created yet!
+            pass
+
     assert (
         values.units == lowest_value.units and lowest_value.units == highest_value.units
     ), "Please ensure that all value quantities have the same units."
@@ -161,6 +215,9 @@ def create_adaptive_bins(
         bin_edges = unyt.unyt_array(
             np.array([*bin_edges_left, bin_edges_right[-1]]), units=values.units
         )
+
+    if this_hash:
+        adaptive_bin_cache[this_hash] = (bin_centers, bin_edges)
 
     return bin_centers, bin_edges
 

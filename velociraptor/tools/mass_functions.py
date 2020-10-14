@@ -242,12 +242,21 @@ def create_adaptive_mass_function(
             bin_medians.append(
                 np.median(sorted_masses[current_lower_index : index + 1])
             )
-            bin_edges_right.append(mass)
-            bin_edges_left.append(mass)
+
+            # The new bin edge lives half way in between our current value and the
+            # next value, if it exists.
+            try:
+                new_edge = 0.5 * (sorted_masses[index + 1] + mass)
+            except IndexError:
+                # This case is where `value` is the last item in the array.
+                new_edge = mass
+
+            bin_edges_right.append(new_edge)
+            bin_edges_left.append(new_edge)
             number_in_bin.append(current_bin_count)
 
             # Reset for the lads
-            current_edge_left = mass
+            current_edge_left = new_edge
             current_lower_index = index
             current_bin_count = 0
         else:

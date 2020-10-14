@@ -117,6 +117,7 @@ def generate_getter(filename, name: str, field: str, full_name: str, unit):
                 try:
                     setattr(self, f"_{name}", unyt.unyt_array(handle[field][...], unit))
                     getattr(self, f"_{name}").name = full_name
+                    getattr(self, f"_{name}").file = filename
                 except KeyError:
                     print(f"Could not read {field}")
                     return None
