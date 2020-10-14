@@ -201,20 +201,31 @@ def create_adaptive_bins(
     else:
         bin_edges_left = bin_edges_left[:-1]
 
-    if logarithmic:
-        bin_centers = unyt.unyt_array(
-            [10 ** x for x in bin_medians], units=values.units, name=values.name
-        )
+    try:
+        if logarithmic:
+            bin_centers = unyt.unyt_array(
+                [10 ** x for x in bin_medians], units=values.units, name=values.name
+            )
 
-        bin_edges = unyt.unyt_array(
-            10 ** np.array([*bin_edges_left, bin_edges_right[-1]]), units=values.units,
-        )
-    else:
-        bin_centers = unyt.unyt_array(bin_medians, units=values.units, name=values.name)
+            bin_edges = unyt.unyt_array(
+                10 ** np.array([*bin_edges_left, bin_edges_right[-1]]),
+                units=values.units,
+                name=values.name,
+            )
+        else:
+            bin_centers = unyt.unyt_array(
+                bin_medians, units=values.units, name=values.name
+            )
 
-        bin_edges = unyt.unyt_array(
-            np.array([*bin_edges_left, bin_edges_right[-1]]), units=values.units
-        )
+            bin_edges = unyt.unyt_array(
+                np.array([*bin_edges_left, bin_edges_right[-1]]),
+                units=values.units,
+                name=values.name,
+            )
+    except IndexError:
+        # We weren't able to generate _any_ bins!
+        bin_centers = unyt.unyt_array([], units=values.units, name=values.name)
+        bin_edges = unyt.unyt_array([], units=values.units, name=values.name)
 
     if this_hash:
         adaptive_bin_cache[this_hash] = (bin_centers, bin_edges)
