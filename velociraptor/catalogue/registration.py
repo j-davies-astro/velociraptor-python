@@ -785,6 +785,7 @@ def registration_element_mass_fractions(
 
     return unit, full_name, snake_case
 
+
 def registration_dust_mass_fractions(
     field_path: str, unit_system: VelociraptorUnits
 ) -> (unyt.Unit, str, str):
@@ -922,6 +923,7 @@ def registration_black_hole_masses(
 
     return
 
+
 def registration_species_fractions(
     field_path: str, unit_system: VelociraptorUnits
 ) -> (unyt.Unit, str, str):
@@ -933,7 +935,6 @@ def registration_species_fractions(
 
     if not field_path[:16] == "SpeciesFractions":
         raise RegistrationDoesNotMatchError
-
 
     unit = unyt.dimensionless
 
@@ -970,6 +971,7 @@ def registration_species_fractions(
 
     return unit, full_name, snake_case
 
+
 def registration_spherical_overdensities(
     field_path: str, unit_system: VelociraptorUnits
 ) -> (unyt.Unit, str, str):
@@ -1001,13 +1003,12 @@ def registration_spherical_overdensities(
         else:
             sf_in_name = ""
 
-        full_name = f"{sf_in_name}{name} ({aperture_size} \\rho_{{\\rm crit}})"
+        full_name = f"{sf_in_name}{name} ({aperture_size} $\\rho_{{\\rm crit}}$)"
         snake_case = field_path.lower().replace("so_", "")
 
         return unit, full_name, snake_case
     else:
         raise RegistrationDoesNotMatchError
-
 
 
 # TODO
