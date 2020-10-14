@@ -290,11 +290,21 @@ def create_adaptive_mass_function(
         np.sqrt(n) / (width * box_volume) for n, width in zip(number_in_bin, bin_widths)
     ]
 
-    mass_function = unyt.unyt_array(mass_function, units=mass_function[0].units,)
+    try:
+        mass_function_units = mass_function[0].units
+    except IndexError:
+        mass_function_units = (1 / box_volume).units
+
+    try:
+        error_units = error[0].units
+    except IndexError:
+        error_units = mass_function_units
+
+    mass_function = unyt.unyt_array(mass_function, units=mass_function_units)
     # For some reason when using a name= argument here this ends up as None?
     mass_function.name = get_mass_function_label_no_units("{}")
 
-    error = unyt.unyt_array(error, units=error[0].units)
+    error = unyt.unyt_array(error, units=error_units)
 
     bin_centers = unyt.unyt_array(
         [10 ** x for x in bin_medians], units=masses.units, name=masses.name
