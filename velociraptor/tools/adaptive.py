@@ -24,7 +24,7 @@ def adaptive_bin_hash(
     """
 
     this_hash = (
-        f"{values.file}{values.name}{lowest_value}{highest_value}"
+        f"{values.size}{values.name}{lowest_value}{highest_value}"
         f"{base_n_bins}{minimum_in_bin}{logarithmic}{stretch_final_bin}"
     )
 
