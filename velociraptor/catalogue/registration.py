@@ -165,7 +165,7 @@ def registration_ids(
     Registers all quantities related to particle ids and halo ids (those beginning or ending with ID).
     """
 
-    if not field_path[:2] == "ID" or field_path[-2:] == "ID":
+    if not (field_path[:2] == "ID" or field_path[-2:] == "ID"):
         raise RegistrationDoesNotMatchError
 
     # As identifiers, all of these quantities are dimensionless
