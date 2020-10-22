@@ -20,6 +20,7 @@ valid_line_types = [
     "mean",
     "mass_function",
     "histogram",
+    "cumulative_histogram",
     "adaptive_mass_function",
 ]
 
@@ -38,6 +39,7 @@ class VelociraptorLine(object):
     mean: bool
     mass_function: bool
     histogram: bool
+    cumulative_histogram: bool
     adaptive_mass_function: bool
     # Create bins in logspace?
     log: bool
@@ -198,10 +200,9 @@ class VelociraptorLine(object):
 
         output: Tuple[unyt_array]
             A five-length (mean, median lines) or three-length (mass_function,
-            histogram) tuple of unyt arrays that takes the following form:
-            (bin centers, vertical values, vertical scatter, additional_x [optional]
-            additional_y [optional]).
-
+            histogram, cumulative_histogram) tuple of unyt arrays that takes the
+            following form: (bin centers, vertical values, vertical scatter,
+            additional_x [optional], additional_y [optional]).
         """
 
         if self.bins is None:
@@ -246,6 +247,15 @@ class VelociraptorLine(object):
         elif self.histogram:
             histogram_output = create_histogram_given_bins(
                 masked_x, self.bins, box_volume=box_volume
+            )
+            self.output = (
+                *histogram_output,
+                unyt_array([], units=histogram_output[0].units),
+                unyt_array([], units=histogram_output[1].units),
+            )
+        elif self.cumulative_histogram:
+            histogram_output = create_histogram_given_bins(
+                masked_x, self.bins, box_volume=box_volume, cumulative=True
             )
             self.output = (
                 *histogram_output,

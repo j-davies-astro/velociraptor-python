@@ -25,6 +25,7 @@ valid_plot_types = [
     "2dhistogram",
     "massfunction",
     "histogram",
+    "cumulative_histogram",
     "adaptivemassfunction",
 ]
 
@@ -67,6 +68,7 @@ class VelociraptorPlot(object):
     mass_function_line: Union[None, VelociraptorLine]
     adaptive_mass_function_line: Union[None, VelociraptorLine]
     histogram_line: Union[None, VelociraptorLine]
+    cumulative_histogram_line: Union[None, VelociraptorLine]
     # Binning for x, y axes.
     number_of_bins: int
     x_bins: unyt_array
@@ -553,6 +555,27 @@ class VelociraptorPlot(object):
 
         return
 
+    def _parse_cumulative_histogram(self) -> None:
+        """
+        Parses the required variables for producing a 1D cumulative histogram plot.
+        """
+
+        # Same as mass function, unsurprisingly!
+        self._parse_common_histogramtype()
+
+        self.cumulative_histogram_line = VelociraptorLine(
+            line_type="cumulative_histogram",
+            line_data=dict(
+                plot=True,
+                log=self.x_log,
+                number_of_bins=self.number_of_bins,
+                start=dict(value=self.x_lim[0].value, units=self.x_lim[0].units),
+                end=dict(value=self.x_lim[1].value, units=self.x_lim[1].units),
+            ),
+        )
+
+        return
+
     def _parse_data(self):
         """
         Federates out data parsing to individual functions based on the
@@ -794,6 +817,29 @@ class VelociraptorPlot(object):
         self.histogram_line.output[1].convert_to_units(self.y_units)
 
         fig, ax = plot.histogram(x=x, x_bins=self.x_bins, histogram=self.histogram_line)
+
+        return fig, ax
+
+    def _make_plot_cumulative_histogram(
+        self, catalogue: VelociraptorCatalogue
+    ) -> Tuple[Figure, Axes]:
+        """
+        Make cumulative histogram plot and return the figure and axes.
+        """
+
+        x = self.get_quantity_from_catalogue_with_mask(self.x, catalogue)
+        x.convert_to_units(self.x_units)
+
+        self.x_bins.convert_to_units(self.x_units)
+
+        self.cumulative_histogram_line.create_line(
+            x=x, y=None, box_volume=catalogue.units.comoving_box_volume
+        )
+        self.cumulative_histogram_line.output[1].convert_to_units(self.y_units)
+
+        fig, ax = plot.histogram(
+            x=x, x_bins=self.x_bins, histogram=self.cumulative_histogram_line
+        )
 
         return fig, ax
 

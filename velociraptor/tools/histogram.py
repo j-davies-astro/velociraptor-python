@@ -13,6 +13,7 @@ def create_histogram_given_bins(
     bins: unyt.unyt_array,
     box_volume: unyt.unyt_quantity,
     minimum_in_bin: int = 1,
+    cumulative: bool = False
 ):
     """
     Creates a mass function (with equal width bins in log M) for you to plot.
@@ -34,6 +35,10 @@ def create_histogram_given_bins(
         The number of objects in a bin for it to be classed as valid. Bins
         with a number of objects smaller than this are not returned. By default
         this parameter takes a value of 1.
+
+    cumulative: bool, optional
+        Whether to make the histogram cumulative. The cumulative sum is computed
+        from right to left along the X axis. The default value is false.
 
 
     Returns
@@ -59,6 +64,12 @@ def create_histogram_given_bins(
 
     histogram.name = "Number of Haloes"
     bin_centers.name = masses.name
+
+    if cumulative:
+        # Cumulative sum from right to left
+        histogram = np.cumsum(histogram[::-1])[::-1]
+        # Change Y-axis label
+        histogram.name = "Cumulative Number of Haloes"
 
     return bin_centers[valid_bins], histogram[valid_bins], None
 
