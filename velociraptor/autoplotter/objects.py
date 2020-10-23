@@ -834,7 +834,7 @@ class VelociraptorPlot(object):
 
         assert (
             type(self.reverse_cumsum) == bool
-        ), f"reverse_cumsum must either true or false, not {self.reverse_cumsum}"
+        ), f"reverse_cumsum must be either true or false, not {self.reverse_cumsum}"
 
         x = self.get_quantity_from_catalogue_with_mask(self.x, catalogue)
         x.convert_to_units(self.x_units)
