@@ -92,6 +92,8 @@ def create_histogram(
     n_bins: int = 25,
     minimum_in_bin: int = 1,
     return_bin_edges: bool = False,
+    cumulative: bool = False,
+    reverse: bool = False,
 ):
     """
     Creates a mass function (with equal width bins in log M) for you to plot.
@@ -119,6 +121,13 @@ def create_histogram(
         The number of objects in a bin for it to be classed as valid. Bins
         with a number of objects smaller than this are not returned. By default
         this parameter takes a value of 1.
+
+    cumulative: bool, optional
+        Whether to make the histogram cumulative. The default value is false.
+
+    reverse: bool, optional
+        Whether to reverse the cumulative sum, i.e. do the sum from high to low values.
+        The default value is false. Relevant only if cumulative is true.
 
     return_bin_edges: bool, optional
         Return the bin edges used in the binning process? Default is False.
@@ -150,7 +159,12 @@ def create_histogram(
     )
 
     bin_centers, mass_function, _ = create_histogram_given_bins(
-        masses=masses, bins=bins, box_volume=box_volume, minimum_in_bin=minimum_in_bin
+        masses=masses,
+        bins=bins,
+        box_volume=box_volume,
+        minimum_in_bin=minimum_in_bin,
+        cumulative=cumulative,
+        reverse=reverse,
     )
 
     if return_bin_edges:
