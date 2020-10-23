@@ -20,7 +20,7 @@ from unyt import unyt_array
 
 class VelociraptorLineMetadata(object):
     """
-    Individual mnetadat for a given velociraptor line.
+    Individual metadata for a given velociraptor line.
     """
 
     # Forward declarations

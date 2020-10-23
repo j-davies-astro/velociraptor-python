@@ -9,10 +9,11 @@ This yaml file has the following format:
 
    output_filename:
      # Global plot quantities
-     type: scatter / histogram / 2dhistogram / massfunction / adaptivemassfunction
+     type: scatter / histogram / cumulative_histogram / 2dhistogram / massfunction / adaptivemassfunction
      select_structure_type: number of substructure to select (e.g. 10 is centrals)
      selection_mask: "quantity.name" - a boolean quantity to select the items you wish to plot.
      number_of_bins: number of bins in the (background) histogram or massfunc
+     reverse_cumsum: reverse the cumulative sum in cumulative histogram plots? Choose true or false
      comment: "An extra string to be placed on the plot"
      legend_loc: Location of legend (string). One of:
             "upper right",

@@ -20,6 +20,7 @@ valid_line_types = [
     "mean",
     "mass_function",
     "histogram",
+    "cumulative_histogram",
     "adaptive_mass_function",
 ]
 
@@ -38,6 +39,7 @@ class VelociraptorLine(object):
     mean: bool
     mass_function: bool
     histogram: bool
+    cumulative_histogram: bool
     adaptive_mass_function: bool
     # Create bins in logspace?
     log: bool
@@ -175,6 +177,7 @@ class VelociraptorLine(object):
         x: unyt_array,
         y: unyt_array,
         box_volume: Union[None, unyt_quantity] = None,
+        reverse_cumsum: bool = False,
     ):
         """
         Creates the line!
@@ -193,15 +196,19 @@ class VelociraptorLine(object):
             have associated volume units. Generally this is given as a comoving
             quantity.
 
+        reverse_cumsum: bool
+            A boolean deciding whether to reverse the cumulative sum. If false,
+            the sum is computed from low to high values (along the X-axis). Relevant
+            only for cumulative histogram lines. Default is false.
+
         Returns
         -------
 
         output: Tuple[unyt_array]
             A five-length (mean, median lines) or three-length (mass_function,
-            histogram) tuple of unyt arrays that takes the following form:
-            (bin centers, vertical values, vertical scatter, additional_x [optional]
-            additional_y [optional]).
-
+            histogram, cumulative_histogram) tuple of unyt arrays that takes the
+            following form: (bin centers, vertical values, vertical scatter,
+            additional_x [optional], additional_y [optional]).
         """
 
         if self.bins is None:
@@ -246,6 +253,19 @@ class VelociraptorLine(object):
         elif self.histogram:
             histogram_output = create_histogram_given_bins(
                 masked_x, self.bins, box_volume=box_volume
+            )
+            self.output = (
+                *histogram_output,
+                unyt_array([], units=histogram_output[0].units),
+                unyt_array([], units=histogram_output[1].units),
+            )
+        elif self.cumulative_histogram:
+            histogram_output = create_histogram_given_bins(
+                masked_x,
+                self.bins,
+                box_volume=box_volume,
+                cumulative=True,
+                reverse=reverse_cumsum,
             )
             self.output = (
                 *histogram_output,
