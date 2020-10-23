@@ -71,6 +71,8 @@ class VelociraptorPlot(object):
     cumulative_histogram_line: Union[None, VelociraptorLine]
     # Binning for x, y axes.
     number_of_bins: int
+    # Whether to reverse cumulative sum. If true, do the summation from high to low
+    reverse_cumsum: bool
     x_bins: unyt_array
     y_bins: unyt_array
     # Select a specific strucutre type?
@@ -827,13 +829,23 @@ class VelociraptorPlot(object):
         Make cumulative histogram plot and return the figure and axes.
         """
 
+        # Whether to reverse the summation (high to low in place of low to high)
+        self.reverse_cumsum = self.data.get("reverse_cumsum", False)
+
+        assert (
+            type(self.reverse_cumsum) == bool
+        ), f"reverse_cumsum must either true or false, not {self.reverse_cumsum}"
+
         x = self.get_quantity_from_catalogue_with_mask(self.x, catalogue)
         x.convert_to_units(self.x_units)
 
         self.x_bins.convert_to_units(self.x_units)
 
         self.cumulative_histogram_line.create_line(
-            x=x, y=None, box_volume=catalogue.units.comoving_box_volume
+            x=x,
+            y=None,
+            box_volume=catalogue.units.comoving_box_volume,
+            reverse_cumsum=self.reverse_cumsum,
         )
         self.cumulative_histogram_line.output[1].convert_to_units(self.y_units)
 

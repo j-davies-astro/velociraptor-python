@@ -177,6 +177,7 @@ class VelociraptorLine(object):
         x: unyt_array,
         y: unyt_array,
         box_volume: Union[None, unyt_quantity] = None,
+        reverse_cumsum: bool = False,
     ):
         """
         Creates the line!
@@ -194,6 +195,11 @@ class VelociraptorLine(object):
             Box volume for the simulation, required for mass functions. Should
             have associated volume units. Generally this is given as a comoving
             quantity.
+
+        reverse_cumsum: bool
+            A boolean deciding whether to reverse the cumulative sum. If false,
+            the sum is computed from low to high values (along the X-axis). Relevant
+            only for cumulative histogram lines. Default is false.
 
         Returns
         -------
@@ -255,7 +261,11 @@ class VelociraptorLine(object):
             )
         elif self.cumulative_histogram:
             histogram_output = create_histogram_given_bins(
-                masked_x, self.bins, box_volume=box_volume, cumulative=True
+                masked_x,
+                self.bins,
+                box_volume=box_volume,
+                cumulative=True,
+                reverse=reverse_cumsum,
             )
             self.output = (
                 *histogram_output,
