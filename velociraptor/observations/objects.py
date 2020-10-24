@@ -569,8 +569,11 @@ class ObservationalData(object):
         elif self.plot_as == "line":
             kwargs["zorder"] = line_zorder
 
-        # Make both the data name and redshift appear in the legend
-        data_label = f"{self.citation} ($z={self.redshift:.1f}$)"
+        try:
+            # Make both the data name and redshift appear in the legend
+            data_label = f"{self.citation} ($z={self.redshift:.cd ;1f}$)"
+        except (TypeError, ValueError):
+            data_label = self.citation
 
         axes.errorbar(
             self.x,
