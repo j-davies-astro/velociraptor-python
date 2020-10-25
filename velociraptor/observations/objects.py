@@ -571,7 +571,7 @@ class ObservationalData(object):
 
         try:
             # Make both the data name and redshift appear in the legend
-            data_label = f"{self.citation} ($z={self.redshift:.cd ;1f}$)"
+            data_label = f"{self.citation} ($z={self.redshift:.1f}$)"
         except (TypeError, ValueError):
             data_label = self.citation
 
@@ -581,7 +581,7 @@ class ObservationalData(object):
             yerr=self.y_scatter,
             xerr=self.x_scatter,
             **kwargs,
-            label=data_label
+            label=data_label,
         )
 
         return
