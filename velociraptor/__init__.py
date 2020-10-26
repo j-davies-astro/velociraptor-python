@@ -14,6 +14,13 @@ except RuntimeError:
     # We've already done that, oops.
     pass
 
+try:
+    unyt.define_unit("mh", unyt.hydrogen_mass, tex_repr=r"m_{\\rm H}")
+except RuntimeError:
+    # We've already done that, oops.
+    pass
+
+
 from velociraptor.catalogue.catalogue import VelociraptorCatalogue
 from velociraptor.__version__ import __version__
 
