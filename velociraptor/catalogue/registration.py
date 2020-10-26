@@ -924,6 +924,36 @@ def registration_black_hole_masses(
     return
 
 
+def registration_stellar_birth_densities(
+    field_path: str, unit_system: VelociraptorUnits
+) -> (unyt.Unit, str, str):
+    """
+    Stellar birth density registrations.
+    """
+
+    if not field_path[:14] == "BirthDensities" and field_path[-4:] == "star":
+        raise RegistrationDoesNotMatchError
+
+    unit = unit_system.mass / unit_system.length ** 3
+
+    # Need to do a regex search (average, min, max)
+    match_string = "BirthDensities_([a-z]+)_star"
+    regex = cached_regex(match_string)
+    match = regex.match(field_path)
+
+    if match:
+        minmax = match.group(1)
+
+        full_name = f"Stellar Birth Density ({minmax})"
+        snake_case = minmax.lower()
+
+        return unit, full_name, snake_case
+    else:
+        raise RegistrationDoesNotMatchError
+
+    return
+
+
 def registration_species_fractions(
     field_path: str, unit_system: VelociraptorUnits
 ) -> (unyt.Unit, str, str):
@@ -1058,6 +1088,7 @@ global_registration_functions = {
         "number",
         "hydrogen_phase_fractions",
         "black_hole_masses",
+        "stellar_birth_densities",
         "species_fractions",
         "fail_all",
     ]
