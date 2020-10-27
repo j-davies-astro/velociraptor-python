@@ -38,8 +38,8 @@ def binned_mean_line(
     return_additional: bool, optional
         Boolean. If true, makes the function return x and y data points that
         lie in the bins where the number of data points is smaller than
-        minimum_in_bin.
-        Default: false.
+        minimum_in_bin, and any points that are higher than the highest bin
+        edge. Default: false.
 
 
     Returns
@@ -107,6 +107,11 @@ def binned_mean_line(
             additional_x += list(x[indicies_in_this_bin].value)
             additional_y += list(y[indicies_in_this_bin].value)
 
+    # Add any points that are larger:
+    above_highest = hist == len(x_bins)
+    additional_x += list(x[above_highest].value)
+    additional_y += list(y[above_highest].value)
+
     means = unyt.unyt_array(means, units=y.units, name=y.name)
     standard_deviations = unyt.unyt_array(
         standard_deviations, units=y.units, name=f"{y.name} ($sigma$)"
@@ -156,8 +161,9 @@ def binned_median_line(
     return_additional: bool, optional
         Boolean. If true, makes the function return x and y data points that
         lie in the bins where the number of data points is smaller than
-        minimum_in_bin.
-        Default: false.
+        minimum_in_bin, and any points that are higher than the highest bin
+        edge. Default: false.
+
 
 
     Returns
@@ -225,6 +231,11 @@ def binned_median_line(
         elif number_of_items_in_bin > 0 and return_additional:
             additional_x += list(x[indicies_in_this_bin].value)
             additional_y += list(y[indicies_in_this_bin].value)
+
+    # Add any points that are larger:
+    above_highest = hist == len(x_bins)
+    additional_x += list(x[above_highest].value)
+    additional_y += list(y[above_highest].value)
 
     medians = unyt.unyt_array(medians, units=y.units, name=y.name)
     # Percentiles actually gives us the values - we want to be able to use
