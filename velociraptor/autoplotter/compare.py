@@ -164,14 +164,25 @@ def recreate_single_figure(
     for line_type in valid_line_types:
         line = getattr(plot, f"{line_type}_line", None)
         if line is not None:
-            for name, data in line_data.items():
+            for color, (name, data) in enumerate(line_data.items()):
+                color = f"C{color}"
+
+                try:
+                    this_line_dict = data[plot.filename]["lines"][line_type]
+                    centers = unyt.unyt_array(
+                        this_line_dict["centers"], units=plot.x_units
+                    )
+                    heights = unyt.unyt_array(
+                        this_line_dict["values"], units=plot.y_units
+                    )
+                    errors = unyt.unyt_array(
+                        this_line_dict["scatter"], units=plot.y_units
+                    )
+                except KeyError:
+                    continue
+
                 ax.set_xlabel(data[plot.filename].get("x_label"))
                 ax.set_ylabel(data[plot.filename].get("y_label"))
-
-                this_line_dict = data[plot.filename]["lines"][line_type]
-                centers = unyt.unyt_array(this_line_dict["centers"], units=plot.x_units)
-                heights = unyt.unyt_array(this_line_dict["values"], units=plot.y_units)
-                errors = unyt.unyt_array(this_line_dict["scatter"], units=plot.y_units)
 
                 # Data points from the bins with too few data points
                 additional_x = unyt.unyt_array(
@@ -182,11 +193,11 @@ def recreate_single_figure(
                 )
 
                 if line.scatter == "errorbar":
-                    (mpl_line, _, _) = ax.errorbar(
-                        centers, heights, yerr=errors, label=name
+                    ax.errorbar(
+                        centers, heights, yerr=errors, label=name, color=color
                     )
                 elif line.scatter == "shaded":
-                    (mpl_line,) = ax.plot(centers, heights, label=name)
+                    ax.plot(centers, heights, label=name, color=color)
 
                     # Deal with different + and -ve errors
                     if errors.shape[0]:
@@ -203,7 +214,7 @@ def recreate_single_figure(
                         centers,
                         heights - down,
                         heights + up,
-                        color=mpl_line.get_color(),
+                        color=color,
                         alpha=0.3,
                         linewidth=0.0,
                     )
@@ -212,7 +223,7 @@ def recreate_single_figure(
                 else:
                     (mpl_line,) = ax.plot(centers, heights, label=name)
 
-                ax.scatter(additional_x, additional_y, c=mpl_line.get_color())
+                ax.scatter(additional_x, additional_y, c=color)
 
     # Add observational data second to allow for colour precedence
     # to go to runs
