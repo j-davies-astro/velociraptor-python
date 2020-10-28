@@ -2,13 +2,6 @@
 Tools for creating comparison plots that are built out of the saved data.yml files.
 """
 
-"""
-A script for plotting multiple data lines on one set of observational data.
-This uses the `data.yml` files from the pipeline.
-See the help (from argparse) for more information. That can be seen by using
-python3 create_comparison.py -h
-"""
-
 import matplotlib.pyplot as plt
 import yaml
 import unyt

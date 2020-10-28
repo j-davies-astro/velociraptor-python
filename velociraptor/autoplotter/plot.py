@@ -36,7 +36,13 @@ def scatter_x_against_y(
 
     kwargs["alpha"] = (5.5 - 4.5 * np.tanh(0.75 * np.log10(x.size) - 3.0)) / 10.0
 
-    ax.scatter(x.value, y.value, **kwargs)
+    try:
+        ax.scatter(x, y, **kwargs)
+    except:
+        # Having .value breaks the labels in some cases. But I _think_ if
+        # x and y are zero length, then trying to use the unyt plotting system
+        # also breaks.
+        ax.scatter(x.value, y.value, **kwargs)
 
     return fig, ax
 
