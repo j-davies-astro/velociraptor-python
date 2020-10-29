@@ -476,6 +476,12 @@ class ObservationalData(object):
 
         """
 
+        try:
+            fake_axis_label = f"{redshift:.1f}"
+        except (TypeError, ValueError) as Error:
+            print(f"Redshift must be a float, not {redshift} \n")
+            raise Error
+
         self.redshift = redshift
 
         return
@@ -569,11 +575,8 @@ class ObservationalData(object):
         elif self.plot_as == "line":
             kwargs["zorder"] = line_zorder
 
-        try:
-            # Make both the data name and redshift appear in the legend
-            data_label = f"{self.citation} ($z={self.redshift:.1f}$)"
-        except (TypeError, ValueError):
-            data_label = self.citation
+        # Make both the data name and redshift appear in the legend
+        data_label = f"{self.citation} ($z={self.redshift:.1f}$)"
 
         axes.errorbar(
             self.x,
