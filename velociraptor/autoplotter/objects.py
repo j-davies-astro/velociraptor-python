@@ -4,6 +4,8 @@ Main objects for holding information relating to the autoplotter.
 
 from velociraptor import VelociraptorCatalogue
 from velociraptor.autoplotter.lines import VelociraptorLine, valid_line_types
+from velociraptor.regex import cached_regex
+from glob import glob
 from velociraptor.exceptions import AutoPlotterError
 from velociraptor.observations.objects import ObservationalData
 
@@ -84,8 +86,8 @@ class VelociraptorPlot(object):
     redshift_loc: str
     comment_loc: str
     # Observational data
-    observational_data: List[ObservationalData]
-    observational_data_redshift_bracketing: List[List[float]]
+    observational_data: List[Union[ObservationalData, List[ObservationalData]]]
+    observational_data_automatic_z: List[bool]
     observational_data_directory: str
 
     def __init__(
@@ -600,47 +602,124 @@ class VelociraptorPlot(object):
 
         return
 
+    def observational_data_load_single_file(self, filename: str) -> ObservationalData:
+        """
+        Creates and returns an instance of the ObservationalData class for the provided
+        observational data file
+
+        Parameters
+        ----------
+
+        filename: str
+            Name of the file with the observational data in the observational data
+            directory
+
+        Returns
+        -------
+
+        output: ObservationalData
+            An instance of the ObservationalData class containing the observational data
+        """
+
+        observational_data_file_path = f"{self.observational_data_directory}/{filename}"
+
+        if not path.exists(observational_data_file_path):
+            raise AutoPlotterError(f"Unable to find file at {filename}.")
+        else:
+            obs_data_instance = ObservationalData()
+            obs_data_instance.load(observational_data_file_path)
+
+            try:
+                obs_data_instance.x.convert_to_units(self.x_units)
+                obs_data_instance.y.convert_to_units(self.y_units)
+            except UnitConversionError as e:
+                raise AutoPlotterError(
+                    f"Unable to convert observational data units for "
+                    f"{filename} in plot {self.filename}. See: {e}."
+                )
+
+        return obs_data_instance
+
+    def observational_data_load_multiple_files(
+        self, filename: str, re_pattern: str = "z\d{3}p\d{3}"
+    ) -> List[ObservationalData]:
+        """
+        Creates and returns an instance of the ObservationalData class for each of the
+        observational data files whose name has the form {filename}_{re_pattern}.hdf5,
+        where filename is the first string passed to the function and re_pattern is the
+        pattern to be matched using regular expression syntax.
+
+        Parameters
+        ----------
+
+        filename: str
+            Name of the file containing the observational data, in the observational
+            data directory, and excluding the redshift suffix.
+        re_pattern: str
+            Pattern to be matched using regular expression syntax
+
+        Returns
+        -------
+
+        output: List[ObservationalData]
+            A list containing instances of the ObservationalData class for each of the
+            observational data files that have been successfully matched.
+        """
+
+        list_of_obs_data_objects = []
+
+        # All paths to files that begin with filename_ and have .hdf5 extension
+        paths_to_files = glob(f"{self.observational_data_directory}/{filename}_*.hdf5")
+
+        # The string we want to match. We need ".*?" to get rid of the path to the files
+        match_string = f".*?{filename}_({re_pattern}).hdf5"
+
+        # Loop through the files we have found
+        for path_to_file in paths_to_files:
+
+            # Match file name with what we want
+            regex = cached_regex(match_string)
+            match = regex.match(path_to_file)
+
+            # Is it a match?
+            if match:
+
+                # Recover the filename (excluding the path to the file)
+                name = f"{filename}_{match.group(1)}.hdf5"
+
+                # Load and store the data as ObservationalData class instance
+                list_of_obs_data_objects.append(
+                    self.observational_data_load_single_file(name)
+                )
+
+        return list_of_obs_data_objects
+
     def _parse_observational_data(self):
         """
         Parses the observational data segment.
         """
 
         self.observational_data = []
-        self.observational_data_redshift_bracketing = []
+        self.observational_data_automatic_z = []
 
         try:
             obs_data = self.data["observational_data"]
 
             for data in obs_data:
-                observational_data_file_path = (
-                    f"{self.observational_data_directory}/{data['filename']}"
-                )
 
-                if not path.exists(observational_data_file_path):
-                    raise AutoPlotterError(
-                        f"Unable to find file at {data['filename']}."
+                automatic_redshift = data.get("automatic_redshift", False)
+                self.observational_data_automatic_z.append(automatic_redshift)
+
+                if automatic_redshift:
+                    obs_data_instances = self.observational_data_load_multiple_files(
+                        data["filename"]
                     )
+                    self.observational_data.append(obs_data_instances)
                 else:
-                    obs_data_instance = ObservationalData()
-                    obs_data_instance.load(observational_data_file_path)
-
-                    try:
-                        obs_data_instance.x.convert_to_units(self.x_units)
-                        obs_data_instance.y.convert_to_units(self.y_units)
-                    except UnitConversionError as e:
-                        raise AutoPlotterError(
-                            f"Unable to convert observational data units for "
-                            f"{data['filename']} in plot {self.filename}. See: {e}."
-                        )
-
+                    obs_data_instance = self.observational_data_load_single_file(
+                        data["filename"]
+                    )
                     self.observational_data.append(obs_data_instance)
-
-                    minimum_redshift = data.get("minimum_redshift", -1e9)
-                    maximum_redshift = data.get("maximum_redshift", 1e9)
-
-                    bracket = [minimum_redshift, maximum_redshift]
-
-                    self.observational_data_redshift_bracketing.append(bracket)
 
         except KeyError:
             pass
@@ -872,10 +951,29 @@ class VelociraptorPlot(object):
 
             self._add_shading_to_axes(ax)
 
-            for data, bracket in zip(
-                self.observational_data, self.observational_data_redshift_bracketing
+            # Loop over provided observational data
+            for data, auto_z in zip(
+                self.observational_data, self.observational_data_automatic_z
             ):
-                if bracket[0] < catalogue.z and bracket[1] > catalogue.z:
+                # If automatic z, find observational data at z closest to catalogue.z
+                if auto_z:
+
+                    # Default choice. The zeroth object in the observational data list
+                    idx_min = 0
+                    data_delta_z_min = abs(data[0].redshift - catalogue.z)
+
+                    # Can we find data with z closer to catalogue.z than the default?
+                    for idx, data_z in enumerate(data):
+                        delta_z = abs(data_z.redshift - catalogue.z)
+                        if delta_z < data_delta_z_min:
+                            data_delta_z_min = delta_z
+                            idx_min = idx
+
+                    # Plot data with the best matched redshift
+                    data[idx_min].plot_on_axes(ax, errorbar_kwargs=dict(zorder=-10))
+
+                # Choose observational data redshift by hand
+                else:
                     data.plot_on_axes(ax, errorbar_kwargs=dict(zorder=-10))
 
             try:
