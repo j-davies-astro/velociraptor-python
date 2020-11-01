@@ -662,23 +662,27 @@ class VelociraptorPlot(object):
         -------
 
         output: List[ObservationalData]
-            A list containing instances of the ObservationalData class for each of the
-            files with observational data that have been successfully matched.
+            A list of instances of the ObservationalData class for each of the files
+            with observational data whose names were found by using the provided
+            search pattern
         """
 
-        list_of_obs_data_objects = []
+        # The string we want to match. We need ".*?" to get rid of the path in filenames
+        match_string = f".*?{filename}_({z_pattern}).hdf5"
+
+        # Create re object
+        regex = cached_regex(match_string)
 
         # All paths to files that begin with filename_ and have .hdf5 extension
         paths_to_files = glob(f"{self.observational_data_directory}/{filename}_*.hdf5")
 
-        # The string we want to match. We need ".*?" to get rid of the path to the files
-        match_string = f".*?{filename}_({z_pattern}).hdf5"
+        # List of successful matches
+        list_of_obs_data_objects = []
 
         # Loop through the files we have found
         for path_to_file in paths_to_files:
 
             # Match file name with what we want
-            regex = cached_regex(match_string)
             match = regex.match(path_to_file)
 
             # Is it a match?
