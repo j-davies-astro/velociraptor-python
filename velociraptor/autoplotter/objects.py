@@ -86,8 +86,7 @@ class VelociraptorPlot(object):
     redshift_loc: str
     comment_loc: str
     # Observational data
-    observational_data: List[Union[ObservationalData, List[ObservationalData]]]
-    observational_data_automatic_z: List[bool]
+    observational_data: List[List[ObservationalData]]
     observational_data_directory: str
 
     def __init__(
@@ -708,7 +707,6 @@ class VelociraptorPlot(object):
         """
 
         self.observational_data = []
-        self.observational_data_automatic_z = []
 
         try:
             obs_data = self.data["observational_data"]
@@ -723,8 +721,6 @@ class VelociraptorPlot(object):
                         f"{automatic_redshift}"
                     )
 
-                self.observational_data_automatic_z.append(automatic_redshift)
-
                 if automatic_redshift:
                     obs_data_instances = self.observational_data_load_multiple_files(
                         data["filename"]
@@ -734,7 +730,7 @@ class VelociraptorPlot(object):
                     obs_data_instance = self.observational_data_load_single_file(
                         data["filename"]
                     )
-                    self.observational_data.append(obs_data_instance)
+                    self.observational_data.append([obs_data_instance])
 
         except KeyError:
             pass
@@ -969,29 +965,27 @@ class VelociraptorPlot(object):
             self._add_shading_to_axes(ax)
 
             # Loop over observational dataset provided by the user
-            for data, automatic_z in zip(
-                self.observational_data, self.observational_data_automatic_z
-            ):
-                # If automatic z, find observational data at z closest to catalogue.z
-                if automatic_z:
+            for data in self.observational_data:
 
-                    # Default choice. The zeroth object in the observational data list
-                    idx_min = 0
-                    data_delta_z_min = abs(data[0].redshift - catalogue.z)
+                # The data instance index whose redshift is the closest to catalogue.z
+                idx_min = 0
+                # Large enough number
+                data_delta_z_min = 1e3
 
-                    # Can we find data with z closer to catalogue.z than the default?
-                    for idx, data_z in enumerate(data):
-                        delta_z = abs(data_z.redshift - catalogue.z)
-                        if delta_z < data_delta_z_min:
-                            data_delta_z_min = delta_z
-                            idx_min = idx
+                # Loop over all available redshifts in data and find the closest one
+                for idx, data_per_z in enumerate(data):
 
-                    # Plot data with the best matched redshift
-                    data[idx_min].plot_on_axes(ax, errorbar_kwargs=dict(zorder=-10))
+                    # This is the variable we are minimising
+                    delta_z = abs(data_per_z.redshift - catalogue.z)
 
-                # If non-automatic z, Choose observational data redshift by hand
-                else:
-                    data.plot_on_axes(ax, errorbar_kwargs=dict(zorder=-10))
+                    # Update the running minimum value if needed
+                    if delta_z < data_delta_z_min:
+                        data_delta_z_min = delta_z
+                        idx_min = idx
+
+                # Plot data with the best matched redshift
+                data[idx_min].plot_on_axes(ax, errorbar_kwargs=dict(zorder=-10))
+
 
             try:
                 ax.set_xlim(*self.x_lim)
