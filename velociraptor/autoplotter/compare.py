@@ -217,7 +217,25 @@ def recreate_single_figure(
     # Add observational data second to allow for colour precedence
     # to go to runs
     for data in plot.observational_data:
-        data.plot_on_axes(ax, errorbar_kwargs=dict(zorder=-10))
+
+        # The data instance index whose redshift is the closest to catalogue.z
+        idx_min = 0
+        # Large enough number
+        data_delta_z_min = 1e3
+
+        # Loop over all available redshifts in data and find the closest one
+        for idx, data_per_z in enumerate(data):
+
+            # This is the variable we are minimising
+            delta_z = abs(data_per_z.redshift - fake_catalogue.z)
+
+            # Update the running minimum value if needed
+            if delta_z < data_delta_z_min:
+                data_delta_z_min = delta_z
+                idx_min = idx
+
+        # Plot data with the best matched redshift
+        data[idx_min].plot_on_axes(ax, errorbar_kwargs=dict(zorder=-10))
 
     # Finally set up metadata
     if plot.x_log:
