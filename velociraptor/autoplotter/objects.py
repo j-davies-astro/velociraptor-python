@@ -605,13 +605,13 @@ class VelociraptorPlot(object):
     def observational_data_load_single_file(self, filename: str) -> ObservationalData:
         """
         Creates and returns an instance of the ObservationalData class for the provided
-        observational data file
+        file with observational data
 
         Parameters
         ----------
 
         filename: str
-            Name of the file with the observational data in the observational data
+            Name of the file with observational data in the observational data
             directory
 
         Returns
@@ -641,29 +641,30 @@ class VelociraptorPlot(object):
         return obs_data_instance
 
     def observational_data_load_multiple_files(
-        self, filename: str, re_pattern: str = "z\d{3}p\d{3}"
+        self, filename: str, z_pattern: str = "z\d{3}p\d{3}"
     ) -> List[ObservationalData]:
         """
         Creates and returns an instance of the ObservationalData class for each of the
-        observational data files whose name has the form {filename}_{re_pattern}.hdf5,
-        where filename is the first string passed to the function and re_pattern is the
-        pattern to be matched using regular expression syntax.
+        files with observational data whose names have the form
+        {filename}_{z_pattern}.hdf5, where 'filename' is the first string passed to the
+        function and 'z_pattern' is the search pattern to be matched using regular
+        expression syntax.
 
         Parameters
         ----------
 
         filename: str
-            Name of the file containing the observational data, in the observational
-            data directory, and excluding the redshift suffix.
-        re_pattern: str
-            Pattern to be matched using regular expression syntax
+            Name of the file containing the observational data,  excluding 
+            the redshift suffix 'z_pattern' and the file extension '.hdf5'.
+        z_pattern: str
+            Redshift pattern to be matched using regular expression syntax
 
         Returns
         -------
 
         output: List[ObservationalData]
             A list containing instances of the ObservationalData class for each of the
-            observational data files that have been successfully matched.
+            files with observational data that have been successfully matched.
         """
 
         list_of_obs_data_objects = []
@@ -672,7 +673,7 @@ class VelociraptorPlot(object):
         paths_to_files = glob(f"{self.observational_data_directory}/{filename}_*.hdf5")
 
         # The string we want to match. We need ".*?" to get rid of the path to the files
-        match_string = f".*?{filename}_({re_pattern}).hdf5"
+        match_string = f".*?{filename}_({z_pattern}).hdf5"
 
         # Loop through the files we have found
         for path_to_file in paths_to_files:
@@ -691,6 +692,13 @@ class VelociraptorPlot(object):
                 list_of_obs_data_objects.append(
                     self.observational_data_load_single_file(name)
                 )
+
+        if len(list_of_obs_data_objects) == 0:
+            raise Exception(
+                f"No matches for the regular-expression search pattern "
+                f"'{filename}_{z_pattern}.hdf5' were found. Choose a "
+                f"correct search pattern or set automatic redshift parameter to false"
+            )
 
         return list_of_obs_data_objects
 
@@ -960,12 +968,12 @@ class VelociraptorPlot(object):
 
             self._add_shading_to_axes(ax)
 
-            # Loop over provided observational data
-            for data, auto_z in zip(
+            # Loop over observational dataset provided by the user
+            for data, automatic_z in zip(
                 self.observational_data, self.observational_data_automatic_z
             ):
                 # If automatic z, find observational data at z closest to catalogue.z
-                if auto_z:
+                if automatic_z:
 
                     # Default choice. The zeroth object in the observational data list
                     idx_min = 0
@@ -981,7 +989,7 @@ class VelociraptorPlot(object):
                     # Plot data with the best matched redshift
                     data[idx_min].plot_on_axes(ax, errorbar_kwargs=dict(zorder=-10))
 
-                # Choose observational data redshift by hand
+                # If non-automatic z, Choose observational data redshift by hand
                 else:
                     data.plot_on_axes(ax, errorbar_kwargs=dict(zorder=-10))
 
