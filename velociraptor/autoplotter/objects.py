@@ -708,6 +708,13 @@ class VelociraptorPlot(object):
             for data in obs_data:
 
                 automatic_redshift = data.get("automatic_redshift", False)
+
+                if type(automatic_redshift) != bool:
+                    raise TypeError(
+                        f"Automatic redshift must be either true or false, not "
+                        f"{automatic_redshift}"
+                    )
+
                 self.observational_data_automatic_z.append(automatic_redshift)
 
                 if automatic_redshift:
@@ -911,9 +918,11 @@ class VelociraptorPlot(object):
         # Whether to reverse the summation (high to low in place of low to high)
         self.reverse_cumsum = self.data.get("reverse_cumsum", False)
 
-        assert (
-            type(self.reverse_cumsum) == bool
-        ), f"reverse_cumsum must be either true or false, not {self.reverse_cumsum}"
+        if type(self.reverse_cumsum) != bool:
+            raise TypeError(
+                f"reverse_cumsum must be either true or false, not "
+                f"{self.reverse_cumsum}"
+            )
 
         x = self.get_quantity_from_catalogue_with_mask(self.x, catalogue)
         x.convert_to_units(self.x_units)
