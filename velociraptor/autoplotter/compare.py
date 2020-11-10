@@ -168,21 +168,17 @@ def recreate_single_figure(
                 color = f"C{color}"
 
                 try:
-                    this_line_dict = data[plot.filename]["lines"][line_type]
-                    centers = unyt.unyt_array(
-                        this_line_dict["centers"], units=plot.x_units
-                    )
-                    heights = unyt.unyt_array(
-                        this_line_dict["values"], units=plot.y_units
-                    )
-                    errors = unyt.unyt_array(
-                        this_line_dict["scatter"], units=plot.y_units
-                    )
+                    this_plot = data[plot.filename]
+                    this_line_dict = this_plot["lines"][line_type]
                 except KeyError:
                     continue
 
-                ax.set_xlabel(data[plot.filename].get("x_label"))
-                ax.set_ylabel(data[plot.filename].get("y_label"))
+                centers = unyt.unyt_array(this_line_dict["centers"], units=plot.x_units)
+                heights = unyt.unyt_array(this_line_dict["values"], units=plot.y_units)
+                errors = unyt.unyt_array(this_line_dict["scatter"], units=plot.y_units)
+
+                ax.set_xlabel(this_plot.get("x_label", ax.get_xlabel()))
+                ax.set_ylabel(this_plot.get("y_label", ax.get_ylabel()))
 
                 # Data points from the bins with too few data points
                 additional_x = unyt.unyt_array(
@@ -193,9 +189,7 @@ def recreate_single_figure(
                 )
 
                 if line.scatter == "errorbar":
-                    ax.errorbar(
-                        centers, heights, yerr=errors, label=name, color=color
-                    )
+                    ax.errorbar(centers, heights, yerr=errors, label=name, color=color)
                 elif line.scatter == "shaded":
                     ax.plot(centers, heights, label=name, color=color)
 
