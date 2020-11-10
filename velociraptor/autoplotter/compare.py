@@ -165,7 +165,7 @@ def recreate_single_figure(
         line = getattr(plot, f"{line_type}_line", None)
         if line is not None:
             for color, (name, data) in enumerate(line_data.items()):
-                color = f"C{color}"
+                color_name = f"C{color}"
 
                 try:
                     this_plot = data[plot.filename]
@@ -189,9 +189,11 @@ def recreate_single_figure(
                 )
 
                 if line.scatter == "errorbar":
-                    ax.errorbar(centers, heights, yerr=errors, label=name, color=color)
+                    ax.errorbar(
+                        centers, heights, yerr=errors, label=name, color=color_name
+                    )
                 elif line.scatter == "shaded":
-                    ax.plot(centers, heights, label=name, color=color)
+                    ax.plot(centers, heights, label=name, color=color_name)
 
                     # Deal with different + and -ve errors
                     if errors.shape[0]:
@@ -208,7 +210,7 @@ def recreate_single_figure(
                         centers,
                         heights - down,
                         heights + up,
-                        color=color,
+                        color=color_name,
                         alpha=0.3,
                         linewidth=0.0,
                     )
@@ -217,12 +219,14 @@ def recreate_single_figure(
                 else:
                     (mpl_line,) = ax.plot(centers, heights, label=name)
 
-                ax.scatter(additional_x, additional_y, c=color)
+                ax.scatter(additional_x, additional_y, c=color_name)
 
     # Add observational data second to allow for colour precedence
     # to go to runs
-    for data in plot.observational_data:
-        data.plot_on_axes(ax, errorbar_kwargs=dict(zorder=-10))
+    for index, data in enumerate(plot.observational_data):
+        data.plot_on_axes(
+            ax, errorbar_kwargs=dict(zorder=-10, color=f"C{index + color}")
+        )
 
     # Finally set up metadata
     if plot.x_log:
