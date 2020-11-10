@@ -173,6 +173,13 @@ def recreate_single_figure(
                 except KeyError:
                     continue
 
+                if (
+                    this_line_dict.get("centers", []) == []
+                    and this_line_dict.get("additional_points_x", []) == []
+                ):
+                    # Don't plot this line, as it contains no information.
+                    continue
+
                 centers = unyt.unyt_array(this_line_dict["centers"], units=plot.x_units)
                 heights = unyt.unyt_array(this_line_dict["values"], units=plot.y_units)
                 errors = unyt.unyt_array(this_line_dict["scatter"], units=plot.y_units)
