@@ -217,13 +217,13 @@ def recreate_single_figure(
 
                 # line.scatter == "none":
                 else:
-                    (mpl_line,) = ax.plot(centers, heights, label=name)
+                    ax.plot(centers, heights, label=name)
 
                 ax.scatter(additional_x, additional_y, c=color_name)
 
     # Add observational data second to allow for colour precedence
     # to go to runs
-    for index, data in enumerate(plot.observational_data):
+    for index, data in enumerate(plot.observational_data, start=1):
         data.plot_on_axes(
             ax, errorbar_kwargs=dict(zorder=-10, color=f"C{index + color}")
         )
