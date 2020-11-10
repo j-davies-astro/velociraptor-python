@@ -164,14 +164,28 @@ def recreate_single_figure(
     for line_type in valid_line_types:
         line = getattr(plot, f"{line_type}_line", None)
         if line is not None:
-            for name, data in line_data.items():
-                ax.set_xlabel(data[plot.filename].get("x_label"))
-                ax.set_ylabel(data[plot.filename].get("y_label"))
+            for color, (name, data) in enumerate(line_data.items()):
+                color_name = f"C{color}"
 
-                this_line_dict = data[plot.filename]["lines"][line_type]
+                try:
+                    this_plot = data[plot.filename]
+                    this_line_dict = this_plot["lines"][line_type]
+                except KeyError:
+                    continue
+
+                if (
+                    this_line_dict.get("centers", []) == []
+                    and this_line_dict.get("additional_points_x", []) == []
+                ):
+                    # Don't plot this line, as it contains no information.
+                    continue
+
                 centers = unyt.unyt_array(this_line_dict["centers"], units=plot.x_units)
                 heights = unyt.unyt_array(this_line_dict["values"], units=plot.y_units)
                 errors = unyt.unyt_array(this_line_dict["scatter"], units=plot.y_units)
+
+                ax.set_xlabel(this_plot.get("x_label", ax.get_xlabel()))
+                ax.set_ylabel(this_plot.get("y_label", ax.get_ylabel()))
 
                 # Data points from the bins with too few data points
                 additional_x = unyt.unyt_array(
@@ -182,11 +196,11 @@ def recreate_single_figure(
                 )
 
                 if line.scatter == "errorbar":
-                    (mpl_line, _, _) = ax.errorbar(
-                        centers, heights, yerr=errors, label=name
+                    ax.errorbar(
+                        centers, heights, yerr=errors, label=name, color=color_name
                     )
                 elif line.scatter == "shaded":
-                    (mpl_line,) = ax.plot(centers, heights, label=name)
+                    ax.plot(centers, heights, label=name, color=color_name)
 
                     # Deal with different + and -ve errors
                     if errors.shape[0]:
@@ -203,20 +217,20 @@ def recreate_single_figure(
                         centers,
                         heights - down,
                         heights + up,
-                        color=mpl_line.get_color(),
+                        color=color_name,
                         alpha=0.3,
                         linewidth=0.0,
                     )
 
                 # line.scatter == "none":
                 else:
-                    (mpl_line,) = ax.plot(centers, heights, label=name)
+                    ax.plot(centers, heights, label=name)
 
-                ax.scatter(additional_x, additional_y, c=mpl_line.get_color())
+                ax.scatter(additional_x, additional_y, c=color_name)
 
     # Add observational data second to allow for colour precedence
     # to go to runs
-    for data in plot.observational_data:
+    for index, data in enumerate(plot.observational_data, start=1):
 
         # The data instance index whose redshift is the closest to catalogue.z
         idx_min = 0
@@ -235,7 +249,9 @@ def recreate_single_figure(
                 idx_min = idx
 
         # Plot data with the best matched redshift
-        data[idx_min].plot_on_axes(ax, errorbar_kwargs=dict(zorder=-10))
+        data[idx_min].plot_on_axes(
+            ax, errorbar_kwargs=dict(zorder=-10, color=f"C{index + color}")
+        )
 
     # Finally set up metadata
     if plot.x_log:
