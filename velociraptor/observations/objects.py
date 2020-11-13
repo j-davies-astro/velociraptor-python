@@ -516,7 +516,10 @@ class ObservationalData(object):
         return
 
     def plot_on_axes(
-        self, axes: Axes, errorbar_kwargs: Union[dict, None] = None, line_idx: int = -1
+        self,
+        axes: Axes,
+        errorbar_kwargs: Union[dict, None] = None,
+        redshift: float = 0.0,
     ):
         """
         Plot this set of observational data as an errorbar().
@@ -533,11 +536,9 @@ class ObservationalData(object):
         errorbar_kwargs: dict
             Optional keyword arguments to pass to plt.errorbar.
 
-        line_idx: int
-            If the observational-data file has data at multiple redshifts, then
-            line_idx argument is used to specify at which z to plot the data. The
-            default value of -1 means that the file contains data only at a single
-            redshift
+        redshift: float
+            Target redshift at which to plot the data. If the data at this z is not
+            available, then the next closest z is used.
         """
 
         # Do this because dictionaries are mutable
@@ -576,16 +577,38 @@ class ObservationalData(object):
         elif self.plot_as == "line":
             kwargs["zorder"] = line_zorder
 
-        # Check whether the data is available at several redshifts
-        if line_idx >= 0:
-            observational_data_y = self.y[line_idx, :]
-            data_label = f"{self.citation} ($z={self.redshift[line_idx]:.1f}$)"
-        else:
+        # Try to iterate over z (works only for multi-z observational data)
+        try:
+            # Index of the data in a 2D array whose redshift is closest to
+            # catalogue.z (relevant only for data available at several z)
+            idx_min = 0
+
+            # Large enough number
+            data_delta_z_min = 1e3
+
+            # Loop over all available redshifts in data and find the closest one
+            for z_idx, z in enumerate(self.redshift):
+
+                # This is the variable we are minimising
+                delta_z = abs(z - redshift)
+
+                # Update the running minimum value if needed
+                if delta_z < data_delta_z_min:
+                    data_delta_z_min = delta_z
+                    idx_min = z_idx
+
+            observational_data_x = self.x[idx_min, :]
+            observational_data_y = self.y[idx_min, :]
+            data_label = f"{self.citation} ($z={self.redshift[idx_min]:.1f}$)"
+
+        # Single-z observational data is not iterable
+        except TypeError:
+            observational_data_x = self.x
             observational_data_y = self.y
             data_label = f"{self.citation} ($z={self.redshift:.1f}$)"
 
         axes.errorbar(
-            self.x,
+            observational_data_x,
             observational_data_y,
             yerr=self.y_scatter,
             xerr=self.x_scatter,
