@@ -232,25 +232,35 @@ def recreate_single_figure(
     # to go to runs
     for index, data in enumerate(plot.observational_data, start=1):
 
-        # The data instance index whose redshift is the closest to catalogue.z
-        idx_min = 0
-        # Large enough number
-        data_delta_z_min = 1e3
+        # Index of the data in a 2D array whose redshift is closest to
+        # catalogue.z (relevant only for data available at several z)
+        idx_min = -1
 
-        # Loop over all available redshifts in data and find the closest one
-        for idx, data_per_z in enumerate(data):
+        # Try to iterate over z (works only for multi-z observational data)
+        try:
+            # Large enough number
+            data_delta_z_min = 1e3
 
-            # This is the variable we are minimising
-            delta_z = abs(data_per_z.redshift - fake_catalogue.z)
+            # Loop over all available redshifts in data and find the closest one
+            for z_idx, z in enumerate(data.redshift):
 
-            # Update the running minimum value if needed
-            if delta_z < data_delta_z_min:
-                data_delta_z_min = delta_z
-                idx_min = idx
+                # This is the variable we are minimising
+                delta_z = abs(z - fake_catalogue.z)
 
-        # Plot data with the best matched redshift
-        data[idx_min].plot_on_axes(
-            ax, errorbar_kwargs=dict(zorder=-10, color=f"C{index + color}")
+                # Update the running minimum value if needed
+                if delta_z < data_delta_z_min:
+                    data_delta_z_min = delta_z
+                    idx_min = z_idx
+
+        # Single-z observational data is not iterable
+        except TypeError:
+            pass
+
+        # Plot observational data
+        data.plot_on_axes(
+            ax,
+            errorbar_kwargs=dict(zorder=-10, color=f"C{index + color}"),
+            line_idx=idx_min,
         )
 
     # Finally set up metadata

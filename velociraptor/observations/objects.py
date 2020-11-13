@@ -17,9 +17,8 @@ from astropy.cosmology.core import Cosmology
 from astropy.cosmology import wCDM, FlatLambdaCDM
 
 import h5py
-import json
 
-from typing import Union
+from typing import Union, List
 
 # Default z_orders for errorbar points and lines
 line_zorder = -5
@@ -221,7 +220,7 @@ class ObservationalData(object):
     citation: str
     bibcode: str
     # redshift that the data is at
-    redshift: float
+    redshift: Union[float, List[float]]
     # plot as points, or a line?
     plot_as: Union[str, None] = None
     # the cosmology that this dataset was corrected to
@@ -462,7 +461,7 @@ class ObservationalData(object):
 
         return
 
-    def associate_redshift(self, redshift: float):
+    def associate_redshift(self, redshift: Union[float, List[float]]):
         """
         Associate the redshift that the observations were taken at
         with this observational data instance.
@@ -470,9 +469,9 @@ class ObservationalData(object):
         Parameters
         ----------
 
-        redshift: float
-            Redshift at which the data is collected at. If a range, use
-            the mid-point.
+        redshift: Union[float, List[float]]
+            Redshift at which the data is collected at. The type list[float] is
+            used when the file contains data at several redshifts
 
         """
 
@@ -516,7 +515,9 @@ class ObservationalData(object):
 
         return
 
-    def plot_on_axes(self, axes: Axes, errorbar_kwargs: Union[dict, None] = None):
+    def plot_on_axes(
+        self, axes: Axes, errorbar_kwargs: Union[dict, None] = None, line_idx: int = -1
+    ):
         """
         Plot this set of observational data as an errorbar().
 
@@ -531,6 +532,12 @@ class ObservationalData(object):
 
         errorbar_kwargs: dict
             Optional keyword arguments to pass to plt.errorbar.
+
+        line_idx: int
+            If the observational-data file has data at multiple redshifts, then
+            line_idx argument is used to specify at which z to plot the data. The
+            default value of -1 means that the file contains data only at a single
+            redshift
         """
 
         # Do this because dictionaries are mutable
@@ -569,16 +576,21 @@ class ObservationalData(object):
         elif self.plot_as == "line":
             kwargs["zorder"] = line_zorder
 
-        # Make both the data name and redshift appear in the legend
-        data_label = f"{self.citation} ($z={self.redshift:.1f}$)"
+        # Check whether the data is available at several redshifts
+        if line_idx >= 0:
+            observational_data_y = self.y[line_idx, :]
+            data_label = f"{self.citation} ($z={self.redshift[line_idx]:.1f}$)"
+        else:
+            observational_data_y = self.y
+            data_label = f"{self.citation} ($z={self.redshift:.1f}$)"
 
         axes.errorbar(
             self.x,
-            self.y,
+            observational_data_y,
             yerr=self.y_scatter,
             xerr=self.x_scatter,
             **kwargs,
-            label=data_label
+            label=data_label,
         )
 
         return

@@ -4,8 +4,6 @@ Main objects for holding information relating to the autoplotter.
 
 from velociraptor import VelociraptorCatalogue
 from velociraptor.autoplotter.lines import VelociraptorLine, valid_line_types
-from velociraptor.regex import cached_regex
-from glob import glob
 from velociraptor.exceptions import AutoPlotterError
 from velociraptor.observations.objects import ObservationalData
 
@@ -86,7 +84,7 @@ class VelociraptorPlot(object):
     redshift_loc: str
     comment_loc: str
     # Observational data
-    observational_data: List[List[ObservationalData]]
+    observational_data: List[ObservationalData]
     observational_data_directory: str
 
     def __init__(
@@ -601,7 +599,7 @@ class VelociraptorPlot(object):
 
         return
 
-    def observational_data_load_single_file(self, filename: str) -> ObservationalData:
+    def observational_data_load(self, filename: str) -> ObservationalData:
         """
         Creates and returns an instance of the ObservationalData class for the provided
         file with observational data
@@ -639,72 +637,6 @@ class VelociraptorPlot(object):
 
         return obs_data_instance
 
-    def observational_data_load_multiple_files(
-        self, filename: str, z_pattern: str = "z\d{3}p\d{3}"
-    ) -> List[ObservationalData]:
-        """
-        Creates and returns an instance of the ObservationalData class for each of the
-        files with observational data whose names have the form
-        {filename}_{z_pattern}.hdf5, where 'filename' is the first string passed to the
-        function and 'z_pattern' is the search pattern to be matched using regular
-        expression syntax.
-
-        Parameters
-        ----------
-
-        filename: str
-            Name of the file containing the observational data,  excluding 
-            the redshift suffix 'z_pattern' and the file extension '.hdf5'.
-        z_pattern: str
-            Redshift pattern to be matched using regular expression syntax
-
-        Returns
-        -------
-
-        output: List[ObservationalData]
-            A list of instances of the ObservationalData class for each of the files
-            with observational data whose names were found by using the provided
-            search pattern
-        """
-
-        # The string we want to match. We need ".*?" to get rid of the path in filenames
-        match_string = f".*?{filename}_({z_pattern}).hdf5"
-
-        # Create re object
-        regex = cached_regex(match_string)
-
-        # All paths to files that begin with filename_ and have .hdf5 extension
-        paths_to_files = glob(f"{self.observational_data_directory}/{filename}_*.hdf5")
-
-        # List of successful matches
-        list_of_obs_data_objects = []
-
-        # Loop through the files we have found
-        for path_to_file in paths_to_files:
-
-            # Match file name with what we want
-            match = regex.match(path_to_file)
-
-            # Is it a match?
-            if match:
-
-                # Recover the filename (excluding the path to the file)
-                name = f"{filename}_{match.group(1)}.hdf5"
-
-                # Load and store the data as ObservationalData class instance
-                list_of_obs_data_objects.append(
-                    self.observational_data_load_single_file(name)
-                )
-
-        if len(list_of_obs_data_objects) == 0:
-            raise Exception(
-                f"No matches for the regular-expression search pattern "
-                f"'{filename}_{z_pattern}.hdf5' were found. Choose a "
-                f"correct search pattern or set automatic redshift parameter to false"
-            )
-
-        return list_of_obs_data_objects
-
     def _parse_observational_data(self):
         """
         Parses the observational data segment.
@@ -716,25 +648,8 @@ class VelociraptorPlot(object):
             obs_data = self.data["observational_data"]
 
             for data in obs_data:
-
-                automatic_redshift = data.get("automatic_redshift", False)
-
-                if type(automatic_redshift) != bool:
-                    raise TypeError(
-                        f"Automatic redshift must be either true or false, not "
-                        f"{automatic_redshift}"
-                    )
-
-                if automatic_redshift:
-                    obs_data_instances = self.observational_data_load_multiple_files(
-                        data["filename"]
-                    )
-                    self.observational_data.append(obs_data_instances)
-                else:
-                    obs_data_instance = self.observational_data_load_single_file(
-                        data["filename"]
-                    )
-                    self.observational_data.append([obs_data_instance])
+                obs_data_instance = self.observational_data_load(data["filename"])
+                self.observational_data.append(obs_data_instance)
 
         except KeyError:
             pass
@@ -971,25 +886,34 @@ class VelociraptorPlot(object):
             # Loop over observational dataset provided by the user
             for data in self.observational_data:
 
-                # The data instance index whose redshift is the closest to catalogue.z
-                idx_min = 0
-                # Large enough number
-                data_delta_z_min = 1e3
+                # Index of the data in a 2D array whose redshift is closest to
+                # catalogue.z (relevant only for data available at several z)
+                idx_min = -1
 
-                # Loop over all available redshifts in data and find the closest one
-                for idx, data_per_z in enumerate(data):
+                # Try to iterate over z (works only for multi-z observational data)
+                try:
+                    # Large enough number
+                    data_delta_z_min = 1e3
 
-                    # This is the variable we are minimising
-                    delta_z = abs(data_per_z.redshift - catalogue.z)
+                    # Loop over all available redshifts in data and find the closest one
+                    for z_idx, z in enumerate(data.redshift):
 
-                    # Update the running minimum value if needed
-                    if delta_z < data_delta_z_min:
-                        data_delta_z_min = delta_z
-                        idx_min = idx
+                        # This is the variable we are minimising
+                        delta_z = abs(z - catalogue.z)
 
-                # Plot data with the best matched redshift
-                data[idx_min].plot_on_axes(ax, errorbar_kwargs=dict(zorder=-10))
+                        # Update the running minimum value if needed
+                        if delta_z < data_delta_z_min:
+                            data_delta_z_min = delta_z
+                            idx_min = z_idx
 
+                # Single-z observational data is not iterable
+                except TypeError:
+                    pass
+
+                # Plot observational data
+                data.plot_on_axes(
+                    ax, errorbar_kwargs=dict(zorder=-10), line_idx=idx_min
+                )
 
             try:
                 ax.set_xlim(*self.x_lim)
