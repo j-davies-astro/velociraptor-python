@@ -81,8 +81,6 @@ This yaml file has the following format:
      # Comparison data to plot on top
      observational_data:
        - filename: filename of data to plot on this plot (use ObservationalData written to disk)
-         automatic_redshift: true or false. If true, automatically plots ObsData file
-         with z closest to that of the snapshot. Default: false. If true, provide the filename w/o the "_z???p???.hdf5" part
        - filename: second filename for observational data
        - filename: ... you can plot as many of these as you'd like
 """
