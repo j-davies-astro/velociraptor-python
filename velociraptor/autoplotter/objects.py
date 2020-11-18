@@ -5,7 +5,11 @@ Main objects for holding information relating to the autoplotter.
 from velociraptor import VelociraptorCatalogue
 from velociraptor.autoplotter.lines import VelociraptorLine, valid_line_types
 from velociraptor.exceptions import AutoPlotterError
-from velociraptor.observations.objects import ObservationalData
+from velociraptor.observations import (
+    ObservationalData,
+    MultiRedshiftObservationalData,
+    load_observations,
+)
 
 import velociraptor.autoplotter.plot as plot
 
@@ -84,8 +88,8 @@ class VelociraptorPlot(object):
     redshift_loc: str
     comment_loc: str
     # Observational data
-    observational_data: List[ObservationalData]
-    observational_data_redshift_bracketing: List[List[float]]
+    observational_data_filenames: List[str]
+    observational_data_bracket_width: float
     observational_data_directory: str
 
     def __init__(
@@ -621,29 +625,16 @@ class VelociraptorPlot(object):
                         f"Unable to find file at {data['filename']}."
                     )
                 else:
-                    obs_data_instance = ObservationalData()
-                    obs_data_instance.load(observational_data_file_path)
-
-                    try:
-                        obs_data_instance.x.convert_to_units(self.x_units)
-                        obs_data_instance.y.convert_to_units(self.y_units)
-                    except UnitConversionError as e:
-                        raise AutoPlotterError(
-                            f"Unable to convert observational data units for "
-                            f"{data['filename']} in plot {self.filename}. See: {e}."
-                        )
-
-                    self.observational_data.append(obs_data_instance)
-
-                    minimum_redshift = data.get("minimum_redshift", -1e9)
-                    maximum_redshift = data.get("maximum_redshift", 1e9)
-
-                    bracket = [minimum_redshift, maximum_redshift]
-
-                    self.observational_data_redshift_bracketing.append(bracket)
+                    self.observational_data_filenames.append(
+                        observational_data_file_path
+                    )
 
         except KeyError:
             pass
+
+        self.observational_data_bracket_width = float(
+            self.data.get("metadata", {}).get("observational_data_bracket_width", 0.1)
+        )
 
         return
 
@@ -863,6 +854,20 @@ class VelociraptorPlot(object):
         plot type.
         """
 
+        observational_data_scale_factor_bracket = [
+            10 ** (log10(catalogue.a) + self.observational_data_bracket_width),
+            10 ** (log10(catalogue.a) - self.observational_data_bracket_width),
+        ]
+
+        observational_data_redshift_bracket = [
+            (1 - x) / x for x in observational_data_scale_factor_bracket
+        ]
+
+        valid_observational_data = load_observations(
+            self.observational_data_filenames,
+            redshift_bracket=observational_data_redshift_bracket,
+        )
+
         with matplotlib_support:
             fig, ax = getattr(self, f"_make_plot_{self.plot_type}")(catalogue=catalogue)
             if self.x_log:
@@ -872,11 +877,8 @@ class VelociraptorPlot(object):
 
             self._add_shading_to_axes(ax)
 
-            for data, bracket in zip(
-                self.observational_data, self.observational_data_redshift_bracketing
-            ):
-                if bracket[0] < catalogue.z and bracket[1] > catalogue.z:
-                    data.plot_on_axes(ax, errorbar_kwargs=dict(zorder=-10))
+            for data in valid_observational_data:
+                data.plot_on_axes(ax, errorbar_kwargs=dict(zorder=-10))
 
             try:
                 ax.set_xlim(*self.x_lim)
