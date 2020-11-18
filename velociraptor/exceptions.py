@@ -18,3 +18,8 @@ class RegistrationDoesNotMatchError(Exception):
 class AutoPlotterError(Exception):
     def __init__(self, message):
         self.message = message
+
+
+class ObservationalDataError(Exception):
+    def __init__(self, message):
+        self.message = message
