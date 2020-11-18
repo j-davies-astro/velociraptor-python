@@ -6,17 +6,16 @@ opened into python objects through the use of the API available
 in :mod:`velociraptor.observations`.
 
 To load a file, you should use the
-:func:`velociraptor.observations.load_observation`, which will return an
-object of type :class:`velociraptor.observations.objects.ObservationalData`.
-This instance has several useful properties, and one key method,
-:meth:`velociraptor.observations.objects.ObservationalData.plot_on_axes`. This
-method allows you to provide a :class:`matplotlib.pyplot.Axes` object to
+:func:`velociraptor.observations.load_observations`, which will return an
+list of objects of type
+:class:`velociraptor.observations.objects.ObservationalData`. Each instance
+has several useful properties, and one key method,
+:meth:`velociraptor.observations.objects.ObservationalData.plot_on_axes`.
+This method allows you to provide a :class:`matplotlib.pyplot.Axes` object to
 automatically plot the ``x`` and ``y`` fields on those axes. Those arrays,
 ``x`` and ``y``, are instances of the :class:`unyt.unyt_array` class, and as
-such you can use the ``convert_to_units`` method to convert these to whatever
-units you would like your axes to be in. Unfortunately there is no
-integration within :mod:`matplotlib` to allow for automatic conversion of
-data that is already plotted on a figure.
+such you can use the ``matplotlib_support`` environment within ``unyt`` to
+automatically convert units to be consistent on the axes.
 
 Example
 -------
@@ -26,10 +25,10 @@ instance (and file) after loading it.
 
 .. code-block:: python
 
-   from velociraptor.observations import load_observation
+   from velociraptor.observations import load_observations
    import matplotlib.pyplot as plt
 
-   obs = load_observation("path/to/file.hdf5")
+   obs = load_observations("path/to/file.hdf5")[0]
 
    fig, ax = plt.subplots()
    ax.loglog()
@@ -38,5 +37,30 @@ instance (and file) after loading it.
    obs.y.convert_to_units("msun")
 
    obs.plot_on_axes(ax)
+
+   fig.savefig("out.png")
+
+
+You can provide multiple filenames, and possibly multi-redshift
+datasets, along with a redshift bracket to only return datasets
+that overlap with the given redshift range:
+
+.. code-block:: python
+
+   from velociraptor.observations import load_observation
+   import matplotlib.pyplot as plt
+   import unyt
+
+   observations = load_observations(
+      ["path/to/file_1.hdf5", "path/to/file_2.hdf5", "path/to/file_3.hdf5"],
+      [0.0, 0.5] # Plot observations from z=0.0 to z=0.5
+   )[0]
+
+   fig, ax = plt.subplots()
+   ax.loglog()
+
+   with unyt.matplotlib_support:
+      for obs in observations:
+         obs.plot_on_axes(ax)
 
    fig.savefig("out.png")
