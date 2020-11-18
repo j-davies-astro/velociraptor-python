@@ -19,6 +19,7 @@ from numpy import log10, linspace, logspace, array, logical_and
 from matplotlib.pyplot import Axes, Figure, close
 from yaml import safe_load
 from typing import Union, List, Dict, Tuple
+from pathlib import Path
 
 from os import path, mkdir
 from functools import reduce
@@ -609,20 +610,19 @@ class VelociraptorPlot(object):
         Parses the observational data segment.
         """
 
-        self.observational_data = []
-        self.observational_data_redshift_bracketing = []
+        self.observational_data_filenames = []
 
         try:
             obs_data = self.data["observational_data"]
 
             for data in obs_data:
-                observational_data_file_path = (
-                    f"{self.observational_data_directory}/{data['filename']}"
+                observational_data_file_path = self.observational_data_directory / Path(
+                    data.get("filename", "")
                 )
 
                 if not path.exists(observational_data_file_path):
                     raise AutoPlotterError(
-                        f"Unable to find file at {data['filename']}."
+                        f"Unable to find file at {observational_data_file_path}."
                     )
                 else:
                     self.observational_data_filenames.append(
@@ -955,10 +955,10 @@ class AutoPlotter(object):
         self.filename = filename
 
         self.multiple_yaml_files = isinstance(filename, list)
-        self.observational_data_directory = (
+        self.observational_data_directory = Path(
             observational_data_directory
             if observational_data_directory is not None
-            else "."
+            else ""
         )
 
         self.load_yaml()
