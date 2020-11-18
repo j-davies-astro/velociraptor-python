@@ -19,6 +19,7 @@ from velociraptor.autoplotter.plot import decorate_axes
 
 from velociraptor.autoplotter.objects import AutoPlotter
 from velociraptor.autoplotter.metadata import AutoPlotterMetadata
+from velociraptor.observations import load_observations
 
 
 class FakeCatalogue(object):
@@ -230,7 +231,23 @@ def recreate_single_figure(
 
     # Add observational data second to allow for colour precedence
     # to go to runs
-    for index, data in enumerate(plot.observational_data, start=1):
+    observational_data_scale_factor_bracket = [
+        10 ** (log10(fake_catalogue.a) + plot.observational_data_bracket_width),
+        10 ** (log10(fake_catalogue.a) - plot.observational_data_bracket_width),
+    ]
+
+    observational_data_redshift_bracket = [
+        (1 - x) / x for x in observational_data_scale_factor_bracket
+    ]
+
+    valid_observational_data = load_observations(
+        self.observational_data_filenames,
+        redshift_bracket=observational_data_redshift_bracket,
+    )
+
+    for index, data in enumerate(valid_observational_data, start=1):
+        data.x.convert_to_units(plot.x_units)
+        data.y.convert_to_units(plot.y_units)
         data.plot_on_axes(
             ax, errorbar_kwargs=dict(zorder=-10, color=f"C{index + color}")
         )
