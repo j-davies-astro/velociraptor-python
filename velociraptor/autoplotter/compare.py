@@ -242,7 +242,7 @@ def recreate_single_figure(
     ]
 
     valid_observational_data = load_observations(
-        self.observational_data_filenames,
+        plot.observational_data_filenames,
         redshift_bracket=observational_data_redshift_bracket,
     )
 
