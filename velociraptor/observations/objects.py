@@ -694,7 +694,7 @@ class MultiRedshiftObservationalData(object):
         self, redshifts: List[float] = [0.0, 1000.0]
     ) -> List[ObservationalData]:
         """
-        Gets individual redshift datsets overlapping with the specified
+        Gets individual redshift datasets overlapping with the specified
         redshift range. The check is performed inclusively, so if you ask
         for overlaps with [0.25, 0.75], and an observation has a redshift
         range of [0.75, 1.25], it will be included.
