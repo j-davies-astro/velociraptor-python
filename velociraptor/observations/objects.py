@@ -189,6 +189,14 @@ class ObservationalData(object):
         Redshift at which the data is collected at. If a range, use
         the mid-point.
 
+    redshift_lower: float
+        Lowest redshift at which the data is collected at. Used to
+        determine whether it should be plotted on a given figure.
+
+    redshift_upper: float
+        Highest redshift at which the data is collected at. Used to
+        determine whether it should be plotted on a given figure.
+
     plot_as: Union[str, None]
         Whether the data should be plotted as points (typical for observations)
         or as a line (typical for simulation data). Allowed values:
@@ -227,7 +235,7 @@ class ObservationalData(object):
     bibcode: str
     # redshift that the data is at
     redshift: float
-    # optional, redshift upper and lower bounds for plotting
+    # redshift upper and lower bounds for plotting
     redshift_lower: float
     redshift_upper: float
     # plot as points, or a line?
