@@ -13,6 +13,7 @@ import matplotlib.pyplot as plt
 import yaml
 import unyt
 
+from numpy import log10
 from typing import Union, List, Dict, Optional, Tuple
 from velociraptor.autoplotter.objects import VelociraptorPlot, valid_line_types
 from velociraptor.autoplotter.plot import decorate_axes
