@@ -303,8 +303,8 @@ class ObservationalData(object):
             self.citation = metadata["citation"]
             self.bibcode = metadata["bibcode"]
             self.redshift = metadata["redshift"]
-            self.redshift_lower = metadata["redshift_lower"]
-            self.redshift_upper = metadata["redshift_upper"]
+            self.redshift_lower = metadata.get("redshift_lower", self.redshift)
+            self.redshift_upper = metadata.get("redshift_upper", self.redshift)
             self.plot_as = metadata["plot_as"]
 
             self.x_comoving = bool(handle["x"].attrs[f"{prefix}comoving"])
@@ -908,4 +908,3 @@ class MultiRedshiftObservationalData(object):
             self.datasets.append(this_observation)
 
         return
-
