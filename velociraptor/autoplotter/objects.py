@@ -5,11 +5,7 @@ Main objects for holding information relating to the autoplotter.
 from velociraptor import VelociraptorCatalogue
 from velociraptor.autoplotter.lines import VelociraptorLine, valid_line_types
 from velociraptor.exceptions import AutoPlotterError
-from velociraptor.observations import (
-    ObservationalData,
-    MultiRedshiftObservationalData,
-    load_observations,
-)
+from velociraptor.observations import load_observations
 
 import velociraptor.autoplotter.plot as plot
 
