@@ -689,6 +689,9 @@ class MultiRedshiftObservationalData(object):
     cosmology: Cosmology
     # the code version this was created with
     code_version = code_version
+    # maximum number of returned datasets when asking for
+    # redshift overlap.
+    maximum_number_of_returns = 1024
 
     def __init__(self):
         """
@@ -705,7 +708,10 @@ class MultiRedshiftObservationalData(object):
         Gets individual redshift datasets overlapping with the specified
         redshift range. The check is performed inclusively, so if you ask
         for overlaps with [0.25, 0.75], and an observation has a redshift
-        range of [0.75, 1.25], it will be included.
+        range of [0.75, 1.25], it will be included. Note that
+        ``maximum_number_of_returns`` modifies the behaviour of this
+        function, and the maximum length of the returned list will
+        be the same as that attribute.
 
         Parameters
         ----------
@@ -722,6 +728,9 @@ class MultiRedshiftObservationalData(object):
         You can access this ability in a slightly more user-friendly
         way using the :func:`velociraptor.observations.load_observations`
         function.
+
+        Datasets are returned in order of their scale-factor proximity
+        to the centre of the range specified in ``redshifts``.
         """
 
         overlapping_datasets = []
@@ -734,6 +743,17 @@ class MultiRedshiftObservationalData(object):
                 or (lower <= dataset.redshift_lower and dataset.redshift_upper <= upper)
             ):
                 overlapping_datasets.append(dataset)
+
+        # Filter datasets so that they are returned ordered by their
+        # proximity in scale factor
+        a = lambda z: 1.0 / (1.0 + z)
+
+        central_scale_factor = 0.5 * sum([a(z) for z in redshifts])
+
+        overlapping_datasets = sorted(
+            overlapping_datasets,
+            key=lambda x: abs(central_scale_factor - a(x.redshift)),
+        )[: self.maximum_number_of_returns]
 
         return overlapping_datasets
 
@@ -837,6 +857,25 @@ class MultiRedshiftObservationalData(object):
 
         return
 
+    def associate_maximum_number_of_returns(self, maximum_number_of_returns: int):
+        """
+        Associate a maximum number of returned datasets with this object.
+        This number will give the maximum number of datasets that are returned in
+        a call to ``load_datasets``. This is particularly useful in the
+        case where you want to provide a large number of fits and only want
+        to show a single curve on the figure.
+
+        Parameters
+        ----------
+
+        maximum_number_of_returns: int
+            The maximum number of datasets to plot simultaneously.
+        """
+
+        self.maximum_number_of_returns = maximum_number_of_returns
+
+        return
+
     def write(self, filename: str):
         """
         Writes all of the datasets currently present in the object
@@ -866,6 +905,9 @@ class MultiRedshiftObservationalData(object):
             group.attrs.create(
                 "maximal_redshift",
                 max([dataset.redshift_upper for dataset in self.datasets]),
+            )
+            group.attrs.create(
+                "maximum_number_of_returns", self.maximum_number_of_returns
             )
             group.attrs.create("comment", self.comment)
             group.attrs.create("name", self.name)
@@ -901,6 +943,7 @@ class MultiRedshiftObservationalData(object):
                 )
 
             self.prefixes = group["prefixes"]
+            self.maximum_number_of_returns = group["maximum_number_of_returns"]
             self.comment = group["comment"]
             self.name = group["name"]
             self.citation = group["citation"]

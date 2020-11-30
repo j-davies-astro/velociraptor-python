@@ -156,6 +156,7 @@ case:
    multi_z.associate_name(name)
    multi_z.associate_comment(comment)
    multi_z.associate_cosmology(cosmology)
+   multi_z.associate_maximum_number_of_returns(1)
 
    for filename, redshifts in zip(input_filenames, input_redshifts):
       processed = ObservationalData()
@@ -201,3 +202,9 @@ Below this, at the individual dataset level, we have
 + Plotting commands (as some redshifts may have a very small number
   of objects, hence being better plotted as points, whereas some
   redshifts may require binning to a line).
+
+Finally, we have the new ``associate_maximum_number_of_returns`` function.
+This determines the maximum number of returned datasets from the
+``load_datasets`` function. This is useful in cases where you have a large
+number of individual datasets that cover very small ranges in redshift,
+and you may only wish to plot one of them at a time on a given figure.
