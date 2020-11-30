@@ -97,6 +97,8 @@ def load_observations(
             data = ObservationalData()
             data.load(filename)
 
+            # Lower and upper bounds of the requested redshift bracket to
+            # return datasets between
             lower, upper = redshift_bracket
 
             if (
