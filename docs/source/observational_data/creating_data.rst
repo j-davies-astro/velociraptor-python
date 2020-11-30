@@ -86,6 +86,8 @@ Conversion file:
    name = "GSMF from GIMIC"
    plot_as = "line"
    redshift = 0.0
+   redshift_lower = 0.0
+   redshift_upper = 0.2
    h = cosmology.h
 
    log_M = raw.T[0]
@@ -97,7 +99,7 @@ Conversion file:
    processed.associate_citation(citation, bibcode)
    processed.associate_name(name)
    processed.associate_comment(comment)
-   processed.associate_redshift(redshift)
+   processed.associate_redshift(redshift, redshift_lower, redshift_upper)
    processed.associate_plot_as(plot_as)
    processed.associate_cosmology(cosmology)
 
@@ -107,3 +109,102 @@ Conversion file:
       os.remove(output_path)
 
    processed.write(filename=output_path)
+
+
+Multi-Redshift Data
+-------------------
+
+Data from a single paper that has been collected at multiple redshifts (or a
+single simulation, with multiple snapshots) should be stored in a
+multi-redshift file. This will allow the most appropriate redshift from the
+data to be plotted automatically when using the pipeline.
+
+The :class:`velociraptor.observations.MultiRedshiftObservationalData` class
+acts as a container for multiple instances of the
+:class:`velociraptor.observations.ObservationalData` object, each for a
+single redshift. However, the comments and cosmology are stored at 
+the top level. Extending the example above to handle the multiple redshift
+case:
+
+.. code-block:: python
+
+   from velociraptor.observations.objects import (
+      ObservationalData,
+      MultiRedshiftObservationalData,
+   )
+   from astropy.cosmology import WMAP7 as cosmology
+   import unyt
+   import numpy as np
+   import os
+
+   input_filenames = ["Crain2009_GSMF_z0.txt", "Crain2009_GSMF_z1.txt"]
+   input_redshifts = [[0.0, 0.5], [0.5, 1.5]]
+   delimiter = "\t"
+
+   output_filename = "Crain_2009.hdf5"
+   output_directory = "gsmf"
+   comment = f"Assuming Chabrier IMF. h-corrected for SWIFT using cosmology: {cosmology.name}."
+   citation = "Crain et al. 2009 (GIMIC)"
+   bibcode = "2009MNRAS.399.1773C"
+   name = "GSMF from GIMIC"
+
+   if not os.path.exists(output_directory):
+      os.mkdir(output_directory)
+
+   multi_z = MultiRedshiftObservationalData()
+   multi_z.associate_citation(citation, bibcode)
+   multi_z.associate_name(name)
+   multi_z.associate_comment(comment)
+   multi_z.associate_cosmology(cosmology)
+   multi_z.associate_maximum_number_of_returns(1)
+
+   for filename, redshifts in zip(input_filenames, input_redshifts):
+      processed = ObservationalData()
+      raw = np.loadtxt(filename, delimiter=delimiter)
+
+      plot_as = "line"
+      redshift = 0.5 * sum(redshifts)
+      redshift_lower, redshift_upper = redshifts
+      h = cosmology.h
+
+      log_M = raw.T[0]
+      M = 10 ** (log_M) * unyt.Solar_Mass / h
+      Phi = (10**raw.T[1] * (h ** 3)) * unyt.Mpc ** (-3)
+
+      processed.associate_x(M, scatter=None, comoving=True, description="Galaxy Stellar Mass")
+      processed.associate_y(Phi, scatter=None, comoving=True, description="Phi (GSMF)")
+      processed.associate_redshift(redshift, redshift_lower, redshift_upper)
+      processed.associate_plot_as(plot_as)
+
+      multi_z.associate_dataset(processed)
+
+   output_path = f"{output_directory}/{output_filename}"
+
+   if os.path.exists(output_path):
+      os.remove(output_path)
+
+   multi_z.write(filename=output_path)
+
+
+In this example, note that the following items are stored at the
+top level:
+
++ Citation
++ Name
++ Comment
++ Cosmology
+
+as the object is an abstraction for a single piece of academic work.
+Below this, at the individual dataset level, we have
+
++ Actual data (e.g. x, y, associated with a single redshift)
++ Redshift (with bracketing)
++ Plotting commands (as some redshifts may have a very small number
+  of objects, hence being better plotted as points, whereas some
+  redshifts may require binning to a line).
+
+Finally, we have the new ``associate_maximum_number_of_returns`` function.
+This determines the maximum number of returned datasets from the
+``load_datasets`` function. This is useful in cases where you have a large
+number of individual datasets that cover very small ranges in redshift,
+and you may only wish to plot one of them at a time on a given figure.
