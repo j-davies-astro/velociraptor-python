@@ -671,7 +671,7 @@ class MultiRedshiftObservationalData(object):
     """
 
     # List of the individual redshift datasets.
-    datasets: List[ObservationalData] = []
+    datasets: List[ObservationalData]
 
     # name of the observation (to be plotted on axes)
     name: str
@@ -698,6 +698,8 @@ class MultiRedshiftObservationalData(object):
         Initialises the object for observational data. Does nothing as we are
         unsure if we wish to read or write data at this point.
         """
+        
+        self.datasets = []
 
         return
 
