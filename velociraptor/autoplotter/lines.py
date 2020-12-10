@@ -350,8 +350,8 @@ class VelociraptorLine(object):
                     up = errors
                     down = errors
             else:
-                up = 0
-                down = 0
+                up = unyt_quantity(0, units=heights.units)
+                down = unyt_quantity(0, units=heights.units)
 
             ax.fill_between(
                 centers,
