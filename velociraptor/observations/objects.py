@@ -698,7 +698,7 @@ class MultiRedshiftObservationalData(object):
         Initialises the object for observational data. Does nothing as we are
         unsure if we wish to read or write data at this point.
         """
-        
+
         self.datasets = []
 
         return
@@ -935,7 +935,7 @@ class MultiRedshiftObservationalData(object):
 
         self.filename = filename
 
-        with h5py.File(filename, "a") as handle:
+        with h5py.File(filename, "r") as handle:
             try:
                 group = handle["multi_file_metadata"].attrs
             except KeyError:
