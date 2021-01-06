@@ -326,14 +326,12 @@ class VelociraptorLine(object):
             x=x, y=y
         )
 
-        color_name = "C0"
-
         if self.scatter == "none" or errors is None:
-            ax.plot(centers, heights, label=label, color=color_name)
+            (line,) = ax.plot(centers, heights, label=label)
         elif self.scatter == "errorbar":
-            ax.errorbar(centers, heights, yerr=errors, label=label, color=color_name)
+            (line, *_) = ax.errorbar(centers, heights, yerr=errors, label=label)
         elif self.scatter == "errorbar_both":
-            ax.errorbar(
+            (line, *_) = ax.errorbar(
                 centers,
                 heights,
                 yerr=errors,
@@ -343,7 +341,7 @@ class VelociraptorLine(object):
                 fmt=".",  # Do not plot as a line.
             )
         elif self.scatter == "shaded":
-            ax.plot(centers, heights, label=label, color=color_name)
+            (line,) = ax.plot(centers, heights, label=label)
 
             # Deal with different + and -ve errors
             if errors.shape[0]:
@@ -360,11 +358,14 @@ class VelociraptorLine(object):
                 centers,
                 heights - down,
                 heights + up,
-                color=color_name,
+                color=line.get_color(),
                 alpha=0.3,
                 linewidth=0.0,
             )
 
-        ax.scatter(additional_x.value, additional_y.value, color=color_name)
+        try:
+            ax.scatter(additional_x.value, additional_y.value, color=line.get_color())
+        except NameError:
+            ax.scatter(additional_x.value, additional_y.value, color="C0")
 
         return
