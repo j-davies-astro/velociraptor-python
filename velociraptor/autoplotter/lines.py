@@ -337,7 +337,6 @@ class VelociraptorLine(object):
                 yerr=errors,
                 xerr=abs(self.bins - centers),
                 label=label,
-                color=color_name,
                 fmt=".",  # Do not plot as a line.
             )
         elif self.scatter == "shaded":
