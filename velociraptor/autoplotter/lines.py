@@ -364,7 +364,8 @@ class VelociraptorLine(object):
 
         try:
             ax.scatter(additional_x.value, additional_y.value, color=line.get_color())
+        # In case the line object is undefined
         except NameError:
-            ax.scatter(additional_x.value, additional_y.value, color="C0")
+            ax.scatter(additional_x.value, additional_y.value)
 
         return
