@@ -327,11 +327,11 @@ class VelociraptorLine(object):
         )
 
         if self.scatter == "none" or errors is None:
-            ax.plot(centers, heights, label=label)
+            (line,) = ax.plot(centers, heights, label=label)
         elif self.scatter == "errorbar":
-            ax.errorbar(centers, heights, yerr=errors, label=label)
+            (line, *_) = ax.errorbar(centers, heights, yerr=errors, label=label)
         elif self.scatter == "errorbar_both":
-            ax.errorbar(
+            (line, *_) = ax.errorbar(
                 centers,
                 heights,
                 yerr=errors,
@@ -361,5 +361,11 @@ class VelociraptorLine(object):
                 alpha=0.3,
                 linewidth=0.0,
             )
+
+        try:
+            ax.scatter(additional_x.value, additional_y.value, color=line.get_color())
+        # In case the line object is undefined
+        except NameError:
+            ax.scatter(additional_x.value, additional_y.value)
 
         return
