@@ -99,7 +99,9 @@ def binned_mean_line(
             means.append(np.mean(y_values_in_this_bin))
             standard_deviations.append(np.std(y_values_in_this_bin))
 
-            centers.append(0.5 * (x_bins[bin - 1].value + x_bins[bin].value))
+            # Bin center is computed as the median of the X values of the data points
+            # in the bin
+            centers.append(np.median(x[indicies_in_this_bin].value))
 
         # If the number of data points in the bin is less than minimum_in_bin,
         # collect these data points if needed
@@ -224,7 +226,9 @@ def binned_median_line(
             medians.append(np.median(y_values_in_this_bin))
             deviations.append(np.percentile(y_values_in_this_bin, percentiles))
 
-            centers.append(0.5 * (x_bins[bin - 1].value + x_bins[bin].value))
+            # Bin center is computed as the median of the X values of the data points
+            # in the bin
+            centers.append(np.median(x[indicies_in_this_bin].value))
 
         # If the number of data points in the bin is less than minimum_in_bin,
         # collect these data points if needed
