@@ -297,15 +297,17 @@ class VelociraptorLine(object):
         x: unyt_array,
         y: unyt_array,
         color: str,
+        x_lim: List,
         y_lim: List,
     ) -> None:
 
         """
-        Add arrows to the plot for each data point residing outside the Y-axis range.
+        Add arrows to the plot for each data point residing outside the plot's domain.
         The arrows indicate where the missing points are. For a given missing data point
-        with its Y coordinate outside the Y-axis range, the corresponding arrow will
-        have the same X coordinate and point to the direction where the missing point
-        is.
+        with its Y(X) coordinate outside the Y(X)-axis range, the corresponding arrow
+        will have the same X(Y) coordinate and point to the direction where the missing
+        point is. If a data point happens to lie outside both the X-axis range and
+        Y-axis range, then a diagonal arrow is drawn.
 
         Parameters
         ----------
@@ -323,6 +325,9 @@ class VelociraptorLine(object):
             Color of the arrows that this function will draw. The color should be the
             same as the color of the (missing) data points.
 
+        x_lim: List
+            A 2-length list containing the lower and upper limits of the X-axis range.
+
         y_lim: List
             A 2-length list containing the lower and upper limits of the Y-axis range.
         """
@@ -330,31 +335,42 @@ class VelociraptorLine(object):
         # Additional check to ensure all provided data points are good
         if not isnan(x).any() and not isnan(y).any():
 
-            # Find all data points that are outside the Y-axis range
-            outside_y_domain_above = y > y_lim[1]
-            outside_y_domain_below = y < y_lim[0]
-
-            # X coordinates of the data points whose Y coordinates are outside the
-            # Y-axis range
-            x_down_list = x[outside_y_domain_below]
-            x_up_list = x[outside_y_domain_above]
-
-            # Use figure's data coordinates along the X axis and relative coordinates
-            # along the Y axis.
-            tform = blended_transform_factory(ax.transData, ax.transAxes)
-
             # Arrow parameters
             arrow_length = 0.14
             distance_from_edge = 0.01
+
+            # Split data into three categories (along X axis)
+            below_x_range = x < x_lim[0]
+            above_x_range = x > x_lim[1]
+            within_x_range = (x > x_lim[0]) * (x < x_lim[1])
+
+            # Split data into three categories (along Y axis)
+            below_y_range = y < y_lim[0]
+            above_y_range = y > y_lim[1]
+            within_y_range = (y > y_lim[0]) * (y < y_lim[1])
+
+            # First, find all data points that are outside the Y-axis range and within
+            # X-axis range
+            below_y_within_x = below_y_range * within_x_range
+            above_y_within_x = above_y_range * within_x_range
+
+            # X coordinates of the data points whose Y coordinates are outside the
+            # Y-axis range
+            x_down_list = x[below_y_within_x]
+            x_up_list = x[above_y_within_x]
+
+            # Use figure's data coordinates along the X axis and relative coordinates
+            # along the Y axis.
+            tform_x = blended_transform_factory(ax.transData, ax.transAxes)
 
             # Draw arrows pointing downwards
             for x_down in x_down_list:
                 ax.annotate(
                     "",
                     xytext=(x_down, arrow_length + distance_from_edge),
-                    textcoords=tform,
+                    textcoords=tform_x,
                     xy=(x_down, distance_from_edge),
-                    xycoords=tform,
+                    xycoords=tform_x,
                     arrowprops=dict(color=color),
                 )
 
@@ -362,9 +378,80 @@ class VelociraptorLine(object):
             for x_up in x_up_list:
                 ax.annotate(
                     "",
-                    xytext=(x_up, 1.0 - arrow_length + distance_from_edge),
-                    textcoords=tform,
+                    xytext=(x_up, 1.0 - arrow_length - distance_from_edge),
+                    textcoords=tform_x,
                     xy=(x_up, 1.0 - distance_from_edge),
+                    xycoords=tform_x,
+                    arrowprops=dict(color=color),
+                )
+
+            # Next, find all data points that are outside the X-axis range and
+            # within Y-axis range
+            below_x_within_y = below_x_range * within_y_range
+            above_x_within_y = above_x_range * within_y_range
+
+            # Y coordinates of the data points whose X coordinates are outside the
+            # X-axis range
+            y_left_list = y[below_x_within_y]
+            y_right_list = y[above_x_within_y]
+
+            # Use figure's data coordinates along the Y axis and relative coordinates
+            # along the X axis.
+            tform_y = blended_transform_factory(ax.transAxes, ax.transData)
+
+            # Draw arrows pointing leftwards
+            for y_left in y_left_list:
+                ax.annotate(
+                    "",
+                    xytext=(arrow_length + distance_from_edge, y_left),
+                    textcoords=tform_y,
+                    xy=(distance_from_edge, y_left),
+                    xycoords=tform_y,
+                    arrowprops=dict(color=color),
+                )
+
+            # Draw arrows pointing rightwards
+            for y_right in y_right_list:
+                ax.annotate(
+                    "",
+                    xytext=(1.0 - arrow_length - distance_from_edge, y_right),
+                    textcoords=tform_y,
+                    xy=(1.0 - distance_from_edge, y_right),
+                    xycoords=tform_y,
+                    arrowprops=dict(color=color),
+                )
+
+            # Finally, handle the points that are both outside the X and Y axis range
+            outside_plot = (below_y_range + above_y_range) * (
+                below_x_range + above_x_range
+            )
+            x_outside_list, y_outside_list = x[outside_plot], y[outside_plot]
+
+            for x_outside, y_outside in zip(x_outside_list, y_outside_list):
+
+                # Find the correct position of the arrow on the plot
+                if x_lim[0] > x_outside:
+                    arrow_start_x = arrow_length + distance_from_edge
+                    arrow_end_x = distance_from_edge
+                else:
+                    arrow_start_x = 1.0 - arrow_length - distance_from_edge
+                    arrow_end_x = 1.0 - distance_from_edge
+
+                if y_lim[0] > y_outside:
+                    arrow_start_y = arrow_length + distance_from_edge
+                    arrow_end_y = distance_from_edge
+                else:
+                    arrow_start_y = 1.0 - arrow_length - distance_from_edge
+                    arrow_end_y = 1.0 - distance_from_edge
+
+                # Use figure's relative coordinates along the X and Y axis.
+                tform = blended_transform_factory(ax.transAxes, ax.transAxes)
+
+                ax.annotate(
+                    "",
+                    xytext=(arrow_start_x, arrow_start_y),
+                    textcoords=tform,
+                    xy=(arrow_end_x, arrow_end_y),
                     xycoords=tform,
                     arrowprops=dict(color=color),
                 )
@@ -377,6 +464,7 @@ class VelociraptorLine(object):
         x: unyt_array,
         y: unyt_array,
         label: Union[str, None] = None,
+        x_lim: Union[List, None] = None,
         y_lim: Union[List, None] = None,
     ):
         """
@@ -397,6 +485,12 @@ class VelociraptorLine(object):
         label: str
             Label associated with this data that will be included in the
             legend.
+
+        x_lim: Union[List, None]
+            A 2-length list containing the lower and upper limits of the X-axis range.
+
+        y_lim: Union[List, None]
+            A 2-length list containing the lower and upper limits of the Y-axis range.
 
         Notes
         -----
@@ -451,16 +545,18 @@ class VelociraptorLine(object):
         try:
             ax.scatter(additional_x.value, additional_y.value, color=line.get_color())
 
-            # Enter only if the plot has a valid Y-axis range and there are any
-            # additional data points.
-            if y_lim is not None and len(additional_x) > 0:
+            # Enter only if the plot has a valid X-axis and Y-axis ranges and there are
+            # any additional data points.
+            if x_lim is not None and y_lim is not None and len(additional_x) > 0:
 
-                # Add arrows to the plot for each data point beyond the Y-axis range
+                # Add arrows to the plot for each data point beyond X- or/and Y- axis
+                # range
                 self.highlight_data_outside_domain(
                     ax,
                     additional_x.value,
                     additional_y.value,
                     line.get_color(),
+                    (x_lim[0].value, x_lim[1].value),
                     (y_lim[0].value, y_lim[1].value),
                 )
 

@@ -234,12 +234,13 @@ def recreate_single_figure(
                 # additional data points.
                 if plot.y_lim is not None and len(additional_x) > 0:
 
-                    # Add arrows to the plot for each data point beyond the Y-axis range
+                    # Draw arrows for each data point beyond X- or/and Y- axis range
                     line.highlight_data_outside_domain(
                         ax,
                         additional_x.value,
                         additional_y.value,
                         color_name,
+                        (plot.x_lim[0].value, plot.x_lim[1].value),
                         (plot.y_lim[0].value, plot.y_lim[1].value),
                     )
 
