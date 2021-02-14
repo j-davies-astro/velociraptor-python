@@ -3,9 +3,10 @@ Objects for handling and plotting mean and median lines.
 """
 
 from unyt import unyt_quantity, unyt_array
-from numpy import logspace, linspace, log10, logical_and
+from numpy import logspace, linspace, log10, logical_and, isnan
 from typing import Dict, Union, Tuple, List
 from matplotlib.pyplot import Axes
+from matplotlib.transforms import blended_transform_factory
 
 import velociraptor.tools.lines as lines
 from velociraptor.tools.mass_functions import (
@@ -187,7 +188,7 @@ class VelociraptorLine(object):
 
         x: unyt_array
             Horizontal axis data
-        
+
         y: unyt_array
             Vertical axis data
 
@@ -290,8 +291,73 @@ class VelociraptorLine(object):
 
         return self.output
 
+    def highlight_data_outside_domain(
+        self,
+        ax: Axes,
+        x: unyt_array,
+        y: unyt_array,
+        arrow_color: str,
+        y_lim: List,
+    ) -> None:
+
+        """
+        Add arrows to the plot for each data point residing outside the domain. The
+        arrows indicate where the missing points are. For a given missing data point
+        with its Y(X) coordinate outside the domain, the corresponding arrow will have
+        the same X(Y) coordinate and point to the direction where the missing point is.
+        """
+
+        # Additional check to ensure all provided points are good
+        if not isnan(additional_y).any() and not isnan(additional_y).any():
+
+            # Find non-binned data points that are outside the Y domain
+            outside_y_domain_above = y > y_lim[1]
+            outside_y_domain_below = y < y_lim[0]
+
+            # X coordinates of the data points whose Y coordinates are outside the
+            # domain
+            x_down_arr = x[outside_y_domain_below]
+            x_up_arr = x[outside_y_domain_above]
+
+            # Use figure's data coordinates along the X axis and relative coordinates
+            # along the Y axis.
+            tform = blended_transform_factory(ax.transData, ax.transAxes)
+
+            # Arrow parameters
+            arrow_length = 0.14
+            distance_from_edge = 0.01
+
+            # Loop over arrows pointing down
+            for x_down in x_down_arr:
+                ax.annotate(
+                    "",
+                    xytext=(x_down, arrow_length + distance_from_edge),
+                    textcoords=tform,
+                    xy=(x_down, distance_from_edge),
+                    xycoords=tform,
+                    arrowprops=dict(color=arrow_color),
+                )
+
+            # Loop over arrows pointing up
+            for x_up in x_up_arr:
+                ax.annotate(
+                    "",
+                    xytext=(x_up, 1.0 - arrow_length + distance_from_edge),
+                    textcoords=tform,
+                    xy=(x_up, 1.0 - distance_from_edge),
+                    xycoords=tform,
+                    arrowprops=dict(color=arrow_color),
+                )
+
+        return
+
     def plot_line(
-        self, ax: Axes, x: unyt_array, y: unyt_array, label: Union[str, None] = None
+        self,
+        ax: Axes,
+        x: unyt_array,
+        y: unyt_array,
+        label: Union[str, None] = None,
+        y_lim: Union[List, None] = None,
     ):
         """
         Plot a line using these parameters on some axes, x against y.
@@ -304,7 +370,7 @@ class VelociraptorLine(object):
 
         x: unyt_array
             Horizontal axis data
-        
+
         y: unyt_array
             Vertical axis data
 
@@ -364,7 +430,17 @@ class VelociraptorLine(object):
 
         try:
             ax.scatter(additional_x.value, additional_y.value, color=line.get_color())
-        # In case the line object is undefined
+
+            if y_lim is not None and len(additional_x) > 0:
+                self.highlight_data_outside_domain(
+                    ax,
+                    additional_x.value,
+                    additional_y.value,
+                    line.get_color(),
+                    (y_lim[0].value, y_lim[1].value),
+                )
+
+            # In case the line object is undefined
         except NameError:
             ax.scatter(additional_x.value, additional_y.value)
 
