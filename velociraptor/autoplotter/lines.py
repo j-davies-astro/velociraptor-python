@@ -296,28 +296,48 @@ class VelociraptorLine(object):
         ax: Axes,
         x: unyt_array,
         y: unyt_array,
-        arrow_color: str,
+        color: str,
         y_lim: List,
     ) -> None:
 
         """
-        Add arrows to the plot for each data point residing outside the domain. The
-        arrows indicate where the missing points are. For a given missing data point
-        with its Y(X) coordinate outside the domain, the corresponding arrow will have
-        the same X(Y) coordinate and point to the direction where the missing point is.
+        Add arrows to the plot for each data point residing outside the Y-axis range.
+        The arrows indicate where the missing points are. For a given missing data point
+        with its Y coordinate outside the Y-axis range, the corresponding arrow will
+        have the same X coordinate and point to the direction where the missing point
+        is.
+
+        Parameters
+        ----------
+
+        ax: Axes
+            An object of axes where to draw the arrows
+
+        x: unyt_array
+            Horizontal axis data
+
+        y: unyt_array
+            Vertical axis data
+
+        color: str
+            Color of the arrows that this function will draw. The color should be the
+            same as the color of the (missing) data points.
+
+        y_lim: List
+            A 2-length list containing the lower and upper limits of the Y-axis range.
         """
 
-        # Additional check to ensure all provided points are good
-        if not isnan(additional_y).any() and not isnan(additional_y).any():
+        # Additional check to ensure all provided data points are good
+        if not isnan(x).any() and not isnan(y).any():
 
-            # Find non-binned data points that are outside the Y domain
+            # Find all data points that are outside the Y-axis range
             outside_y_domain_above = y > y_lim[1]
             outside_y_domain_below = y < y_lim[0]
 
             # X coordinates of the data points whose Y coordinates are outside the
-            # domain
-            x_down_arr = x[outside_y_domain_below]
-            x_up_arr = x[outside_y_domain_above]
+            # Y-axis range
+            x_down_list = x[outside_y_domain_below]
+            x_up_list = x[outside_y_domain_above]
 
             # Use figure's data coordinates along the X axis and relative coordinates
             # along the Y axis.
@@ -327,26 +347,26 @@ class VelociraptorLine(object):
             arrow_length = 0.14
             distance_from_edge = 0.01
 
-            # Loop over arrows pointing down
-            for x_down in x_down_arr:
+            # Draw arrows pointing downwards
+            for x_down in x_down_list:
                 ax.annotate(
                     "",
                     xytext=(x_down, arrow_length + distance_from_edge),
                     textcoords=tform,
                     xy=(x_down, distance_from_edge),
                     xycoords=tform,
-                    arrowprops=dict(color=arrow_color),
+                    arrowprops=dict(color=color),
                 )
 
-            # Loop over arrows pointing up
-            for x_up in x_up_arr:
+            # Draw arrows pointing upwards
+            for x_up in x_up_list:
                 ax.annotate(
                     "",
                     xytext=(x_up, 1.0 - arrow_length + distance_from_edge),
                     textcoords=tform,
                     xy=(x_up, 1.0 - distance_from_edge),
                     xycoords=tform,
-                    arrowprops=dict(color=arrow_color),
+                    arrowprops=dict(color=color),
                 )
 
         return
@@ -431,7 +451,11 @@ class VelociraptorLine(object):
         try:
             ax.scatter(additional_x.value, additional_y.value, color=line.get_color())
 
+            # Enter only if the plot has a valid Y-axis range and there are any
+            # additional data points.
             if y_lim is not None and len(additional_x) > 0:
+
+                # Add arrows to the plot for each data point beyond the Y-axis range
                 self.highlight_data_outside_domain(
                     ax,
                     additional_x.value,
@@ -440,7 +464,7 @@ class VelociraptorLine(object):
                     (y_lim[0].value, y_lim[1].value),
                 )
 
-            # In case the line object is undefined
+        # In case the line object is undefined
         except NameError:
             ax.scatter(additional_x.value, additional_y.value)
 

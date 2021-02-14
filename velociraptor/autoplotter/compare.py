@@ -44,14 +44,14 @@ def load_yaml_line_data(
     ----------
     paths: Union[str, List[str]]
         Paths to yaml data files to load.
-    
+
     names: Union[str, List[str]]
         Names of the simulations that correspond to the yaml data files.
         Will be placed in the legends of the plots.
-        
+
     Returns
     -------
-    
+
     data: Dict[str, Dict]
         Dictionary of line data read directly from the files.
     """
@@ -139,7 +139,7 @@ def recreate_single_figure(
     """
     Recreates a single figure using the data in ``line_data`` and the metadata in
     ``plot``.
-    
+
     Parameters
     ----------
     plot: VelociraptorPlot
@@ -229,6 +229,19 @@ def recreate_single_figure(
                     ax.plot(centers, heights, label=name)
 
                 ax.scatter(additional_x, additional_y, c=color_name)
+
+                # Enter only if the plot has a valid Y-axis range and there are any
+                # additional data points.
+                if plot.y_lim is not None and len(additional_x) > 0:
+
+                    # Add arrows to the plot for each data point beyond the Y-axis range
+                    line.highlight_data_outside_domain(
+                        ax,
+                        additional_x.value,
+                        additional_y.value,
+                        color_name,
+                        (plot.y_lim[0].value, plot.y_lim[1].value),
+                    )
 
     # Add observational data second to allow for colour precedence
     # to go to runs
