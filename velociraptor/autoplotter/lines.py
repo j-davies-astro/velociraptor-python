@@ -3,7 +3,7 @@ Objects for handling and plotting mean and median lines.
 """
 
 from unyt import unyt_quantity, unyt_array
-from numpy import logspace, linspace, log10, logical_and, isnan
+from numpy import logspace, linspace, log10, logical_and, isnan, sqrt
 from typing import Dict, Union, Tuple, List
 from matplotlib.pyplot import Axes
 from matplotlib.transforms import blended_transform_factory
@@ -336,7 +336,7 @@ class VelociraptorLine(object):
         if not isnan(x).any() and not isnan(y).any():
 
             # Arrow parameters
-            arrow_length = 0.14
+            arrow_length = 0.07
             distance_from_edge = 0.01
 
             # Split data into three categories (along X axis)
@@ -371,7 +371,7 @@ class VelociraptorLine(object):
                     textcoords=tform_x,
                     xy=(x_down, distance_from_edge),
                     xycoords=tform_x,
-                    arrowprops=dict(color=color),
+                    arrowprops=dict(color=color, arrowstyle="->"),
                 )
 
             # Draw arrows pointing upwards
@@ -382,7 +382,7 @@ class VelociraptorLine(object):
                     textcoords=tform_x,
                     xy=(x_up, 1.0 - distance_from_edge),
                     xycoords=tform_x,
-                    arrowprops=dict(color=color),
+                    arrowprops=dict(color=color, arrowstyle="->"),
                 )
 
             # Next, find all data points that are outside the X-axis range and
@@ -407,7 +407,7 @@ class VelociraptorLine(object):
                     textcoords=tform_y,
                     xy=(distance_from_edge, y_left),
                     xycoords=tform_y,
-                    arrowprops=dict(color=color),
+                    arrowprops=dict(color=color, arrowstyle="->"),
                 )
 
             # Draw arrows pointing rightwards
@@ -418,7 +418,7 @@ class VelociraptorLine(object):
                     textcoords=tform_y,
                     xy=(1.0 - distance_from_edge, y_right),
                     xycoords=tform_y,
-                    arrowprops=dict(color=color),
+                    arrowprops=dict(color=color, arrowstyle="->"),
                 )
 
             # Finally, handle the points that are both outside the X and Y axis range
@@ -429,19 +429,24 @@ class VelociraptorLine(object):
 
             for x_outside, y_outside in zip(x_outside_list, y_outside_list):
 
+                # Unlike vertical and horizontal arrows, diagonal arrows extend both
+                # in X and Y directions. We account for it by dividing the length of
+                # diagonal arrow along each dimension by \sqrt(2).
+                arrow_proj_length = arrow_length / sqrt(2.0)
+
                 # Find the correct position of the arrow on the plot
                 if x_lim[0] > x_outside:
-                    arrow_start_x = arrow_length + distance_from_edge
+                    arrow_start_x = arrow_proj_length + distance_from_edge
                     arrow_end_x = distance_from_edge
                 else:
-                    arrow_start_x = 1.0 - arrow_length - distance_from_edge
+                    arrow_start_x = 1.0 - arrow_proj_length - distance_from_edge
                     arrow_end_x = 1.0 - distance_from_edge
 
                 if y_lim[0] > y_outside:
-                    arrow_start_y = arrow_length + distance_from_edge
+                    arrow_start_y = arrow_proj_length + distance_from_edge
                     arrow_end_y = distance_from_edge
                 else:
-                    arrow_start_y = 1.0 - arrow_length - distance_from_edge
+                    arrow_start_y = 1.0 - arrow_proj_length - distance_from_edge
                     arrow_end_y = 1.0 - distance_from_edge
 
                 # Use figure's relative coordinates along the X and Y axis.
@@ -453,7 +458,7 @@ class VelociraptorLine(object):
                     textcoords=tform,
                     xy=(arrow_end_x, arrow_end_y),
                     xycoords=tform,
-                    arrowprops=dict(color=color),
+                    arrowprops=dict(color=color, arrowstyle="->"),
                 )
 
         return
