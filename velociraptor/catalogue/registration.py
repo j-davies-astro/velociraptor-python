@@ -32,7 +32,7 @@ def registration_fail_all(
       information that is available from the velociraptor catalogue
 
     Return signature:
-    
+
     + field_units: the units that correspond to field_path.
     + name: A fancy (possibly LaTeX'd) name for the field.
     + snake_case: A correct snake_case name for the field.
@@ -954,6 +954,39 @@ def registration_stellar_birth_densities(
     return
 
 
+def registration_snii_thermal_feedback_densities(
+    field_path: str, unit_system: VelociraptorUnits
+) -> (unyt.Unit, str, str):
+    """
+    SNII thermal feedback density registrations.
+    """
+
+    if (
+        not field_path[:14] == "DensitiesAtLastSupernovaEvent"
+        and field_path[-4:] == "gas"
+    ):
+        raise RegistrationDoesNotMatchError
+
+    unit = unit_system.mass / unit_system.length ** 3
+
+    # Need to do a regex search (average, min, max)
+    match_string = "DensitiesAtLastSupernovaEvent_([a-z]+)_gas"
+    regex = cached_regex(match_string)
+    match = regex.match(field_path)
+
+    if match:
+        minmax = match.group(1)
+
+        full_name = f"SNII Thermal Feedback Density ({minmax})"
+        snake_case = minmax.lower()
+
+        return unit, full_name, snake_case
+    else:
+        raise RegistrationDoesNotMatchError
+
+    return
+
+
 def registration_species_fractions(
     field_path: str, unit_system: VelociraptorUnits
 ) -> (unyt.Unit, str, str):
@@ -1089,6 +1122,7 @@ global_registration_functions = {
         "hydrogen_phase_fractions",
         "black_hole_masses",
         "stellar_birth_densities",
+        "snii_thermal_feedback_densities",
         "species_fractions",
         "fail_all",
     ]
