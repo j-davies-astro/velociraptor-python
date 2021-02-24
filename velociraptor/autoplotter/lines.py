@@ -343,12 +343,12 @@ class VelociraptorLine(object):
             # Split data into three categories (along X axis)
             below_x_range = x < x_lim[0]
             above_x_range = x > x_lim[1]
-            within_x_range = logical_and(x > x_lim[0], x < x_lim[1])
+            within_x_range = logical_and(x >= x_lim[0], x <= x_lim[1])
 
             # Split data into three categories (along Y axis)
             below_y_range = y < y_lim[0]
             above_y_range = y > y_lim[1]
-            within_y_range = logical_and(y > y_lim[0], y < y_lim[1])
+            within_y_range = logical_and(y >= y_lim[0], y <= y_lim[1])
 
             # First, find all data points that are outside the Y-axis range and within
             # X-axis range
