@@ -3,7 +3,7 @@ Objects for handling and plotting mean and median lines.
 """
 
 from unyt import unyt_quantity, unyt_array
-from numpy import logspace, linspace, log10, logical_and, isnan, sqrt
+from numpy import logspace, linspace, log10, logical_and, isnan, sqrt, logical_or
 from typing import Dict, Union, Tuple, List
 from matplotlib.pyplot import Axes
 from matplotlib.transforms import blended_transform_factory
@@ -338,21 +338,22 @@ class VelociraptorLine(object):
             # Arrow parameters
             arrow_length = 0.07
             distance_from_edge = 0.01
+            arrow_style = "->"
 
             # Split data into three categories (along X axis)
             below_x_range = x < x_lim[0]
             above_x_range = x > x_lim[1]
-            within_x_range = (x > x_lim[0]) * (x < x_lim[1])
+            within_x_range = logical_and(x > x_lim[0], x < x_lim[1])
 
             # Split data into three categories (along Y axis)
             below_y_range = y < y_lim[0]
             above_y_range = y > y_lim[1]
-            within_y_range = (y > y_lim[0]) * (y < y_lim[1])
+            within_y_range = logical_and(y > y_lim[0], y < y_lim[1])
 
             # First, find all data points that are outside the Y-axis range and within
             # X-axis range
-            below_y_within_x = below_y_range * within_x_range
-            above_y_within_x = above_y_range * within_x_range
+            below_y_within_x = logical_and(below_y_range, within_x_range)
+            above_y_within_x = logical_and(above_y_range, within_x_range)
 
             # X coordinates of the data points whose Y coordinates are outside the
             # Y-axis range
@@ -365,13 +366,17 @@ class VelociraptorLine(object):
 
             # Draw arrows pointing downwards
             for x_down in x_down_list:
+                # We are using 'ax.annotate' instead of 'ax.arrow' because we want the
+                # arrow's head and tail to have the same size regardless of what the
+                # axes aspect ratio is or whether the plot is in logarithmic or linear
+                # scale.
                 ax.annotate(
                     "",
                     xytext=(x_down, arrow_length + distance_from_edge),
                     textcoords=tform_x,
                     xy=(x_down, distance_from_edge),
                     xycoords=tform_x,
-                    arrowprops=dict(color=color, arrowstyle="->"),
+                    arrowprops=dict(color=color, arrowstyle=arrow_style),
                 )
 
             # Draw arrows pointing upwards
@@ -382,13 +387,13 @@ class VelociraptorLine(object):
                     textcoords=tform_x,
                     xy=(x_up, 1.0 - distance_from_edge),
                     xycoords=tform_x,
-                    arrowprops=dict(color=color, arrowstyle="->"),
+                    arrowprops=dict(color=color, arrowstyle=arrow_style),
                 )
 
             # Next, find all data points that are outside the X-axis range and
             # within Y-axis range
-            below_x_within_y = below_x_range * within_y_range
-            above_x_within_y = above_x_range * within_y_range
+            below_x_within_y = logical_and(below_x_range, within_y_range)
+            above_x_within_y = logical_and(above_x_range, within_y_range)
 
             # Y coordinates of the data points whose X coordinates are outside the
             # X-axis range
@@ -407,7 +412,7 @@ class VelociraptorLine(object):
                     textcoords=tform_y,
                     xy=(distance_from_edge, y_left),
                     xycoords=tform_y,
-                    arrowprops=dict(color=color, arrowstyle="->"),
+                    arrowprops=dict(color=color, arrowstyle=arrow_style),
                 )
 
             # Draw arrows pointing rightwards
@@ -418,12 +423,13 @@ class VelociraptorLine(object):
                     textcoords=tform_y,
                     xy=(1.0 - distance_from_edge, y_right),
                     xycoords=tform_y,
-                    arrowprops=dict(color=color, arrowstyle="->"),
+                    arrowprops=dict(color=color, arrowstyle=arrow_style),
                 )
 
             # Finally, handle the points that are both outside the X and Y axis range
-            outside_plot = (below_y_range + above_y_range) * (
-                below_x_range + above_x_range
+            outside_plot = logical_and(
+                logical_or(below_y_range, above_y_range),
+                logical_or(below_x_range, above_x_range),
             )
             x_outside_list, y_outside_list = x[outside_plot], y[outside_plot]
 
@@ -458,7 +464,7 @@ class VelociraptorLine(object):
                     textcoords=tform,
                     xy=(arrow_end_x, arrow_end_y),
                     xycoords=tform,
-                    arrowprops=dict(color=color, arrowstyle="->"),
+                    arrowprops=dict(color=color, arrowstyle=arrow_style),
                 )
 
         return
