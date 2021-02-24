@@ -663,9 +663,13 @@ class VelociraptorPlot(object):
         """
 
         if self.median_line is not None:
-            self.median_line.plot_line(ax=ax, x=x, y=y, label="Median")
+            self.median_line.plot_line(
+                ax=ax, x=x, y=y, label="Median", x_lim=self.x_lim, y_lim=self.y_lim
+            )
         if self.mean_line is not None:
-            self.mean_line.plot_line(ax=ax, x=x, y=y, label="Mean")
+            self.mean_line.plot_line(
+                ax=ax, x=x, y=y, label="Mean", x_lim=self.x_lim, y_lim=self.y_lim
+            )
 
         return
 
