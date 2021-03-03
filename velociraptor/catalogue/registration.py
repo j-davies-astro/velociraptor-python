@@ -733,7 +733,7 @@ def registration_stellar_age(
     """
 
     if field_path == "tage_star":
-        return unit_system.age, "Mean Stellar Age", field_path.lower()
+        return "yr", "Mean Stellar Age", field_path.lower()
     else:
         raise RegistrationDoesNotMatchError
 
