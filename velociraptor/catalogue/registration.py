@@ -842,9 +842,9 @@ def registration_number(
 
     if field_path[:2] == "n_":
         unit = unyt.dimensionless
-        switch = {"bh": "Black Hole", "gas": "Gas", "star": "Star"}
+        switch = {"bh": "Black Hole", "gas": "Gas", "star": "Star", "interloper": "Interloper"}
         snake_case = field_path[2:]
-        full_name = f"Number of {switch[snake_case]} Particles"
+        full_name = f"Number of {switch.get(snake_case, 'Unknown')} Particles"
 
     elif field_path == "npart":
         unit = unyt.dimensionless
