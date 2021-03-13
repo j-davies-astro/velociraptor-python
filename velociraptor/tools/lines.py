@@ -14,6 +14,7 @@ def binned_mean_line(
     x_bins: unyt.unyt_array,
     minimum_in_bin: int = 3,
     return_additional: bool = False,
+    minimum_additional_points: int = 0,
 ):
     """
     Gets a mean (y) line, binned in the x direction.
@@ -40,6 +41,14 @@ def binned_mean_line(
         lie in the bins where the number of data points is smaller than
         minimum_in_bin, and any points that are higher than the highest bin
         edge. Default: false.
+
+    minimum_additional_points: int, optional
+        Minimum number of additional data points with the highest values of x to return.
+        Has to be used with return_additional=True. If set to N, then at least N
+        additional data points will always be present in the plot, regardless of how the
+        adaptive binning is done. The adaptive binning is stopped at the lowest value of
+        x among the additional data points so that these points and the mean line do
+        not overlap.
 
 
     Returns
@@ -81,33 +90,52 @@ def binned_mean_line(
         x.units == x_bins.units
     ), "Please ensure that the x values and bins have the same units."
 
-    hist = np.digitize(x, x_bins)
-
     means = []
     standard_deviations = []
     centers = []
     additional_x = []
     additional_y = []
 
+    # Do we want to have at least 'minimum_additional_points' additional data points in
+    # the plot?
+    if return_additional and minimum_additional_points > 0:
+
+        # Sort the data along the X axis
+        idx_sort = np.argsort(x)
+        x, y = x[idx_sort], y[idx_sort]
+
+        # Ensure we don't run out of data points to plot
+        N_points_to_plot = min(minimum_additional_points, len(x))
+
+        # Collect 'N_points_to_plot' additional data points
+        additional_x += list(x[-N_points_to_plot:].value)
+        additional_y += list(y[-N_points_to_plot:].value)
+
+        # Don't use the collected additional data points for the bins
+        x = x[:-N_points_to_plot]
+        y = y[:-N_points_to_plot]
+
+    hist = np.digitize(x, x_bins)
+
     for bin in range(1, len(x_bins)):
-        indicies_in_this_bin = hist == bin
-        number_of_items_in_bin = indicies_in_this_bin.sum()
+        indices_in_this_bin = hist == bin
+        number_of_items_in_bin = indices_in_this_bin.sum()
 
         if number_of_items_in_bin >= minimum_in_bin:
-            y_values_in_this_bin = y[indicies_in_this_bin].value
+            y_values_in_this_bin = y[indices_in_this_bin].value
 
             means.append(np.mean(y_values_in_this_bin))
             standard_deviations.append(np.std(y_values_in_this_bin))
 
             # Bin center is computed as the median of the X values of the data points
             # in the bin
-            centers.append(np.median(x[indicies_in_this_bin].value))
+            centers.append(np.median(x[indices_in_this_bin].value))
 
         # If the number of data points in the bin is less than minimum_in_bin,
         # collect these data points if needed
         elif number_of_items_in_bin > 0 and return_additional:
-            additional_x += list(x[indicies_in_this_bin].value)
-            additional_y += list(y[indicies_in_this_bin].value)
+            additional_x += list(x[indices_in_this_bin].value)
+            additional_y += list(y[indices_in_this_bin].value)
 
     # Add any points that are larger:
     above_highest = hist == len(x_bins)
@@ -135,6 +163,7 @@ def binned_median_line(
     percentiles: List[int] = [16, 84],
     minimum_in_bin: int = 3,
     return_additional: bool = False,
+    minimum_additional_points: int = 0,
 ):
     """
     Gets a median (y) line, binned in the x direction.
@@ -166,6 +195,13 @@ def binned_median_line(
         minimum_in_bin, and any points that are higher than the highest bin
         edge. Default: false.
 
+    minimum_additional_points: int, optional
+        Minimum number of additional data points with the highest values of x to return.
+        Has to be used with return_additional=True. If set to N, then at least N
+        additional data points will always be present in the plot, regardless of how the
+        adaptive binning is done. The adaptive binning is stopped at the lowest value of
+        x among the additional data points so that these points and the median line do
+        not overlap.
 
 
     Returns
@@ -208,33 +244,52 @@ def binned_median_line(
         x.units == x_bins.units
     ), "Please ensure that the x values and bins have the same units."
 
-    hist = np.digitize(x, x_bins)
-
     medians = []
     deviations = []
     centers = []
     additional_x = []
     additional_y = []
 
+    # Do we want to have at least 'minimum_additional_points' additional data points in
+    # the plot?
+    if return_additional and minimum_additional_points > 0:
+
+        # Sort the data along the X axis
+        idx_sort = np.argsort(x)
+        x, y = x[idx_sort], y[idx_sort]
+
+        # Ensure we don't run out of data points to plot
+        N_points_to_plot = min(minimum_additional_points, len(x))
+
+        # Collect 'N_points_to_plot' additional data points
+        additional_x += list(x[-N_points_to_plot:].value)
+        additional_y += list(y[-N_points_to_plot:].value)
+
+        # Don't use the collected additional data points for the bins
+        x = x[:-N_points_to_plot]
+        y = y[:-N_points_to_plot]
+
+    hist = np.digitize(x, x_bins)
+
     for bin in range(1, len(x_bins)):
-        indicies_in_this_bin = hist == bin
-        number_of_items_in_bin = indicies_in_this_bin.sum()
+        indices_in_this_bin = hist == bin
+        number_of_items_in_bin = indices_in_this_bin.sum()
 
         if number_of_items_in_bin >= minimum_in_bin:
-            y_values_in_this_bin = y[indicies_in_this_bin].value
+            y_values_in_this_bin = y[indices_in_this_bin].value
 
             medians.append(np.median(y_values_in_this_bin))
             deviations.append(np.percentile(y_values_in_this_bin, percentiles))
 
             # Bin center is computed as the median of the X values of the data points
             # in the bin
-            centers.append(np.median(x[indicies_in_this_bin].value))
+            centers.append(np.median(x[indices_in_this_bin].value))
 
         # If the number of data points in the bin is less than minimum_in_bin,
         # collect these data points if needed
         elif number_of_items_in_bin > 0 and return_additional:
-            additional_x += list(x[indicies_in_this_bin].value)
-            additional_y += list(y[indicies_in_this_bin].value)
+            additional_x += list(x[indices_in_this_bin].value)
+            additional_y += list(y[indices_in_this_bin].value)
 
     # Add any points that are larger:
     above_highest = hist == len(x_bins)

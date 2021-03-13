@@ -6,3 +6,4 @@ unyt
 tqdm
 pyyaml
 black
+matplotlib
