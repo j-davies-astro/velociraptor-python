@@ -105,15 +105,15 @@ def binned_mean_line(
         x, y = x[idx_sort], y[idx_sort]
 
         # Ensure we don't run out of data points to plot
-        N_points_to_plot = min(minimum_additional_points, len(x))
+        num_points_to_plot = min(minimum_additional_points, len(x))
 
-        # Collect 'N_points_to_plot' additional data points
-        additional_x += list(x[-N_points_to_plot:].value)
-        additional_y += list(y[-N_points_to_plot:].value)
+        # Collect 'num_points_to_plot' additional data points
+        additional_x += list(x[-num_points_to_plot:].value)
+        additional_y += list(y[-num_points_to_plot:].value)
 
         # Don't use the collected additional data points for the bins
-        x = x[:-N_points_to_plot]
-        y = y[:-N_points_to_plot]
+        x = x[:-num_points_to_plot]
+        y = y[:-num_points_to_plot]
 
     hist = np.digitize(x, x_bins)
 
@@ -259,15 +259,15 @@ def binned_median_line(
         x, y = x[idx_sort], y[idx_sort]
 
         # Ensure we don't run out of data points to plot
-        N_points_to_plot = min(minimum_additional_points, len(x))
+        num_points_to_plot = min(minimum_additional_points, len(x))
 
-        # Collect 'N_points_to_plot' additional data points
-        additional_x += list(x[-N_points_to_plot:].value)
-        additional_y += list(y[-N_points_to_plot:].value)
+        # Collect 'num_points_to_plot' additional data points
+        additional_x += list(x[-num_points_to_plot:].value)
+        additional_y += list(y[-num_points_to_plot:].value)
 
         # Don't use the collected additional data points for the bins
-        x = x[:-N_points_to_plot]
-        y = y[:-N_points_to_plot]
+        x = x[:-num_points_to_plot]
+        y = y[:-num_points_to_plot]
 
     hist = np.digitize(x, x_bins)
 

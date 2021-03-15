@@ -490,7 +490,7 @@ class VelociraptorLine(object):
         label: Union[str, None] = None,
         x_lim: Union[List, None] = None,
         y_lim: Union[List, None] = None,
-        min_num_points_highlight=0,
+        min_num_points_highlight: int = 0,
     ):
         """
         Plot a line using these parameters on some axes, x against y.

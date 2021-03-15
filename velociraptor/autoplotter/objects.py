@@ -242,6 +242,9 @@ class VelociraptorPlot(object):
         except KeyError:
             setattr(self, f"{line_type}_line", None)
 
+        # Fetch the minimum number of points to highlight
+        self.min_num_points_highlight = self.data.get("min_num_points_highlight", 10)
+
         return
 
     def _parse_lines(self) -> None:
@@ -664,11 +667,6 @@ class VelociraptorPlot(object):
         """
         Adds any lines present to the given axes.
         """
-
-        # Fetch the minimum number of points to highlight
-        self.min_num_points_highlight = self.data.get(
-            "min_num_points_highlight", 10
-        )
 
         if self.median_line is not None:
             self.median_line.plot_line(
