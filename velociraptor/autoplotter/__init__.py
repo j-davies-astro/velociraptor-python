@@ -13,6 +13,7 @@ This yaml file has the following format:
      select_structure_type: number of substructure to select (e.g. 10 is centrals)
      selection_mask: "quantity.name" - a boolean quantity to select the items you wish to plot.
      number_of_bins: number of bins in the (background) histogram or massfunc
+     min_num_points_highlight: Minimum number of data points (with the largest values of x) to highlight in mean- and median-line plots (default: 10)
      reverse_cumsum: reverse the cumulative sum in cumulative histogram plots? Choose true or false
      comment: "An extra string to be placed on the plot"
      legend_loc: Location of legend (string). One of:

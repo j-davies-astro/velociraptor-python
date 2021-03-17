@@ -8,7 +8,7 @@ import unyt
 
 from matplotlib import rcParams
 
-from matplotlib.colors import Normalize, LogNorm
+from matplotlib.colors import LogNorm
 from velociraptor import VelociraptorCatalogue
 from velociraptor.autoplotter.objects import VelociraptorLine
 from typing import Tuple, Union
@@ -17,7 +17,7 @@ import velociraptor.tools as tools
 
 
 def scatter_x_against_y(
-    x: unyt.unyt_array, y: unyt.unyt_quantity
+    x: unyt.unyt_array, y: unyt.unyt_array
 ) -> Tuple[plt.Figure, plt.Axes]:
     """
     Creates a scatter of x against y (unyt arrays).

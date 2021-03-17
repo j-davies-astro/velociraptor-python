@@ -179,6 +179,7 @@ class VelociraptorLine(object):
         y: unyt_array,
         box_volume: Union[None, unyt_quantity] = None,
         reverse_cumsum: bool = False,
+        minimum_additional_points: int = 0,
     ):
         """
         Creates the line!
@@ -201,6 +202,10 @@ class VelociraptorLine(object):
             A boolean deciding whether to reverse the cumulative sum. If false,
             the sum is computed from low to high values (along the X-axis). Relevant
             only for cumulative histogram lines. Default is false.
+
+        minimum_additional_points: int, optional
+            Minimum number of additional data points with the highest values of x to
+            show in the median-line or mean-line plots.
 
         Returns
         -------
@@ -236,11 +241,19 @@ class VelociraptorLine(object):
 
         if self.median:
             self.output = lines.binned_median_line(
-                x=masked_x, y=masked_y, x_bins=self.bins, return_additional=True
+                x=masked_x,
+                y=masked_y,
+                x_bins=self.bins,
+                return_additional=True,
+                minimum_additional_points=minimum_additional_points,
             )
         elif self.mean:
             self.output = lines.binned_mean_line(
-                x=masked_x, y=masked_y, x_bins=self.bins, return_additional=True
+                x=masked_x,
+                y=masked_y,
+                x_bins=self.bins,
+                return_additional=True,
+                minimum_additional_points=minimum_additional_points,
             )
         elif self.mass_function:
             mass_function_output = create_mass_function_given_bins(
@@ -477,6 +490,7 @@ class VelociraptorLine(object):
         label: Union[str, None] = None,
         x_lim: Union[List, None] = None,
         y_lim: Union[List, None] = None,
+        min_num_points_highlight: int = 0,
     ):
         """
         Plot a line using these parameters on some axes, x against y.
@@ -503,6 +517,10 @@ class VelociraptorLine(object):
         y_lim: Union[List, None]
             A 2-length list containing the lower and upper limits of the Y-axis range.
 
+        min_num_points_highlight: int, optional
+            Minimum number of data points with the highest values of x to highlight in
+            the median-line or mean-line plots.
+
         Notes
         -----
 
@@ -514,7 +532,7 @@ class VelociraptorLine(object):
             return
 
         centers, heights, errors, additional_x, additional_y = self.create_line(
-            x=x, y=y
+            x=x, y=y, minimum_additional_points=min_num_points_highlight
         )
 
         if self.scatter == "none" or errors is None:

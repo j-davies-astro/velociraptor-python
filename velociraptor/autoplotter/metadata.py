@@ -15,7 +15,6 @@ from velociraptor.autoplotter.lines import VelociraptorLine
 from typing import List, Dict
 
 import yaml
-from unyt import unyt_array
 
 
 class VelociraptorLineMetadata(object):

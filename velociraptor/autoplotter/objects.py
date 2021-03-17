@@ -72,11 +72,14 @@ class VelociraptorPlot(object):
     cumulative_histogram_line: Union[None, VelociraptorLine]
     # Binning for x, y axes.
     number_of_bins: int
+    # Minimum number of data points (with the largest values of x) to highlight in the
+    # mean-line and median-line plots
+    min_num_points_highlight: int
     # Whether to reverse cumulative sum. If true, do the summation from high to low
     reverse_cumsum: bool
     x_bins: unyt_array
     y_bins: unyt_array
-    # Select a specific strucutre type?
+    # Select a specific structure type?
     select_structure_type: Union[None, int]
     structure_mask: Union[None, array]
     selection_mask: Union[None, array]
@@ -238,6 +241,9 @@ class VelociraptorPlot(object):
             )
         except KeyError:
             setattr(self, f"{line_type}_line", None)
+
+        # Fetch the minimum number of points to highlight
+        self.min_num_points_highlight = self.data.get("min_num_points_highlight", 10)
 
         return
 
@@ -664,11 +670,23 @@ class VelociraptorPlot(object):
 
         if self.median_line is not None:
             self.median_line.plot_line(
-                ax=ax, x=x, y=y, label="Median", x_lim=self.x_lim, y_lim=self.y_lim
+                ax=ax,
+                x=x,
+                y=y,
+                label="Median",
+                x_lim=self.x_lim,
+                y_lim=self.y_lim,
+                min_num_points_highlight=self.min_num_points_highlight,
             )
         if self.mean_line is not None:
             self.mean_line.plot_line(
-                ax=ax, x=x, y=y, label="Mean", x_lim=self.x_lim, y_lim=self.y_lim
+                ax=ax,
+                x=x,
+                y=y,
+                label="Mean",
+                x_lim=self.x_lim,
+                y_lim=self.y_lim,
+                min_num_points_highlight=self.min_num_points_highlight,
             )
 
         return
