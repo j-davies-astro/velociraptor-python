@@ -842,7 +842,12 @@ def registration_number(
 
     if field_path[:2] == "n_":
         unit = unyt.dimensionless
-        switch = {"bh": "Black Hole", "gas": "Gas", "star": "Star", "interloper": "Interloper"}
+        switch = {
+            "bh": "Black Hole",
+            "gas": "Gas",
+            "star": "Star",
+            "interloper": "Interloper",
+        }
         snake_case = field_path[2:]
         full_name = f"Number of {switch.get(snake_case, 'Unknown')} Particles"
 
@@ -855,6 +860,62 @@ def registration_number(
         raise RegistrationDoesNotMatchError
 
     return unit, full_name, snake_case
+
+
+def registration_HI_masses(
+    field_path: str, unit_system: VelociraptorUnits
+) -> (unyt.Unit, str, str):
+    """
+    Registers the HI masses in apertures.
+    """
+
+    unit = unyt.solar_mass
+
+    # Capture aperture size
+    match_string = (
+        "Aperture_AtomicHydrogenMasses_index_0_aperture_total_gas_([0-9]*)_kpc"
+    )
+    regex = cached_regex(match_string)
+
+    match = regex.match(field_path)
+
+    if match:
+        aperture_size = int(match.group(1))
+
+        full_name = "HI gas mass ({aperture_size} kpc)"
+        snake_case = "HI_mass_{aperture_size}_kpc"
+
+        return unit, full_name, snake_case
+    else:
+        raise RegistrationDoesNotMatchError
+
+
+def registration_H2_masses(
+    field_path: str, unit_system: VelociraptorUnits
+) -> (unyt.Unit, str, str):
+    """
+    Registers the H_2 masses in apertures.
+    """
+
+    unit = unyt.solar_mass
+
+    # Capture aperture size
+    match_string = (
+        "Aperture_MolecularHydrogenMasses_index_0_aperture_total_gas_([0-9]*)_kpc"
+    )
+    regex = cached_regex(match_string)
+
+    match = regex.match(field_path)
+
+    if match:
+        aperture_size = int(match.group(1))
+
+        full_name = "H2 gas mass ({aperture_size} kpc)"
+        snake_case = "H2_mass_{aperture_size}_kpc"
+
+        return unit, full_name, snake_case
+    else:
+        raise RegistrationDoesNotMatchError
 
 
 def registration_hydrogen_phase_fractions(
@@ -1124,6 +1185,8 @@ global_registration_functions = {
         "stellar_birth_densities",
         "snii_thermal_feedback_densities",
         "species_fractions",
+        "registration_HI_masses",
+        "registration_H2_masses",
         "fail_all",
     ]
 }
