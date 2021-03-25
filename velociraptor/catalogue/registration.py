@@ -1185,8 +1185,8 @@ global_registration_functions = {
         "stellar_birth_densities",
         "snii_thermal_feedback_densities",
         "species_fractions",
-        "registration_HI_masses",
-        "registration_H2_masses",
+        "HI_masses",
+        "H2_masses",
         "fail_all",
     ]
 }
