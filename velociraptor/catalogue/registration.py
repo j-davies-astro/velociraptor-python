@@ -882,8 +882,8 @@ def registration_HI_masses(
     if match:
         aperture_size = int(match.group(1))
 
-        full_name = "HI gas mass ({aperture_size} kpc)"
-        snake_case = "HI_mass_{aperture_size}_kpc"
+        full_name = f"HI gas mass ({aperture_size} kpc)"
+        snake_case = f"HI_mass_{aperture_size}_kpc"
 
         return unit, full_name, snake_case
     else:
@@ -910,8 +910,8 @@ def registration_H2_masses(
     if match:
         aperture_size = int(match.group(1))
 
-        full_name = "H2 gas mass ({aperture_size} kpc)"
-        snake_case = "H2_mass_{aperture_size}_kpc"
+        full_name = f"H2 gas mass ({aperture_size} kpc)"
+        snake_case = f"H2_mass_{aperture_size}_kpc"
 
         return unit, full_name, snake_case
     else:
