@@ -842,7 +842,12 @@ def registration_number(
 
     if field_path[:2] == "n_":
         unit = unyt.dimensionless
-        switch = {"bh": "Black Hole", "gas": "Gas", "star": "Star", "interloper": "Interloper"}
+        switch = {
+            "bh": "Black Hole",
+            "gas": "Gas",
+            "star": "Star",
+            "interloper": "Interloper",
+        }
         snake_case = field_path[2:]
         full_name = f"Number of {switch.get(snake_case, 'Unknown')} Particles"
 
@@ -855,6 +860,43 @@ def registration_number(
         raise RegistrationDoesNotMatchError
 
     return unit, full_name, snake_case
+
+
+def registration_gas_species_masses(
+    field_path: str, unit_system: VelociraptorUnits
+) -> (unyt.Unit, str, str):
+    """
+    Registers the HI masses in apertures.
+    """
+
+    unit = unit_system.mass
+
+    # Capture aperture size
+    match_string = (
+        "Aperture_([a-zA-Z]*)_index_0_aperture_total_gas_([0-9]*)_kpc"
+    )
+    regex = cached_regex(match_string)
+
+    match = regex.match(field_path)
+
+    if match:
+        long_species = match.group(1)
+        aperture_size = match.group(2)
+    
+        try:
+            short_species = {
+                "AtomicHydrogenMasses": "HI",
+                "MolecularHydrogenMasses": "H2",
+            }[long_species]
+        except KeyError:
+            raise RegistrationDoesNotMatchError
+
+        full_name = f"{short_species} gas mass ({aperture_size} kpc)"
+        snake_case = f"{short_species}_mass_{aperture_size}_kpc"
+
+        return unit, full_name, snake_case
+    else:
+        raise RegistrationDoesNotMatchError
 
 
 def registration_hydrogen_phase_fractions(
@@ -1124,6 +1166,7 @@ global_registration_functions = {
         "stellar_birth_densities",
         "snii_thermal_feedback_densities",
         "species_fractions",
+        "gas_species_masses",
         "fail_all",
     ]
 }
