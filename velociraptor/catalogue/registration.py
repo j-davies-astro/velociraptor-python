@@ -869,7 +869,7 @@ def registration_HI_masses(
     Registers the HI masses in apertures.
     """
 
-    unit = unyt.solar_mass
+    unit = unit_system.mass
 
     # Capture aperture size
     match_string = (
@@ -897,7 +897,7 @@ def registration_H2_masses(
     Registers the H_2 masses in apertures.
     """
 
-    unit = unyt.solar_mass
+    unit = unit_system.mass
 
     # Capture aperture size
     match_string = (
