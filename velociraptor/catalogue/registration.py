@@ -912,6 +912,7 @@ def registration_gas_hydrogen_species_masses(
 
     # Capture aperture size
     match_string = "Aperture_([a-zA-Z]*)_aperture_total_gas_([0-9]*)_kpc"
+
     regex = cached_regex(match_string)
 
     match = regex.match(field_path)
