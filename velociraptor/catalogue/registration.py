@@ -862,19 +862,17 @@ def registration_number(
     return unit, full_name, snake_case
 
 
-def registration_gas_species_masses(
+def registration_gas_H_and_He_masses(
     field_path: str, unit_system: VelociraptorUnits
 ) -> (unyt.Unit, str, str):
     """
-    Registers the HI masses in apertures.
+    Registers the masses in Hydrogen & Helium within apertures
     """
 
     unit = unit_system.mass
 
     # Capture aperture size
-    match_string = (
-        "Aperture_([a-zA-Z]*)_index_0_aperture_total_gas_([0-9]*)_kpc"
-    )
+    match_string = "Aperture_([a-zA-Z]*)_aperture_total_gas_([0-9]*)_kpc"
     regex = cached_regex(match_string)
 
     match = regex.match(field_path)
@@ -882,11 +880,114 @@ def registration_gas_species_masses(
     if match:
         long_species = match.group(1)
         aperture_size = match.group(2)
-    
+
+        try:
+            short_species = {"HeliumMasses": "He", "HydrogenMasses": "H"}[long_species]
+        except KeyError:
+            raise RegistrationDoesNotMatchError
+
+        full_name = f"{short_species} gas mass ({aperture_size} kpc)"
+        snake_case = f"{short_species}_mass_{aperture_size}_kpc"
+
+        return unit, full_name, snake_case
+    else:
+        raise RegistrationDoesNotMatchError
+
+
+def registration_gas_hydrogen_species_masses(
+    field_path: str, unit_system: VelociraptorUnits
+) -> (unyt.Unit, str, str):
+    """
+    Registers the masses in hydrogen species within apertures.
+    """
+
+    unit = unit_system.mass
+
+    # Capture aperture size
+    match_string = "Aperture_([a-zA-Z]*)_aperture_total_gas_([0-9]*)_kpc"
+    regex = cached_regex(match_string)
+
+    match = regex.match(field_path)
+
+    if match:
+        long_species = match.group(1)
+        aperture_size = match.group(2)
+
         try:
             short_species = {
                 "AtomicHydrogenMasses": "HI",
+                "IonisedHydrogenMasses": "HII",
                 "MolecularHydrogenMasses": "H2",
+            }[long_species]
+        except KeyError:
+            raise RegistrationDoesNotMatchError
+
+        full_name = f"{short_species} gas mass ({aperture_size} kpc)"
+        snake_case = f"{short_species}_mass_{aperture_size}_kpc"
+
+        return unit, full_name, snake_case
+    else:
+        raise RegistrationDoesNotMatchError
+
+
+def registration_gas_element_ratios_times_masses(
+    field_path: str, unit_system: VelociraptorUnits
+) -> (unyt.Unit, str, str):
+    """
+    Registers the Fe/H times mass and O/H times mass within apertures
+    """
+
+    unit = unit_system.mass
+
+    # Capture aperture size
+    match_string = "Aperture_([a-zA-Z]*)_aperture_total_gas_([0-9]*)_kpc"
+    regex = cached_regex(match_string)
+
+    match = regex.match(field_path)
+
+    if match:
+        long_species = match.group(1)
+        aperture_size = match.group(2)
+
+        try:
+            short_species = {
+                "OxygenOverHydrogenMasses": "O_over_H",
+                "IronOverHydrogenMasses": "Fe_over_H",
+            }[long_species]
+        except KeyError:
+            raise RegistrationDoesNotMatchError
+
+        full_name = f"{short_species} multiplied by gas mass ({aperture_size} kpc)"
+        snake_case = f"{short_species}_time_mass_{aperture_size}_kpc"
+
+        return unit, full_name, snake_case
+    else:
+        raise RegistrationDoesNotMatchError
+
+
+def registration_gas_dust_masses(
+    field_path: str, unit_system: VelociraptorUnits
+) -> (unyt.Unit, str, str):
+    """
+    Registers the masses in dust within apertures
+    """
+
+    unit = unit_system.mass
+
+    # Capture aperture size
+    match_string = "Aperture_([a-zA-Z]*)_aperture_total_gas_([0-9]*)_kpc"
+    regex = cached_regex(match_string)
+
+    match = regex.match(field_path)
+
+    if match:
+        long_species = match.group(1)
+        aperture_size = match.group(2)
+
+        try:
+            short_species = {
+                "GraphiteMasses": "Graphite",
+                "SilicatesMasses": "Silicates",
             }[long_species]
         except KeyError:
             raise RegistrationDoesNotMatchError
@@ -1166,7 +1267,10 @@ global_registration_functions = {
         "stellar_birth_densities",
         "snii_thermal_feedback_densities",
         "species_fractions",
-        "gas_species_masses",
+        "gas_hydrogen_species_masses",
+        "gas_H_and_He_masses",
+        "gas_dust_masses",
+        "gas_element_ratios_times_masses",
         "fail_all",
     ]
 }
