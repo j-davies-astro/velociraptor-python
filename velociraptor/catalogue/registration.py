@@ -883,10 +883,17 @@ def registration_gas_H_and_He_masses(
 
         try:
             short_species = {"HeliumMasses": "He", "HydrogenMasses": "H"}[long_species]
+            long_name_species = {
+                "HeliumMasses": "Helium",
+                "HydrogenMasses": "Hydrogen",
+            }[long_species]
+            math_name = {"HeliumMasses": "M_{\\rm He}", "HydrogenMasses": "M_{\\rm H}"}[
+                long_species
+            ]
         except KeyError:
             raise RegistrationDoesNotMatchError
 
-        full_name = f"{short_species} gas mass ({aperture_size} kpc)"
+        full_name = f"{long_name_species} Gas Mass {math_name} ({aperture_size} kpc)"
         snake_case = f"{short_species}_mass_{aperture_size}_kpc"
 
         return unit, full_name, snake_case
@@ -919,10 +926,23 @@ def registration_gas_hydrogen_species_masses(
                 "IonisedHydrogenMasses": "HII",
                 "MolecularHydrogenMasses": "H2",
             }[long_species]
+            full_name_species = {
+                "AtomicHydrogenMasses": "HI",
+                "IonisedHydrogenMasses": "HII",
+                "MolecularHydrogenMasses": "H$_2$",
+            }[long_species]
+            math_name_species = {
+                "AtomicHydrogenMasses": "$M_{\\rm HI}$",
+                "IonisedHydrogenMasses": "$M_{\\rm HII}$",
+                "MolecularHydrogenMasses": "$M_{\\rm H_2}$",
+            }[long_species]
+
         except KeyError:
             raise RegistrationDoesNotMatchError
 
-        full_name = f"{short_species} gas mass ({aperture_size} kpc)"
+        full_name = (
+            f"{full_name_species} Gas Mass {math_name_species} ({aperture_size} kpc)"
+        )
         snake_case = f"{short_species}_mass_{aperture_size}_kpc"
 
         return unit, full_name, snake_case
@@ -957,15 +977,15 @@ def registration_gas_element_ratios_times_masses(
         except KeyError:
             raise RegistrationDoesNotMatchError
 
-        full_name = f"{short_species} multiplied by gas mass ({aperture_size} kpc)"
-        snake_case = f"{short_species}_time_mass_{aperture_size}_kpc"
+        full_name = f"{short_species} multiplied by Gas Mass ({aperture_size} kpc)"
+        snake_case = f"{short_species}_times_mass_{aperture_size}_kpc"
 
         return unit, full_name, snake_case
     else:
         raise RegistrationDoesNotMatchError
 
 
-def registration_gas_dust_masses(
+def registration_dust_masses(
     field_path: str, unit_system: VelociraptorUnits
 ) -> (unyt.Unit, str, str):
     """
@@ -986,13 +1006,13 @@ def registration_gas_dust_masses(
 
         try:
             short_species = {
-                "GraphiteMasses": "Graphite",
-                "SilicatesMasses": "Silicates",
+                "GraphiteMasses": "graphite",
+                "SilicatesMasses": "silicates",
             }[long_species]
         except KeyError:
             raise RegistrationDoesNotMatchError
 
-        full_name = f"{short_species} gas mass ({aperture_size} kpc)"
+        full_name = f"{short_species} Dust Mass ({aperture_size} kpc)"
         snake_case = f"{short_species}_mass_{aperture_size}_kpc"
 
         return unit, full_name, snake_case
@@ -1269,7 +1289,7 @@ global_registration_functions = {
         "species_fractions",
         "gas_hydrogen_species_masses",
         "gas_H_and_He_masses",
-        "gas_dust_masses",
+        "dust_masses",
         "gas_element_ratios_times_masses",
         "fail_all",
     ]
