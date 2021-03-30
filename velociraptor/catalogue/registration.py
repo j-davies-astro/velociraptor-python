@@ -974,11 +974,19 @@ def registration_gas_element_ratios_times_masses(
                 "OxygenOverHydrogenMasses": "O_over_H",
                 "IronOverHydrogenMasses": "Fe_over_H",
             }[long_species]
+            element_name = {
+                "OxygenOverHydrogenMasses": "Oxygen",
+                "IronOverHydrogenMasses": "Iron",
+            }[long_species]
+            fraction_name = {
+                "OxygenOverHydrogenMasses": "(O/H)",
+                "IronOverHydrogenMasses": "(Fe/H)",
+            }[long_species]
         except KeyError:
             raise RegistrationDoesNotMatchError
 
-        full_name = f"{short_species} multiplied by Gas Mass ({aperture_size} kpc)"
-        snake_case = f"{short_species}_times_mass_{aperture_size}_kpc"
+        full_name = f"{element_name} Abundance Weighted Gas Mass {fraction_name}$\times M_{{\\rm gas}}$ ({aperture_size} kpc)"
+        snake_case = f"{short_species}_times_gas_mass_{aperture_size}_kpc"
 
         return unit, full_name, snake_case
     else:
