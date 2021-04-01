@@ -966,7 +966,7 @@ def registration_gas_diffuse_element_masses(
     else:
         raise RegistrationDoesNotMatchError
 
-def registration_dust_mass_fractions(
+def registration_dust_masses_from_table(
     field_path: str, unit_system: VelociraptorUnits
 ) -> (unyt.Unit, str, str):
     """
@@ -1490,7 +1490,7 @@ global_registration_functions = {
         "gas_hydrogen_species_masses",
         "gas_H_and_He_masses",
         "gas_diffuse_element_masses",
-        "dust_mass_fractions",    
+        "dust_masses_from_table",    
         "dust_masses",
         "gas_dust_masses",
         "gas_element_ratios_times_masses",
