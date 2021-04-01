@@ -910,57 +910,26 @@ def registration_gas_diffuse_element_masses(
     unit = unit_system.mass
 
     # Capture aperture size
-    match_string = "Aperture_([a-zA-Z]*)_aperture_total_gas_([0-9]*)_kpc"
+    match_string = "Aperture_Diffuse([a-zA-Z]*)MassesFrom(Table|Model)_aperture_total_gas_([0-9]*)_kpc"
     regex = cached_regex(match_string)
-
+    
     match = regex.match(field_path)
 
     if match:
-        long_element = match.group(1)
-        aperture_size = match.group(2)
-
+        element = match.group(1)
+        table_model = match.group(2)
+        aperture_size = match.group(3)
         try:
-            short_element = {
-                "DiffuseCarbonMassesFromTable": "diffuse_table_carbon",
-                "DiffuseOxygenMassesFromTable": "diffuse_table_oxygen",
-                "DiffuseMagnesiumMassesFromTable": "diffuse_table_magnesium",
-                "DiffuseSiliconMassesFromTable": "diffuse_table_silicon",
-                "DiffuseIronMassesFromTable": "diffuse_table_iron",
-                "DiffuseCarbonMassesFromModel": "diffuse_model_carbon",
-                "DiffuseOxygenMassesFromModel": "diffuse_model_oxygen",
-                "DiffuseMagnesiumMassesFromModel": "diffuse_model_magnesium",
-                "DiffuseSiliconMassesFromModel": "diffuse_model_silicon",
-                "DiffuseIronMassesFromModel": "diffuse_model_iron",
-            }[long_element]
-            long_name_element = {
-                "DiffuseCarbonMassesFromTable": "Diffuse Carbon from depletion tables",
-                "DiffuseOxygenMassesFromTable": "Diffuse Oxygen from depletion tables",
-                "DiffuseMagnesiumMassesFromTable": "Diffuse Magnesium from depletion tables",
-                "DiffuseSiliconMassesFromTable": "Diffuse Silicon from depletion tables",
-                "DiffuseIronMassesFromTable": "Diffuse Iron from depletion tables",
-                "DiffuseCarbonMassesFromModel": "Diffuse Carbon from depletion tables",
-                "DiffuseOxygenMassesFromModel": "Diffuse Oxygen from depletion tables",
-                "DiffuseMagnesiumMassesFromModel": "Diffuse Magnesium from depletion tables",
-                "DiffuseSiliconMassesFromModel": "Diffuse Silicon from depletion tables",
-                "DiffuseIronMassesFromModel": "Diffuse Iron from depletion tables",
-
-            }[long_element]
-            math_name = {"DiffuseCarbonMassesFromTable": "M^{\\rm table}_{\\rm C,\. diffuse}",
-                         "DiffuseOxygenMassesFromTable": "M^{\\rm table}_{\\rm O,\. diffuse}",
-                         "DiffuseMagnesiumMassesFromTable": "M^{\\rm table}_{\\rm Mg,\. diffuse}",
-                         "DiffuseSiliconMassesFromTable": "M^{\\rm table}_{\\rm Si,\. diffuse}",
-                         "DiffuseIronMassesFromTable": "M^{\\rm table}_{\\rm Fe,\. diffuse}",
-                         "DiffuseCarbonMassesFromModel": "M^{\\rm model}_{\\rm C,\. diffuse}",
-                         "DiffuseOxygenMassesFromModel": "M^{\\rm model}_{\\rm O,\. diffuse}",
-                         "DiffuseMagnesiumMassesFromModel": "M^{\\rm model}_{\\rm Mg,\. diffuse}",
-                         "DiffuseSiliconMassesFromModel": "M^{\\rm model}_{\\rm Si,\. diffuse}",
-                         "DiffuseIronMassesFromModel": "M^{\\rm model}_{\\rm Fe,\. diffuse}",
-                         }[long_element]
+            long_name_element = f"Diffuse {element} from depletion {table_model.lower()}"
+            element_symbol = {
+                "Carbon": "C", "Oxygen": "O", "Magnesium": "Mg", "Silicon": "Si", "Iron": "Fe"
+            }[element]
+            math_name = f"M^{{\\rm {table_model.lower()}}}_{{\\rm {element_symbol}, diffuse}}"
         except KeyError:
             raise RegistrationDoesNotMatchError
-
-        full_name = f"{long_name_element} Gas Mass {math_name} ({aperture_size} kpc)"
-        snake_case = f"{short_element}_mass_{aperture_size}_kpc"
+        
+        full_name = f"{element} ({table_model}) Gas Mass {element_symbol} ({aperture_size} kpc)"
+        snake_case = f"{element.lower()}_mass_{table_model.lower()}_{aperture_size}_kpc"
 
         return unit, full_name, snake_case
     else:
@@ -984,7 +953,7 @@ def registration_dust_masses_from_table(
 
     if match:
         aperture_size = match.group(1)
-        full_name = f"Total Dust Mass from tables ({aperture_size} kpc)"
+        full_name = f"Total Dust Mass from Tables ({aperture_size} kpc)"
         snake_case = f"dust_mass_table_{aperture_size}_kpc"
     else:
         raise RegistrationDoesNotMatchError
