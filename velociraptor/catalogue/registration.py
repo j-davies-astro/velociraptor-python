@@ -900,6 +900,7 @@ def registration_gas_H_and_He_masses(
     else:
         raise RegistrationDoesNotMatchError
 
+
 def registration_gas_diffuse_element_masses(
     field_path: str, unit_system: VelociraptorUnits
 ) -> (unyt.Unit, str, str):
@@ -912,7 +913,7 @@ def registration_gas_diffuse_element_masses(
     # Capture aperture size
     match_string = "Aperture_Diffuse([a-zA-Z]*)MassesFrom(Table|Model)_aperture_total_gas_([0-9]*)_kpc"
     regex = cached_regex(match_string)
-    
+
     match = regex.match(field_path)
 
     if match:
@@ -920,20 +921,31 @@ def registration_gas_diffuse_element_masses(
         table_model = match.group(2)
         aperture_size = match.group(3)
         try:
-            long_name_element = f"Diffuse {element} from depletion {table_model.lower()}"
+            long_name_element = (
+                f"Diffuse {element} from depletion {table_model.lower()}"
+            )
             element_symbol = {
-                "Carbon": "C", "Oxygen": "O", "Magnesium": "Mg", "Silicon": "Si", "Iron": "Fe"
+                "Carbon": "C",
+                "Oxygen": "O",
+                "Magnesium": "Mg",
+                "Silicon": "Si",
+                "Iron": "Fe",
             }[element]
-            math_name = f"M^{{\\rm {table_model.lower()}}}_{{\\rm {element_symbol}, diffuse}}"
+            math_name = (
+                f"M^{{\\rm {table_model.lower()}}}_{{\\rm {element_symbol}, diffuse}}"
+            )
         except KeyError:
             raise RegistrationDoesNotMatchError
-        
-        full_name = f"{element} ({table_model}) Gas Mass {element_symbol} ({aperture_size} kpc)"
+
+        full_name = (
+            f"{element} ({table_model}) Gas Mass {element_symbol} ({aperture_size} kpc)"
+        )
         snake_case = f"{element.lower()}_mass_{table_model.lower()}_{aperture_size}_kpc"
 
         return unit, full_name, snake_case
     else:
         raise RegistrationDoesNotMatchError
+
 
 def registration_dust_masses_from_table(
     field_path: str, unit_system: VelociraptorUnits
@@ -958,8 +970,9 @@ def registration_dust_masses_from_table(
     else:
         raise RegistrationDoesNotMatchError
 
-    return unit, full_name, snake_case    
-    
+    return unit, full_name, snake_case
+
+
 def registration_gas_hydrogen_species_masses(
     field_path: str, unit_system: VelociraptorUnits
 ) -> (unyt.Unit, str, str):
@@ -1459,7 +1472,7 @@ global_registration_functions = {
         "gas_hydrogen_species_masses",
         "gas_H_and_He_masses",
         "gas_diffuse_element_masses",
-        "dust_masses_from_table",    
+        "dust_masses_from_table",
         "dust_masses",
         "gas_dust_masses",
         "gas_element_ratios_times_masses",
