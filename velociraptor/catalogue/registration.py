@@ -901,6 +901,78 @@ def registration_gas_H_and_He_masses(
         raise RegistrationDoesNotMatchError
 
 
+def registration_gas_diffuse_element_masses(
+    field_path: str, unit_system: VelociraptorUnits
+) -> (unyt.Unit, str, str):
+    """
+    Registers the masses in Hydrogen & Helium within apertures
+    """
+
+    unit = unit_system.mass
+
+    # Capture aperture size
+    match_string = "Aperture_Diffuse([a-zA-Z]*)MassesFrom(Table|Model)_aperture_total_gas_([0-9]*)_kpc"
+    regex = cached_regex(match_string)
+
+    match = regex.match(field_path)
+
+    if match:
+        element = match.group(1)
+        table_model = match.group(2)
+        aperture_size = match.group(3)
+        try:
+            long_name_element = (
+                f"Diffuse {element} from depletion {table_model.lower()}"
+            )
+            element_symbol = {
+                "Carbon": "C",
+                "Oxygen": "O",
+                "Magnesium": "Mg",
+                "Silicon": "Si",
+                "Iron": "Fe",
+            }[element]
+            math_name = (
+                f"M^{{\\rm {table_model.lower()}}}_{{\\rm {element_symbol}, diffuse}}"
+            )
+        except KeyError:
+            raise RegistrationDoesNotMatchError
+
+        full_name = (
+            f"{element} ({table_model}) Gas Mass {element_symbol} ({aperture_size} kpc)"
+        )
+        snake_case = f"{element.lower()}_mass_{table_model.lower()}_{aperture_size}_kpc"
+
+        return unit, full_name, snake_case
+    else:
+        raise RegistrationDoesNotMatchError
+
+
+def registration_dust_masses_from_table(
+    field_path: str, unit_system: VelociraptorUnits
+) -> (unyt.Unit, str, str):
+    """
+    Registers the dust mass fraction properties.
+    """
+
+    if not field_path[:28] == "Aperture_DustMassesFromTable":
+        raise RegistrationDoesNotMatchError
+
+    unit = unit_system.mass
+
+    match_string = "Aperture_DustMassesFromTable_aperture_total_gas_([0-9]*)_kpc"
+    regex = cached_regex(match_string)
+    match = regex.match(field_path)
+
+    if match:
+        aperture_size = match.group(1)
+        full_name = f"Total Dust Mass from Tables ({aperture_size} kpc)"
+        snake_case = f"dust_mass_table_{aperture_size}_kpc"
+    else:
+        raise RegistrationDoesNotMatchError
+
+    return unit, full_name, snake_case
+
+
 def registration_gas_hydrogen_species_masses(
     field_path: str, unit_system: VelociraptorUnits
 ) -> (unyt.Unit, str, str):
@@ -1297,6 +1369,8 @@ global_registration_functions = {
         "species_fractions",
         "gas_hydrogen_species_masses",
         "gas_H_and_He_masses",
+        "gas_diffuse_element_masses",
+        "dust_masses_from_table",
         "dust_masses",
         "gas_element_ratios_times_masses",
         "fail_all",
