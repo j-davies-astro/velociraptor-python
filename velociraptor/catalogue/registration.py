@@ -1067,9 +1067,7 @@ def registration_element_ratios_times_masses(
         full_name = f"""Log10 {element_name} Abundance Weighted {part_type.capitalize()} Mass ({fraction_name}) 
         $\times M_{{\\rm gas}}$, from particle values floored at [{fraction_name}]$\\gtreq {floor_value}$ 
         ({aperture_size} kpc)"""
-        snake_case = (
-            f"log_{short_species}_times_{part_type}_mass_{short_floortype}_{aperture_size}_kpc"
-        )
+        snake_case = f"log_{short_species}_times_{part_type}_mass_{short_floortype}_{aperture_size}_kpc"
 
         return unit, full_name, snake_case
     else:
