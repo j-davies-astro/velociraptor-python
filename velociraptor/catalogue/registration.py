@@ -1022,43 +1022,54 @@ def registration_gas_hydrogen_species_masses(
         raise RegistrationDoesNotMatchError
 
 
-def registration_gas_element_ratios_times_masses(
+def registration_element_ratios_times_masses(
     field_path: str, unit_system: VelociraptorUnits
 ) -> (unyt.Unit, str, str):
     """
-    Registers the Fe/H times mass and O/H times mass within apertures
+    Registers the log10(Fe/H) times mass and log10(O/H) times mass within apertures for two particle floor values
     """
 
     unit = unit_system.mass
 
     # Capture aperture size
-    match_string = "Aperture_([a-zA-Z]*)_aperture_total_gas_([0-9]*)_kpc"
+    match_string = (
+        "Aperture_([a-zA-Z]*)Masses(Lo|Hi)Floor_aperture_total_([a-zA-Z]*)_([0-9]*)_kpc"
+    )
     regex = cached_regex(match_string)
 
     match = regex.match(field_path)
 
     if match:
         long_species = match.group(1)
-        aperture_size = match.group(2)
+        floor_type = match.group(2)
+        part_type = match.group(3)
+        aperture_size = match.group(4)
 
         try:
             short_species = {
-                "OxygenOverHydrogenMasses": "O_over_H",
-                "IronOverHydrogenMasses": "Fe_over_H",
+                "LogOxygenOverHydrogen": "O_over_H",
+                "LogIronOverHydrogen": "Fe_over_H",
             }[long_species]
             element_name = {
-                "OxygenOverHydrogenMasses": "Oxygen",
-                "IronOverHydrogenMasses": "Iron",
+                "LogOxygenOverHydrogen": "Oxygen",
+                "LogIronOverHydrogen": "Iron",
             }[long_species]
             fraction_name = {
-                "OxygenOverHydrogenMasses": "(O/H)",
-                "IronOverHydrogenMasses": "(Fe/H)",
+                "LogOxygenOverHydrogen": "O/H",
+                "LogIronOverHydrogen": "Fe/H",
             }[long_species]
+
+            short_floortype = {"Lo": "lowfloor", "Hi": "highfloor",}[floor_type]
+            floor_value = {"Lo": "-4", "Hi": "-3",}[floor_type]
         except KeyError:
             raise RegistrationDoesNotMatchError
 
-        full_name = f"{element_name} Abundance Weighted Gas Mass {fraction_name}$\times M_{{\\rm gas}}$ ({aperture_size} kpc)"
-        snake_case = f"{short_species}_times_gas_mass_{aperture_size}_kpc"
+        full_name = f"""Log10 {element_name} Abundance Weighted {part_type.capitalize()} Mass ({fraction_name}) 
+        $\times M_{{\\rm gas}}$, from particle values floored at [{fraction_name}]$\\gtreq {floor_value}$ 
+        ({aperture_size} kpc)"""
+        snake_case = (
+            f"log_{short_species}_times_{part_type}_mass_{short_floortype}_{aperture_size}_kpc"
+        )
 
         return unit, full_name, snake_case
     else:
@@ -1403,6 +1414,7 @@ global_registration_functions = {
         "dust_masses",
         "gas_element_ratios_times_masses",
         "stellar_luminosities",
+        "element_ratios_times_masses",
         "fail_all",
     ]
 }
