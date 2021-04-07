@@ -1021,8 +1021,46 @@ def registration_gas_hydrogen_species_masses(
     else:
         raise RegistrationDoesNotMatchError
 
+def registration_cold_dense_gas_properties(
+    field_path: str, unit_system: VelociraptorUnits
+) -> (unyt.Unit, str, str):
+    """
+    Registers the mass of cold (T < 10^4.5 K), dense (nH > 0.1 cm^-3) gas in apertures.
+    """
+    unit = unit_system.mass
 
-def registration_element_ratios_times_masses(
+    # Capture aperture size
+    match_string = (
+        "Aperture_ColdDense([a-zA-Z]*)Masses_aperture_total_gas_([0-9]*)_kpc"
+    )
+    regex = cached_regex(match_string)
+    match = regex.match(field_path)
+
+    if match:
+        quantity_key = match.group(1)
+        aperture_size = match.group(2)
+
+        try:
+            long_quantity = {
+                "DiffuseMetal": "Diffuse Metal",
+                "Gas": "Gas",
+            }[quantity_key]
+            short_quantity = {
+                "DiffuseMetal": "diffuse_metal",
+                "Gas": "gas",
+            }[quantity_key]
+        except KeyError:
+            raise RegistrationDoesNotMatchError
+        
+        full_name = f"""{long_quantity} Masses in Cold, Dense ($T < 10^{{4.5}}\;{{\rm K}}$,  
+        $n_{{\\rm H}}$ > 0.1 \\; {{\rm cm^{{-3}}}}$) Gas ({aperture_size} kpc)"""
+        snake_case = f"cold_dense_{short_quantity}_mass_{aperture_size}_kpc"
+        return unit, full_name, snake_case
+    else:
+        raise RegistrationDoesNotMatchError
+
+    
+def registration_log_element_ratios_times_masses(
     field_path: str, unit_system: VelociraptorUnits
 ) -> (unyt.Unit, str, str):
     """
@@ -1068,11 +1106,57 @@ def registration_element_ratios_times_masses(
         $\times M_{{\\rm gas}}$, from particle values floored at [{fraction_name}]$\\gtreq {floor_value}$ 
         ({aperture_size} kpc)"""
         snake_case = f"log_{short_species}_times_{part_type}_mass_{short_floortype}_{aperture_size}_kpc"
-
         return unit, full_name, snake_case
     else:
         raise RegistrationDoesNotMatchError
 
+def registration_lin_element_ratios_times_masses(
+    field_path: str, unit_system: VelociraptorUnits
+) -> (unyt.Unit, str, str):
+    """
+    Registers the Fe/H times mass and O/H times mass within apertures for two particle floor values
+    """
+
+    unit = unit_system.mass
+
+    # Capture aperture size
+    match_string = (
+        "Aperture_([a-zA-Z]*)Masses_aperture_total_([a-zA-Z]*)_([0-9]*)_kpc"
+    )
+    regex = cached_regex(match_string)
+
+    match = regex.match(field_path)
+
+    if match:
+        long_species = match.group(1)
+        part_type = match.group(2)
+        aperture_size = match.group(3)
+
+        try:
+            short_species = {
+                "TotalOxygenOverHydrogen": "O_over_H_total",
+                "OxygenOverHydrogen": "O_over_H",
+                "IronOverHydrogen": "Fe_over_H",
+            }[long_species]
+            element_name = {
+                "TotalOxygenOverHydrogen": "Oxygen",
+                "OxygenOverHydrogen": "Oxygen",
+                "IronOverHydrogen": "Iron",
+            }[long_species]
+            fraction_name = {
+                "TotalOxygenOverHydrogen": "O/H", 
+                "OxygenOverHydrogen": "O/H",
+                "IronOverHydrogen": "Fe/H",
+            }[long_species]
+        except KeyError:
+            raise RegistrationDoesNotMatchError
+
+        full_name = f"""Linear {element_name} Abundance Weighted {part_type.capitalize()} Mass ({fraction_name}) 
+        $\times M_{{\\rm gas}}$ ({aperture_size} kpc)"""
+        snake_case = f"lin_{short_species}_times_{part_type}_mass_{aperture_size}_kpc"
+        return unit, full_name, snake_case
+    else:
+        raise RegistrationDoesNotMatchError
 
 def registration_dust_masses(
     field_path: str, unit_system: VelociraptorUnits
@@ -1413,6 +1497,9 @@ global_registration_functions = {
         "gas_element_ratios_times_masses",
         "stellar_luminosities",
         "element_ratios_times_masses",
+        "cold_dense_gas_properties",
+        "log_element_ratios_times_masses",
+        "lin_element_ratios_times_masses",
         "fail_all",
     ]
 }
