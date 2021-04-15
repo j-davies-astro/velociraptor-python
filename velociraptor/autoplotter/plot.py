@@ -78,11 +78,26 @@ def mass_function(
     if mass_function.adaptive_mass_function:
         centers, mass_function, error, *_ = mass_function.output
         ax.errorbar(
-            centers, mass_function, yerr=error, xerr=abs(x_bins - centers), fmt=".",
+            centers, mass_function, yerr=error, xerr=abs(x_bins - centers), fmt="."
         )
     else:
         centers, mass_function, error, *_ = mass_function.output
         ax.errorbar(centers, mass_function, error)
+
+    return fig, ax
+
+
+def luminosity_function(
+    x: unyt.unyt_array, x_bins: unyt.unyt_array, luminosity_function: VelociraptorLine
+) -> Tuple[plt.Figure, plt.Axes]:
+    """
+    Creates a plot of x as a luminosity function, binned with x_bins.
+    """
+
+    fig, ax = plt.subplots()
+
+    centers, luminosity_function, error, *_ = luminosity_function.output
+    ax.errorbar(centers, luminosity_function, error)
 
     return fig, ax
 

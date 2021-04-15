@@ -13,6 +13,9 @@ from velociraptor.tools.mass_functions import (
     create_mass_function_given_bins,
     create_adaptive_mass_function,
 )
+from velociraptor.tools.luminosity_functions import (
+    create_luminosity_function_given_bins,
+)
 from velociraptor.tools.histogram import create_histogram_given_bins
 from velociraptor.tools.adaptive import create_adaptive_bins
 
@@ -20,6 +23,7 @@ valid_line_types = [
     "median",
     "mean",
     "mass_function",
+    "luminosity_function",
     "histogram",
     "cumulative_histogram",
     "adaptive_mass_function",
@@ -39,9 +43,11 @@ class VelociraptorLine(object):
     median: bool
     mean: bool
     mass_function: bool
+    luminosity_function: bool
     histogram: bool
     cumulative_histogram: bool
     adaptive_mass_function: bool
+    adaptive_luminosity_function: bool
     # Create bins in logspace?
     log: bool
     # Binning properties
@@ -263,6 +269,15 @@ class VelociraptorLine(object):
                 *mass_function_output,
                 unyt_array([], units=mass_function_output[0].units),
                 unyt_array([], units=mass_function_output[1].units),
+            )
+        elif self.luminosity_function:
+            luminosity_function_output = create_luminosity_function_given_bins(
+                masked_x, self.bins, box_volume=box_volume
+            )
+            self.output = (
+                *luminosity_function_output,
+                unyt_array([], units=luminosity_function_output[0].units),
+                unyt_array([], units=luminosity_function_output[1].units),
             )
         elif self.histogram:
             histogram_output = create_histogram_given_bins(

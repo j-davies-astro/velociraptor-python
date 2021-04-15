@@ -25,6 +25,7 @@ valid_plot_types = [
     "scatter",
     "2dhistogram",
     "massfunction",
+    "luminosityfunction",
     "histogram",
     "cumulative_histogram",
     "adaptivemassfunction",
@@ -67,7 +68,9 @@ class VelociraptorPlot(object):
     mean_line: Union[None, VelociraptorLine]
     median_line: Union[None, VelociraptorLine]
     mass_function_line: Union[None, VelociraptorLine]
+    luminosity_function_line: Union[None, VelociraptorLine]
     adaptive_mass_function_line: Union[None, VelociraptorLine]
+    adaptive_luminosity_function_line: Union[None, VelociraptorLine]
     histogram_line: Union[None, VelociraptorLine]
     cumulative_histogram_line: Union[None, VelociraptorLine]
     # Binning for x, y axes.
@@ -543,6 +546,35 @@ class VelociraptorPlot(object):
 
         return
 
+    def _parse_luminosityfunction(self) -> None:
+        """
+        Parses the required variables for producing a luminosity function
+        plot.
+
+        TODO: Re-write the luminosity function in a better way to be the
+        same as other lines.
+        """
+
+        self._parse_common_histogramtype()
+
+        # A bit of a hacky workaround - improve this in the future
+        # by combining this functionality properly into the
+        # VelociraptorLine methods.
+        self.luminosity_function_line = VelociraptorLine(
+            line_type="luminosity_function",
+            line_data=dict(
+                plot=True,
+                log=self.x_log,
+                number_of_bins=self.number_of_bins,
+                start=dict(value=self.x_lim[0].value, units=self.x_lim[0].units),
+                end=dict(value=self.x_lim[1].value, units=self.x_lim[1].units),
+            ),
+        )
+
+        self.x_lim = self.x_lim[::-1]
+
+        return
+
     def _parse_histogram(self) -> None:
         """
         Parses the required variables for producing a 1D histogram plot.
@@ -808,6 +840,38 @@ class VelociraptorPlot(object):
         Makes the _adaptive_ mass function plot. Same as mass function.
         """
         return self._make_plot_massfunction(catalogue=catalogue)
+
+    def _make_plot_luminosityfunction(
+        self, catalogue: VelociraptorCatalogue
+    ) -> Tuple[Figure, Axes]:
+        """
+        Makes a luminosity function plot and returns the figure and axes.
+        """
+
+        x = self.get_quantity_from_catalogue_with_mask(self.x, catalogue)
+        x.convert_to_units(self.x_units)
+
+        # A bit of an odd line but we want to get whichever one is defined
+        luminosity_function_line = getattr(
+            self,
+            "luminosity_function_line",
+            getattr(self, "adaptive_luminosity_function_line", None),
+        )
+
+        luminosity_function_line.create_line(
+            x=x, y=None, box_volume=catalogue.units.comoving_box_volume
+        )
+
+        self.x_bins = luminosity_function_line.bins
+
+        luminosity_function_line.output[1].convert_to_units(self.y_units)
+        luminosity_function_line.output[2].convert_to_units(self.y_units)
+
+        fig, ax = plot.luminosity_function(
+            x=x, x_bins=self.x_bins, luminosity_function=luminosity_function_line
+        )
+
+        return fig, ax
 
     def _make_plot_histogram(
         self, catalogue: VelociraptorCatalogue

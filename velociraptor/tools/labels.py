@@ -42,7 +42,7 @@ def get_mass_function_label(
     """
     Gets a fancy mass-function label such as:
 
-    d$n(M_*)$/d$\log_{10}M_*$ [Mpc$^{-3}$]
+    d$n(M_*)$/d$\log_{10}M_*$ [Mpc$^{-3}$ mag$^{-1}$]
 
     (this would be for an input of "*" and unyt.Mpc**3).
     """
@@ -51,5 +51,21 @@ def get_mass_function_label(
     mass_func_label = get_mass_function_label_no_units(mass_function_sub_label)
 
     output = fr"{mass_func_label} $\left[{unit_repr}\right]$"
+
+    return output
+
+
+def get_luminosity_function_label_no_units(luminosity_function_sub_label: str):
+    """
+    Gets a fancy luminosity-function label such as:
+
+    d$n(M)$/d$M$ [Mpc$^{-3}$ mag$^{-1}$]
+
+    (this would be for an input of "*" and unyt.Mpc**3).
+    """
+
+    output = (
+        fr"d$n(M_{luminosity_function_sub_label})$/d$M_{luminosity_function_sub_label}$"
+    )
 
     return output
