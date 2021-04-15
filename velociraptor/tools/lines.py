@@ -4,7 +4,7 @@ Tools to generate various lines from datasets.
 
 import unyt
 import numpy as np
-
+import sys
 from typing import List
 
 
@@ -145,7 +145,8 @@ def binned_mean_line(
     # If there is nothing to plot as the mean line, add a test point to avoid having
     # empty axes labels or/and wrong axes limits
     if len(means) == 0:
-        means, centers, standard_deviations = [0], [0], [0]
+        float_min = sys.float_info.min
+        means, centers, standard_deviations = [float_min], [float_min], [float_min]
 
     means = unyt.unyt_array(means, units=y.units, name=y.name)
     standard_deviations = unyt.unyt_array(
@@ -304,7 +305,12 @@ def binned_median_line(
     # If there is nothing to plot as the median line, add a test point to avoid having
     # empty axes labels or/and wrong axes limits
     if len(medians) == 0:
-        medians, centers, deviations = [0], [0], [[0, 0]]
+        float_min = sys.float_info.min
+        medians, centers, deviations = (
+            [float_min],
+            [float_min],
+            [[float_min, float_min]],
+        )
 
     medians = unyt.unyt_array(medians, units=y.units, name=y.name)
     # Percentiles actually gives us the values - we want to be able to use
