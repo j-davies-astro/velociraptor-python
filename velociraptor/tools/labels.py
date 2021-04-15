@@ -42,7 +42,7 @@ def get_mass_function_label(
     """
     Gets a fancy mass-function label such as:
 
-    d$n(M_*)$/d$\log_{10}M_*$ [Mpc$^{-3}$ mag$^{-1}$]
+    d$n(M_*)$/d$\log_{10}M_*$ [Mpc$^{-3}$]
 
     (this would be for an input of "*" and unyt.Mpc**3).
     """
