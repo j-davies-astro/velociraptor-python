@@ -1100,6 +1100,35 @@ def registration_dust_masses(
         raise RegistrationDoesNotMatchError
 
 
+def registration_stellar_luminosities(
+    field_path: str, unit_system: VelociraptorUnits
+) -> (unyt.Unit, str, str):
+    """
+    Registers the luminosities within apertures
+    """
+
+    unit = unit.dimensionless
+
+    # Capture aperture size
+    match_string = (
+        "Aperture_Luminosities_([a-zA-Z])_index_0_aperture_total_star_([0-9]*)_kpc"
+    )
+    regex = cached_regex(match_string)
+
+    match = regex.match(field_path)
+
+    if match:
+        band = match.group(1)
+        aperture_size = match.group(2)
+
+        full_name = f"{band}-Band Luminosity ({aperture_size} kpc)"
+        snake_case = f"{band}_luminosity_{aperture_size}_kpc"
+
+        return unit, full_name, snake_case
+    else:
+        raise RegistrationDoesNotMatchError
+
+
 def registration_hydrogen_phase_fractions(
     field_path: str, unit_system: VelociraptorUnits
 ) -> (unyt.Unit, str, str):
@@ -1373,6 +1402,7 @@ global_registration_functions = {
         "dust_masses_from_table",
         "dust_masses",
         "gas_element_ratios_times_masses",
+        "stellar_luminosities",
         "fail_all",
     ]
 }
