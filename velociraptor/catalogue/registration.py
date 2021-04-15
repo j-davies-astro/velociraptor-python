@@ -1107,7 +1107,7 @@ def registration_stellar_luminosities(
     Registers the luminosities within apertures
     """
 
-    unit = unit.dimensionless
+    unit = unyt.dimensionless
 
     # Capture aperture size
     match_string = (
