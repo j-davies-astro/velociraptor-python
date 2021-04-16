@@ -64,8 +64,6 @@ def get_luminosity_function_label_no_units(luminosity_function_sub_label: str):
     (this would be for an input of "*" and unyt.Mpc**3).
     """
 
-    output = (
-        fr"d$n(M_{luminosity_function_sub_label})$/d$M_{luminosity_function_sub_label}$"
-    )
+    output = fr"$\phi(M_{luminosity_function_sub_label})$"
 
     return output

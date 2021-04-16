@@ -97,6 +97,17 @@ def luminosity_function(
     fig, ax = plt.subplots()
 
     centers, luminosity_function, error, *_ = luminosity_function.output
+
+    # A Bit of a dirty hack but we want add a formally-dimensionless magnitude unit to the y-axis
+    unyt.unit_registry.default_unit_registry.add(
+        "mag", 1.0, dimensions=unyt.dimensions.dimensionless
+    )
+    luminosity_function = unyt.unyt_array(
+        luminosity_function.v,
+        str(luminosity_function.units) + " * mag**-1",
+        name=luminosity_function.name,
+    )
+
     ax.errorbar(centers, luminosity_function, error)
 
     return fig, ax
