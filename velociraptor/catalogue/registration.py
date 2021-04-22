@@ -1496,7 +1496,6 @@ global_registration_functions = {
         "dust_masses",
         "gas_element_ratios_times_masses",
         "stellar_luminosities",
-        "element_ratios_times_masses",
         "cold_dense_gas_properties",
         "log_element_ratios_times_masses",
         "lin_element_ratios_times_masses",
