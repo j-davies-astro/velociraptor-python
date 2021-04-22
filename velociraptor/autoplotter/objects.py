@@ -462,7 +462,8 @@ class VelociraptorPlot(object):
         self._parse_loc()
         self._parse_comment()
         self._parse_lines()
-        self._parse_structure_type()
+        self._parse_select_structure_type()
+        self._parse_exclude_structure_type()
         self._parse_selection_mask()
 
         return
@@ -503,7 +504,8 @@ class VelociraptorPlot(object):
         self._parse_coordinate_histogram_bin("x")
         self._parse_loc()
         self._parse_comment()
-        self._parse_structure_type()
+        self._parse_select_structure_type()
+        self._parse_exclude_structure_type()
         self._parse_selection_mask()
 
         return
