@@ -1021,6 +1021,7 @@ def registration_gas_hydrogen_species_masses(
     else:
         raise RegistrationDoesNotMatchError
 
+
 def registration_cold_dense_gas_properties(
     field_path: str, unit_system: VelociraptorUnits
 ) -> (unyt.Unit, str, str):
@@ -1030,9 +1031,7 @@ def registration_cold_dense_gas_properties(
     unit = unit_system.mass
 
     # Capture aperture size
-    match_string = (
-        "Aperture_ColdDense([a-zA-Z]*)Masses_aperture_total_gas_([0-9]*)_kpc"
-    )
+    match_string = "Aperture_ColdDense([a-zA-Z]*)Masses_aperture_total_gas_([0-9]*)_kpc"
     regex = cached_regex(match_string)
     match = regex.match(field_path)
 
@@ -1041,17 +1040,15 @@ def registration_cold_dense_gas_properties(
         aperture_size = match.group(2)
 
         try:
-            long_quantity = {
-                "DiffuseMetal": "Diffuse Metal",
-                "Gas": "Gas",
-            }[quantity_key]
-            short_quantity = {
-                "DiffuseMetal": "diffuse_metal",
-                "Gas": "gas",
-            }[quantity_key]
+            long_quantity = {"DiffuseMetal": "Diffuse Metal", "Gas": "Gas",}[
+                quantity_key
+            ]
+            short_quantity = {"DiffuseMetal": "diffuse_metal", "Gas": "gas",}[
+                quantity_key
+            ]
         except KeyError:
             raise RegistrationDoesNotMatchError
-        
+
         full_name = f"""{long_quantity} Masses in Cold, Dense ($T < 10^{{4.5}}\;{{\rm K}}$,  
         $n_{{\\rm H}}$ > 0.1 \\; {{\rm cm^{{-3}}}}$) Gas ({aperture_size} kpc)"""
         snake_case = f"cold_dense_{short_quantity}_mass_{aperture_size}_kpc"
@@ -1059,7 +1056,7 @@ def registration_cold_dense_gas_properties(
     else:
         raise RegistrationDoesNotMatchError
 
-    
+
 def registration_log_element_ratios_times_masses(
     field_path: str, unit_system: VelociraptorUnits
 ) -> (unyt.Unit, str, str):
@@ -1110,6 +1107,7 @@ def registration_log_element_ratios_times_masses(
     else:
         raise RegistrationDoesNotMatchError
 
+
 def registration_lin_element_ratios_times_masses(
     field_path: str, unit_system: VelociraptorUnits
 ) -> (unyt.Unit, str, str):
@@ -1120,9 +1118,7 @@ def registration_lin_element_ratios_times_masses(
     unit = unit_system.mass
 
     # Capture aperture size
-    match_string = (
-        "Aperture_([a-zA-Z]*)Masses_aperture_total_([a-zA-Z]*)_([0-9]*)_kpc"
-    )
+    match_string = "Aperture_([a-zA-Z]*)Masses_aperture_total_([a-zA-Z]*)_([0-9]*)_kpc"
     regex = cached_regex(match_string)
 
     match = regex.match(field_path)
@@ -1144,7 +1140,7 @@ def registration_lin_element_ratios_times_masses(
                 "IronOverHydrogen": "Iron",
             }[long_species]
             fraction_name = {
-                "TotalOxygenOverHydrogen": "O/H", 
+                "TotalOxygenOverHydrogen": "O/H",
                 "OxygenOverHydrogen": "O/H",
                 "IronOverHydrogen": "Fe/H",
             }[long_species]
@@ -1157,6 +1153,7 @@ def registration_lin_element_ratios_times_masses(
         return unit, full_name, snake_case
     else:
         raise RegistrationDoesNotMatchError
+
 
 def registration_dust_masses(
     field_path: str, unit_system: VelociraptorUnits
