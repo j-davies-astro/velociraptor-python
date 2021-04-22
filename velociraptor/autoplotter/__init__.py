@@ -10,7 +10,8 @@ This yaml file has the following format:
    output_filename:
      # Global plot quantities
      type: scatter / histogram / cumulative_histogram / 2dhistogram / massfunction / adaptivemassfunction
-     select_structure_type: number of substructure to select (e.g. 10 is centrals)
+     select_structure_type: number of substructure to select (e.g. 10 for centrals)
+     exclude_structure_type: number of substructure to exclude (e.g. 10 for non-centrals). Cannot be a number equal to select_structure_type.
      selection_mask: "quantity.name" - a boolean quantity to select the items you wish to plot.
      number_of_bins: number of bins in the (background) histogram or massfunc
      min_num_points_highlight: Minimum number of data points (with the largest values of x) to highlight in mean- and median-line plots (default: 10)
