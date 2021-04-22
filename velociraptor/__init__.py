@@ -4,18 +4,24 @@ The velociraptor module.
 More information is available in the documnetation.
 """
 
-# First things first, we need to upgrade msun from a symbol to a
-# first-class unit.
+# First things first, we need to upgrade msun and mh from a symbol to a
+# first-class unit. We also add a dimensionless unit for magnitudes.
 import unyt
 
 try:
-    unyt.define_unit("msun", unyt.msun, tex_repr=r"M_\odot")
+    unyt.define_unit("msun", 1.0 * unyt.msun, tex_repr=r"M_\odot")
 except RuntimeError:
     # We've already done that, oops.
     pass
 
 try:
-    unyt.define_unit("mh", unyt.hydrogen_mass, tex_repr=r"m_{\rm H}")
+    unyt.define_unit("mh", 1.0 * unyt.hydrogen_mass, tex_repr=r"m_{\rm H}")
+except RuntimeError:
+    # We've already done that, oops.
+    pass
+
+try:
+    unyt.define_unit("mag", 1.0 * unyt.dimensionless, tex_repr=r"mag")
 except RuntimeError:
     # We've already done that, oops.
     pass
