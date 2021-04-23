@@ -1048,9 +1048,10 @@ def registration_cold_dense_gas_properties(
             ]
         except KeyError:
             raise RegistrationDoesNotMatchError
-
-        full_name = f"""{long_quantity} Masses in Cold, Dense ($T < 10^{{4.5}}\;{{\rm K}}$,  
-        $n_{{\\rm H}}$ > 0.1 \\; {{\rm cm^{{-3}}}}$) Gas ({aperture_size} kpc)"""
+        full_name = (
+            f"{long_quantity} Masses in Cold, Dense ($T < 10^{{4.5}}\;{{\rm K}}$, "
+            f"$n_{{\\rm H}}$ > 0.1 \\; {{\rm cm^{{-3}}}}$) Gas ({aperture_size} kpc)"
+        )
         snake_case = f"cold_dense_{short_quantity}_mass_{aperture_size}_kpc"
         return unit, full_name, snake_case
     else:
