@@ -983,14 +983,14 @@ def registration_gas_hydrogen_species_masses(
     unit = unit_system.mass
 
     # Capture aperture size
-    match_string = "Aperture_([a-zA-Z]*)_aperture_total_gas_([0-9]*)_kpc"
+    match_string = "Aperture_([a-zA-Z]*)_(index_0_)?aperture_total_gas_([0-9]*)_kpc"
     regex = cached_regex(match_string)
 
     match = regex.match(field_path)
 
     if match:
         long_species = match.group(1)
-        aperture_size = match.group(2)
+        aperture_size = match.group(3)
 
         try:
             short_species = {
