@@ -84,6 +84,7 @@ class VelociraptorPlot(object):
     y_bins: unyt_array
     # Select a specific structure type?
     select_structure_type: Union[None, int]
+    exclude_structure_type: Union[None, int]
     structure_mask: Union[None, array]
     selection_mask: Union[None, array]
     # Where should the legend and z, a information be placed?
@@ -260,7 +261,7 @@ class VelociraptorPlot(object):
 
         return
 
-    def _parse_structure_type(self) -> None:
+    def _parse_select_structure_type(self) -> None:
         """
         Parses the structure type selector to select_structure_type, as well as
         creating the structure_mask
@@ -269,6 +270,22 @@ class VelociraptorPlot(object):
             self.select_structure_type = int(self.data["select_structure_type"])
         except KeyError:
             self.select_structure_type = None
+
+        # Initialise to None; we set/create this when we first have access to the
+        # catalogue in the plotting functions.
+        self.structure_mask = None
+
+        return
+
+    def _parse_exclude_structure_type(self) -> None:
+        """
+        Parses the structure type excluder to exclude_structure_type, as well as
+        creating the structure_mask
+        """
+        try:
+            self.exclude_structure_type = int(self.data["exclude_structure_type"])
+        except KeyError:
+            self.exclude_structure_type = None
 
         # Initialise to None; we set/create this when we first have access to the
         # catalogue in the plotting functions.
@@ -445,7 +462,8 @@ class VelociraptorPlot(object):
         self._parse_loc()
         self._parse_comment()
         self._parse_lines()
-        self._parse_structure_type()
+        self._parse_select_structure_type()
+        self._parse_exclude_structure_type()
         self._parse_selection_mask()
 
         return
@@ -486,7 +504,8 @@ class VelociraptorPlot(object):
         self._parse_coordinate_histogram_bin("x")
         self._parse_loc()
         self._parse_comment()
-        self._parse_structure_type()
+        self._parse_select_structure_type()
+        self._parse_exclude_structure_type()
         self._parse_selection_mask()
 
         return
@@ -745,18 +764,44 @@ class VelociraptorPlot(object):
             ).astype(bool)
 
             if self.select_structure_type is not None:
+                if self.select_structure_type == self.exclude_structure_type:
+                    raise AutoPlotterError(
+                        f"Cannot simultaneously select and exclude structure"
+                        " type {self.select_structure_type}"
+                    )
                 self.structure_mask = logical_and(
                     self.structure_mask,
                     catalogue.structure_type.structuretype
                     == self.select_structure_type,
                 )
 
+            elif self.exclude_structure_type is not None:
+                self.structure_mask = logical_and(
+                    self.structure_mask,
+                    catalogue.structure_type.structuretype
+                    != self.exclude_structure_type,
+                )
+                
             x = x[self.structure_mask]
             x.name = name
         elif self.select_structure_type is not None:
+            if self.select_structure_type == self.exclude_structure_type:
+                raise AutoPlotterError(
+                    f"Cannot simultaneously select and exclude structure"
+                    " type {self.select_structure_type}"
+                )
+            
             # Need to create mask
             self.structure_mask = (
                 catalogue.structure_type.structuretype == self.select_structure_type
+            )
+
+            x = x[self.structure_mask]
+            x.name = name
+        elif self.exclude_structure_type is not None:
+            # Need to create mask
+            self.structure_mask = (
+                catalogue.structure_type.structuretype != self.exclude_structure_type
             )
 
             x = x[self.structure_mask]
