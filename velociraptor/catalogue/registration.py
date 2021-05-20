@@ -1202,14 +1202,16 @@ def registration_stellar_luminosities(
 
     # Capture aperture size
     match_string = (
-        "Aperture_Luminosities_([a-zA-Z])_index_0_aperture_total_star_([0-9]*)_kpc"
+        "Aperture_Luminosities_index_([0-9]?)_aperture_total_star_([0-9]*)_kpc"
     )
     regex = cached_regex(match_string)
 
     match = regex.match(field_path)
 
     if match:
-        band = match.group(1)
+
+        bands = ["u", "g", "r", "i", "z", "Y", "J", "H", "K"]
+        band = bands[match.group(1)]
         aperture_size = match.group(2)
 
         full_name = f"{band}-Band Luminosity ({aperture_size} kpc)"
