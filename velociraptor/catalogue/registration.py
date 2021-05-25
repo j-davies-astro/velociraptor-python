@@ -1211,7 +1211,7 @@ def registration_stellar_luminosities(
     if match:
 
         bands = ["u", "g", "r", "i", "z", "Y", "J", "H", "K"]
-        band = bands[match.group(1)]
+        band = bands[int(match.group(1))]
         aperture_size = match.group(2)
 
         full_name = f"{band}-Band Luminosity ({aperture_size} kpc)"
