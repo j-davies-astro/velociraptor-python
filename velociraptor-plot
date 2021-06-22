@@ -137,6 +137,8 @@ if __name__ == "__main__":
         style.use(args.stylesheet)
 
     print_if_debug(f"Generating initial AutoPlotter instance for {args.config}.")
+    print(args.config)
+    quit()
     auto_plotter = AutoPlotter(args.config)
     print_if_debug(f"Loading halo catalogue at {args.properties}.")
     if args.registration is not None:

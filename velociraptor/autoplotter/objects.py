@@ -11,7 +11,7 @@ import velociraptor.autoplotter.plot as plot
 
 from unyt import unyt_quantity, unyt_array, matplotlib_support
 from unyt.exceptions import UnitConversionError
-from numpy import log10, linspace, logspace, array, logical_and
+from numpy import log10, linspace, logspace, array, logical_and, ones
 from matplotlib.pyplot import Axes, Figure, close
 from yaml import safe_load
 from typing import Union, List, Dict, Tuple
@@ -95,6 +95,8 @@ class VelociraptorPlot(object):
     observational_data_filenames: List[str]
     observational_data_bracket_width: float
     observational_data_directory: str
+    # global mask
+    global_mask: Union[None, array]
 
     def __init__(
         self,
@@ -743,7 +745,7 @@ class VelociraptorPlot(object):
         return
 
     def get_quantity_from_catalogue_with_mask(
-        self, quantity: str, catalogue: VelociraptorCatalogue
+            self, quantity: str, catalogue: VelociraptorCatalogue,
     ) -> unyt_array:
         """
         Get a quantity from the catalogue using the mask.
@@ -754,61 +756,51 @@ class VelociraptorPlot(object):
         # in versions of unyt less than 2.6.0
         name = x.name
 
+        # temporary masked array to apply global mask
+        # in concert with plot-specific masks
+        x_mask = self.global_mask
+        
         if self.structure_mask is not None:
-            x = x[self.structure_mask]
+            # if structure_mask already set, mask and return
+            x_mask = logical_and(x_mask, self.structure_mask)
+            x = x[x_mask]
             x.name = name
-        elif self.selection_mask is not None:
+            return x
+        
+        # allow all entries by default
+        self.structure_mask = ones(x.shape).astype(bool)
+        
+        if self.selection_mask is not None:
             # Create mask
             self.structure_mask = reduce(
                 getattr, self.selection_mask.split("."), catalogue
             ).astype(bool)
-
-            if self.select_structure_type is not None:
-                if self.select_structure_type == self.exclude_structure_type:
-                    raise AutoPlotterError(
-                        f"Cannot simultaneously select and exclude structure"
-                        " type {self.select_structure_type}"
-                    )
-                self.structure_mask = logical_and(
-                    self.structure_mask,
-                    catalogue.structure_type.structuretype
-                    == self.select_structure_type,
-                )
-
-            elif self.exclude_structure_type is not None:
-                self.structure_mask = logical_and(
-                    self.structure_mask,
-                    catalogue.structure_type.structuretype
-                    != self.exclude_structure_type,
-                )
-                
-            x = x[self.structure_mask]
-            x.name = name
-        elif self.select_structure_type is not None:
+        if self.select_structure_type is not None:
             if self.select_structure_type == self.exclude_structure_type:
                 raise AutoPlotterError(
                     f"Cannot simultaneously select and exclude structure"
                     " type {self.select_structure_type}"
                 )
+            self.structure_mask = logical_and(
+                self.structure_mask,
+                catalogue.structure_type.structuretype
+                == self.select_structure_type,
+            )
+        if self.exclude_structure_type is not None:
+            self.structure_mask = logical_and(
+                self.structure_mask,
+                catalogue.structure_type.structuretype
+                != self.exclude_structure_type,
+            )
             
-            # Need to create mask
-            self.structure_mask = (
-                catalogue.structure_type.structuretype == self.select_structure_type
-            )
+        # combine global and structure masks
+        x_mask = logical_and(x_mask, self.structure_mask)
 
-            x = x[self.structure_mask]
-            x.name = name
-        elif self.exclude_structure_type is not None:
-            # Need to create mask
-            self.structure_mask = (
-                catalogue.structure_type.structuretype != self.exclude_structure_type
-            )
-
-            x = x[self.structure_mask]
-            x.name = name
-
+        # apply to the unyt array of values
+        x = x[x_mask]
+        x.name = name
         return x
-
+                
     def _make_plot_scatter(
         self, catalogue: VelociraptorCatalogue
     ) -> Tuple[Figure, Axes]:
@@ -974,7 +966,7 @@ class VelociraptorPlot(object):
         return fig, ax
 
     def make_plot(
-        self, catalogue: VelociraptorCatalogue, directory: str, file_extension: str
+        self, catalogue: VelociraptorCatalogue, directory: str, file_extension: str,
     ):
         """
         Federates out data parsing to individual functions based on the
@@ -1058,7 +1050,9 @@ class AutoPlotter(object):
     observational_data_directory: str
     # Whether or not the plots were created successfully.
     created_successfully: List[bool]
-
+    # global mask
+    global_mask: Union[None, array]
+    
     def __init__(
         self,
         filename: Union[str, List[str]],
@@ -1123,7 +1117,7 @@ class AutoPlotter(object):
 
         return
 
-    def link_catalogue(self, catalogue: VelociraptorCatalogue):
+    def link_catalogue(self, catalogue: VelociraptorCatalogue, global_mask_tag: str):
         """
         Links a catalogue with this object so that the plots
         can actually be created.
@@ -1131,6 +1125,10 @@ class AutoPlotter(object):
 
         self.catalogue = catalogue
 
+        if global_mask_tag is not None:
+            self.global_mask = reduce(getattr, quantity.split("."), catalogue)
+        else:
+            self.global_mask = True
         return
 
     def create_plots(
@@ -1150,6 +1148,7 @@ class AutoPlotter(object):
 
         for plot in self.plots:
             try:
+                plot.global_mask = self.global_mask
                 plot.make_plot(
                     catalogue=self.catalogue,
                     directory=directory,

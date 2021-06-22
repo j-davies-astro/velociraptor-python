@@ -1,4 +1,4 @@
-"""
+b"""
 Main objects for the velociraptor reading library.
 
 This is based upon the reading routines in the SWIFTsimIO library.
@@ -412,4 +412,3 @@ class VelociraptorCatalogue(object):
         self.derived_quantities = DerivedQuantities(registration_file_path, self)
 
         return
-

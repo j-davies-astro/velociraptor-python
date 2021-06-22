@@ -37,7 +37,8 @@ def registration_fail_all(
     + name: A fancy (possibly LaTeX'd) name for the field.
     + snake_case: A correct snake_case name for the field.
     """
-
+    
+    
     if field_path == "ThisFieldPathWouldNeverExist":
         return (
             unit_system.length,
@@ -1442,7 +1443,18 @@ def registration_spherical_overdensities(
     else:
         raise RegistrationDoesNotMatchError
 
+def registration_bgpart_masses(
+    field_path: str, unit_system: VelociraptorUnits
+) -> (unyt.Unit, str, str):
+    """
+    Registers the stellar ages properties (currently tage_star).
+    """
+    if field_path == "Mass_interloper":
+        return unit_system.mass, "Mass from background particles", "bgpart_masses"
+    else:
+        raise RegistrationDoesNotMatchError
 
+    
 # TODO
 # lambda_B
 # q
@@ -1502,6 +1514,7 @@ global_registration_functions = {
         "cold_dense_gas_properties",
         "log_element_ratios_times_masses",
         "lin_element_ratios_times_masses",
+        "bgpart_masses",
         "fail_all",
     ]
 }
