@@ -1126,7 +1126,7 @@ class AutoPlotter(object):
         self.catalogue = catalogue
 
         if global_mask_tag is not None:
-            self.global_mask = reduce(getattr, quantity.split("."), catalogue)
+            self.global_mask = reduce(getattr, global_mask_tag.split("."), catalogue)
         else:
             self.global_mask = True
         return
