@@ -1447,7 +1447,7 @@ def registration_bgpart_masses(
     field_path: str, unit_system: VelociraptorUnits
 ) -> (unyt.Unit, str, str):
     """
-    Registers the stellar ages properties (currently tage_star).
+    Registers the halo mass contributed by background particle interlopers.
     """
     if field_path == "Mass_interloper":
         return unit_system.mass, "Mass from background particles", "bgpart_masses"

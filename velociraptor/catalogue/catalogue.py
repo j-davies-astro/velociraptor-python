@@ -1,4 +1,4 @@
-b"""
+"""
 Main objects for the velociraptor reading library.
 
 This is based upon the reading routines in the SWIFTsimIO library.
