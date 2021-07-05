@@ -758,11 +758,11 @@ class VelociraptorPlot(object):
 
         # temporary masked array to apply global mask
         # in concert with plot-specific masks
-        x_mask = self.global_mask
+        # x_mask = self.global_mask
         
         if self.structure_mask is not None:
             # if structure_mask already set, mask and return
-            x_mask = logical_and(x_mask, self.structure_mask)
+            x_mask = logical_and(self.global_mask, self.structure_mask)
             x = x[x_mask]
             x.name = name
             return x
@@ -794,7 +794,7 @@ class VelociraptorPlot(object):
             )
             
         # combine global and structure masks
-        x_mask = logical_and(x_mask, self.structure_mask)
+        x_mask = logical_and(self.global_mask, self.structure_mask)
 
         # apply to the unyt array of values
         x = x[x_mask]
@@ -1117,7 +1117,7 @@ class AutoPlotter(object):
 
         return
 
-    def link_catalogue(self, catalogue: VelociraptorCatalogue, global_mask_tag: str):
+    def link_catalogue(self, catalogue: VelociraptorCatalogue, global_mask_tag: Union[None, str]):
         """
         Links a catalogue with this object so that the plots
         can actually be created.
