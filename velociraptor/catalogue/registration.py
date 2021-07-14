@@ -308,6 +308,8 @@ def registration_masses(
         full_name = "$M_{\\rm FOF}$"
     elif field_path == "Mass_tot":
         full_name = r"$M$"
+    elif field_path == "Mass_interloper":
+        full_name = "$M_{\\rm BG}$"
 
     # General regex matching case.
 
@@ -322,7 +324,6 @@ def registration_masses(
     )
     regex = cached_regex(match_string)
     match = regex.match(field_path)
-
     if match and not full_name:
         mass = match.group(1)
         radius = match.group(2)
@@ -1442,18 +1443,6 @@ def registration_spherical_overdensities(
         return unit, full_name, snake_case
     else:
         raise RegistrationDoesNotMatchError
-
-def registration_bgpart_masses(
-    field_path: str, unit_system: VelociraptorUnits
-) -> (unyt.Unit, str, str):
-    """
-    Registers the halo mass contributed by background particle interlopers.
-    """
-    if field_path == "Mass_interloper":
-        return unit_system.mass, "Mass from background particles", "bgpart_masses"
-    else:
-        raise RegistrationDoesNotMatchError
-
     
 # TODO
 # lambda_B
@@ -1514,7 +1503,6 @@ global_registration_functions = {
         "cold_dense_gas_properties",
         "log_element_ratios_times_masses",
         "lin_element_ratios_times_masses",
-        "bgpart_masses",
         "fail_all",
     ]
 }
