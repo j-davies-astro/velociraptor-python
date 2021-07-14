@@ -755,10 +755,6 @@ class VelociraptorPlot(object):
         # We give each dataset a custom name, that gets ruined when masking
         # in versions of unyt less than 2.6.0
         name = x.name
-
-        # temporary masked array to apply global mask
-        # in concert with plot-specific masks
-        # x_mask = self.global_mask
         
         if self.structure_mask is not None:
             # if structure_mask already set, mask and return
