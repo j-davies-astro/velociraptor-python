@@ -76,5 +76,5 @@ def load(
 
     if registration_file_path is not None:
         catalogue.register_derived_quantities(registration_file_path)
-
+        
     return catalogue

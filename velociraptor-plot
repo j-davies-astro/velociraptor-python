@@ -149,7 +149,7 @@ if __name__ == "__main__":
         registration_file_path=args.registration,
     )
     print_if_debug(f"Linking catalogue and AutoPlotter instance.")
-    auto_plotter.link_catalogue(catalogue=catalogue)
+    auto_plotter.link_catalogue(catalogue=catalogue, global_mask_tag=None)
 
     print_if_debug(
         f"Creating figures with extension .{args.file_type} in {args.output}."

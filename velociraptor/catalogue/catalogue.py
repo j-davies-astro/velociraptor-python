@@ -412,4 +412,3 @@ class VelociraptorCatalogue(object):
         self.derived_quantities = DerivedQuantities(registration_file_path, self)
 
         return
-

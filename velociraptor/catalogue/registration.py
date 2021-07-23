@@ -37,7 +37,8 @@ def registration_fail_all(
     + name: A fancy (possibly LaTeX'd) name for the field.
     + snake_case: A correct snake_case name for the field.
     """
-
+    
+    
     if field_path == "ThisFieldPathWouldNeverExist":
         return (
             unit_system.length,
@@ -307,6 +308,8 @@ def registration_masses(
         full_name = "$M_{\\rm FOF}$"
     elif field_path == "Mass_tot":
         full_name = r"$M$"
+    elif field_path == "Mass_interloper":
+        full_name = "$M_{\\rm BG}$"
 
     # General regex matching case.
 
@@ -321,7 +324,6 @@ def registration_masses(
     )
     regex = cached_regex(match_string)
     match = regex.match(field_path)
-
     if match and not full_name:
         mass = match.group(1)
         radius = match.group(2)
@@ -1441,8 +1443,7 @@ def registration_spherical_overdensities(
         return unit, full_name, snake_case
     else:
         raise RegistrationDoesNotMatchError
-
-
+    
 # TODO
 # lambda_B
 # q
