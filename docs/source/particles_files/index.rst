@@ -80,16 +80,15 @@ follows:
    # Or the dark matter co-ordinates
    dm_coordinates_only_fof = data.dark_matter.coordinates[mask.dark_matter]
 
-   # The spatial mask and extra mask can be obtained individually by using
-   # the functions :func:`velociraptor.swift.swift.generate_spatial_mask` and
-   #  :func:`velociraptor.swift.swift.generate_bound_mask`, respectively.
-
    # All of the swiftsimio features are available, so for instance you can
    # generate a py-sphviewer instance out of these
    from swiftismio.visualisation.sphviewer import SPHViewerWrapper
    sphviewer = SPHViewerWrapper(data.gas)
    sphviewer.quickview(xsize=1024,ysize=1024,r="infinity")
 
+The spatial mask and extra mask can be obtained individually by using
+the functions :func:`velociraptor.swift.swift.generate_spatial_mask` and
+:func:`velociraptor.swift.swift.generate_bound_mask`, respectively.
 
 To see these functions in action, you can check out the examples available in
 ``examples/swift_integration*.py``` in the repository.
