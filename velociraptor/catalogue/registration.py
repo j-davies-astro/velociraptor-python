@@ -1443,6 +1443,45 @@ def registration_spherical_overdensities(
         return unit, full_name, snake_case
     else:
         raise RegistrationDoesNotMatchError
+
+
+def registration_element_masses_in_stars(
+    field_path: str, unit_system: VelociraptorUnits
+) -> (unyt.Unit, str, str):
+    """
+    Registers element masses contained in stars
+    """
+
+    unit = unit_system.mass
+
+    # Capture aperture size
+    match_string = "Aperture_([a-zA-Z]*)Masses_aperture_total_star_([0-9]*)_kpc"
+    regex = cached_regex(match_string)
+    match = regex.match(field_path)
+
+    if match:
+        element = match.group(1)
+        aperture_size = match.group(2)
+
+        try:
+            field = {
+                "Oxygen": "Total Oxygen mass in stars",
+                "Magnesium": "Total Magnesium mass in stars",
+                "Iron": "Total Iron mass in stars",
+            }[element]
+        except KeyError:
+            raise RegistrationDoesNotMatchError
+
+        full_name = f"{field} computed in apertures of size ({aperture_size} kpc)"
+
+        snake_case = f"{element.lower()}_mass_{aperture_size}_kpc"
+
+        return unit, full_name, snake_case
+    else:
+        raise RegistrationDoesNotMatchError
+
+    return
+
     
 # TODO
 # lambda_B
@@ -1503,6 +1542,7 @@ global_registration_functions = {
         "cold_dense_gas_properties",
         "log_element_ratios_times_masses",
         "lin_element_ratios_times_masses",
+        "element_masses_in_stars",
         "fail_all",
     ]
 }
