@@ -412,3 +412,17 @@ class VelociraptorCatalogue(object):
         self.derived_quantities = DerivedQuantities(registration_file_path, self)
 
         return
+
+    @property
+    def centrals(self):
+        if hasattr(self.structure_type, "structuretype"):
+            return self.structure_type.structuretype == 10
+        else:
+            return np.s_[:]
+
+    @property
+    def satellites(self):
+        if hasattr(self.structure_type, "structuretype"):
+            return self.structure_type.structuretype != 10
+        else:
+            return np.s_[:]
