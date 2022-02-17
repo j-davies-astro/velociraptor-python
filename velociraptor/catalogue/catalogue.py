@@ -116,7 +116,7 @@ def generate_getter(reader, name: str, field: str, full_name: str, unit):
         else:
             setattr(self, f"_{name}", unyt.unyt_array(reader.read_field(field), unit))
             getattr(self, f"_{name}").name = full_name
-            getattr(self, f"_{name}").file = reader.filenames[0]
+            getattr(self, f"_{name}").file = reader.filename
 
         return getattr(self, f"_{name}")
 
@@ -194,7 +194,7 @@ def generate_sub_catalogue(
     )
 
     # Finally, we can actually create an instance of our new class.
-    catalogue = ThisSubCatalogue(filename=reader.filenames[0])
+    catalogue = ThisSubCatalogue(filename=reader.filename)
     catalogue.valid_sub_paths = valid_sub_paths
 
     return catalogue

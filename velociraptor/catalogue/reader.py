@@ -8,6 +8,7 @@ import h5py
 import re
 import numpy as np
 
+from typing import List
 
 class VelociraptorCatalogueReader(object):
     """
@@ -26,7 +27,15 @@ class VelociraptorCatalogueReader(object):
     as a direct read from the HDF5 file.
     """
 
-    def __init__(self, filename):
+    # List of files that make up the catalogue
+    filenames: List[str]
+
+    def __init__(self, filename: str):
+        """
+        I take in:
+
+        + filename of (one of) the velociraptor properties file(s)
+        """
         with h5py.File(filename, "r") as handle:
             num_files = handle["Num_of_files"][0]
         if num_files == 1:
@@ -36,7 +45,18 @@ class VelociraptorCatalogueReader(object):
             basename = re.match("(\S+properties)\.\d+\Z", filename).groups()[0]
             self.filenames = [f"{basename}.{idx}" for idx in range(num_files)]
 
-    def read_field(self, field):
+    @property
+    def filename(self):
+        """
+        Returns the velociraptor properties file name or the first file name
+        if the catalogue is split
+        """
+        return self.filenames[0]
+
+    def read_field(self, field: str):
+        """
+        Read the given field from the catalogue file(s)
+        """
         if len(self.filenames) == 1:
             with h5py.File(self.filenames[0], "r") as handle:
                 try:
