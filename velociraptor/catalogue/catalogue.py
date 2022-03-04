@@ -10,6 +10,7 @@ import unyt
 import numpy as np
 
 from typing import Union, Callable, List, Dict
+from numpy.typing import NDArray
 
 from velociraptor.units import VelociraptorUnits
 from velociraptor.catalogue.derived import DerivedQuantities
@@ -88,7 +89,13 @@ class VelociraptorFieldMetadata(object):
         return
 
 
-def generate_getter(filename, name: str, field: str, full_name: str, unit):
+def generate_getter(
+        filename,
+        name: str,
+        field: str,
+        full_name: str,
+        unit
+):
     """
     Generates a function that:
 
@@ -115,7 +122,11 @@ def generate_getter(filename, name: str, field: str, full_name: str, unit):
         else:
             with h5py.File(filename, "r") as handle:
                 try:
-                    setattr(self, f"_{name}", unyt.unyt_array(handle[field][...], unit))
+                    mask = getattr(self, "mask")
+                    # would rather set the default value of mask to Ellipsis, but
+                    # can't work out the type hint for this
+                    mask = Ellipsis if mask is None else mask
+                    setattr(self, f"_{name}", unyt.unyt_array(handle[field][mask], unit))
                     getattr(self, f"_{name}").name = full_name
                     getattr(self, f"_{name}").file = filename
                 except KeyError:
@@ -161,6 +172,7 @@ def generate_sub_catalogue(
     registration_function: Callable,
     units: VelociraptorUnits,
     field_metadata: List[VelociraptorFieldMetadata],
+    mask: Union[None, NDArray[bool], int] = None
 ):
     """
     Generates a sub-catalogue object with the correct properties set.
@@ -190,7 +202,7 @@ def generate_sub_catalogue(
                 metadata.snake_case,
                 metadata.path,
                 metadata.name,
-                metadata.unit,
+                metadata.unit
             ),
             generate_setter(metadata.snake_case),
             generate_deleter(metadata.snake_case),
@@ -205,7 +217,7 @@ def generate_sub_catalogue(
     )
 
     # Finally, we can actually create an instance of our new class.
-    catalogue = ThisSubCatalogue(filename=filename)
+    catalogue = ThisSubCatalogue(filename=filename, mask=mask)
     catalogue.valid_sub_paths = valid_sub_paths
 
     return catalogue
@@ -224,8 +236,9 @@ class __VelociraptorSubCatalogue(object):
     # The valid paths contained within
     valid_sub_paths: List[str]
 
-    def __init__(self, filename):
+    def __init__(self, filename, mask=None):
         self.filename = filename
+        self.mask = mask
 
         return
 
@@ -250,6 +263,7 @@ class VelociraptorCatalogue(object):
         filename: str,
         disregard_units: bool = False,
         extra_registration_functions: Union[None, Dict[str, Callable]] = None,
+        mask: Union[None, NDArray[bool], int] = None,
     ):
         """
         Initialise the velociraptor catalogue with all of the available
@@ -276,10 +290,16 @@ class VelociraptorCatalogue(object):
             should be a dictionary of strings pointing to callables, which
             conform to the registration function API. This is an advanced
             feature.
+
+        mask: Union[None, NDArray[bool], int], optional
+            If a boolean array is provided, it is used to mask all catalogue
+            arrays. If an int is provided, catalogue arrays are masked to the
+            single corresponding element.
         """
         self.filename = filename
         self.disregard_units = disregard_units
         self.extra_registration_functions = extra_registration_functions
+        self.mask = mask
 
         self.get_units()
         self.extract_properties_from_units()
@@ -388,6 +408,7 @@ class VelociraptorCatalogue(object):
                     registration_function=self.registration_functions[attribute_name],
                     units=self.units,
                     field_metadata=field_metadata,
+                    mask=self.mask
                 ),
             )
 
