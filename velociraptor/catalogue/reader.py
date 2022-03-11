@@ -10,6 +10,7 @@ import numpy as np
 
 from typing import List
 
+
 class VelociraptorCatalogueReader(object):
     """
     VELOCIraptor catalogue reader. Pass it the name of a catalogue file and it
@@ -42,7 +43,8 @@ class VelociraptorCatalogueReader(object):
             self.filenames = [filename]
         else:
             # compose the other file names
-            basename = re.match("(\S+properties)\.\d+\Z", filename).groups()[0]
+            # we cast to str() because filename could be a pathlib.Path
+            basename = re.match("(\S+properties)\.\d+\Z", str(filename)).groups()[0]
             self.filenames = [f"{basename}.{idx}" for idx in range(num_files)]
 
     @property
