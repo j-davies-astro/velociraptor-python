@@ -9,9 +9,10 @@ import unyt
 
 import numpy as np
 
-from types import EllipsisType
-from typing import Union, Callable, List, Dict
+from typing import Type, Union, Callable, List, Dict
 from numpy.typing import NDArray
+# from types import EllipsisType  # requires python 3.10+
+import builtins  # use 'builtins.ellipsis' instead
 
 from velociraptor.units import VelociraptorUnits
 from velociraptor.catalogue.derived import DerivedQuantities
@@ -170,7 +171,7 @@ def generate_sub_catalogue(
     registration_function: Callable,
     units: VelociraptorUnits,
     field_metadata: List[VelociraptorFieldMetadata],
-    mask: Union[EllipsisType, NDArray[bool], int] = Ellipsis
+    mask: Union['builtins.ellipsis', NDArray[bool], int] = Ellipsis
 ):
     """
     Generates a sub-catalogue object with the correct properties set.
@@ -261,7 +262,7 @@ class VelociraptorCatalogue(object):
         filename: str,
         disregard_units: bool = False,
         extra_registration_functions: Union[None, Dict[str, Callable]] = None,
-        mask: Union[EllipsisType, NDArray[bool], int] = Ellipsis,
+        mask: Union['builtins.ellipsis', NDArray[bool], int] = Ellipsis,
     ):
         """
         Initialise the velociraptor catalogue with all of the available
@@ -289,7 +290,7 @@ class VelociraptorCatalogue(object):
             conform to the registration function API. This is an advanced
             feature.
 
-        mask: Union[EllipsisType, NDArray[bool], int], optional
+        mask: Union['builtins.ellipsis', NDArray[bool], int], optional
             If a boolean array is provided, it is used to mask all catalogue
             arrays. If an int is provided, catalogue arrays are masked to the
             single corresponding element. Default: Ellipsis (``...``).
