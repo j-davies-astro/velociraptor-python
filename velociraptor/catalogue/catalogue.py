@@ -9,7 +9,7 @@ import unyt
 
 import numpy as np
 
-from typing import Type, Union, Callable, List, Dict
+from typing import Union, Callable, List, Dict
 from numpy.typing import NDArray
 # from types import EllipsisType  # requires python 3.10+
 import builtins  # use 'builtins.ellipsis' instead
@@ -315,11 +315,18 @@ class VelociraptorCatalogue(object):
         the memory location.
         """
 
-        return (
-            f"Velociraptor catalogue at {self.filename}. "
-            "Contains the following field collections: "
-            f"{', '.join(self.valid_field_metadata.keys())}"
-        )
+        if self.mask is Ellipsis:
+            return (
+                f"Velociraptor catalogue at {self.filename}. "
+                "Contains the following field collections: "
+                f"{', '.join(self.valid_field_metadata.keys())}"
+            )
+        else:
+            return (
+                f"Masked velociraptor catalogue at {self.filename}. "
+                "Contains the following field collections: "
+                f"{', '.join(self.valid_field_metadata.keys())}"
+            )
 
     def __repr__(self):
         return str(self)
