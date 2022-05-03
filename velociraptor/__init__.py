@@ -30,19 +30,14 @@ except RuntimeError:
 from velociraptor.catalogue.catalogue import VelociraptorCatalogue
 from velociraptor.__version__ import __version__
 
-try:
-    from types import EllipsisType  # python3.10+
-except ImportError:
-    from typing import Any as EllipsisType  # better choice for this?
 from typing import Union
-from numpy.typing import NDArray
 
 
 def load(
     filename: str,
     disregard_units: bool = False,
     registration_file_path: Union[str, None] = None,
-    mask: Union[EllipsisType, NDArray[bool], int] = Ellipsis
+    mask: slice = Ellipsis
 ) -> VelociraptorCatalogue:
     """
     Loads a velociraptor catalogue, producing a VelociraptorCatalogue
