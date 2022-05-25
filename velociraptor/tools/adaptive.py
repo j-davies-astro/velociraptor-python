@@ -121,9 +121,7 @@ def create_adaptive_bins(
     # plotting elsewhere.
     sorted_values = np.sort(values)
 
-    mask = np.logical_and(
-        sorted_values >= lowest_value, sorted_values <= highest_value,
-    )
+    mask = np.logical_and(sorted_values >= lowest_value, sorted_values <= highest_value)
 
     if logarithmic:
         sorted_values = np.log10(sorted_values[mask].value)
@@ -193,7 +191,7 @@ def create_adaptive_bins(
             try:
                 bin_edges_right[-1] = value
                 number_in_bin[-1] += 1
-                bin_medians[-1] = np.median(sorted_values[-number_in_bin[-1]:])
+                bin_medians[-1] = np.median(sorted_values[-number_in_bin[-1] :])
                 # We don't need the next bin now.
                 bin_edges_left = bin_edges_left[:-1]
 
@@ -248,4 +246,3 @@ def create_adaptive_bins(
         adaptive_bin_cache[this_hash] = (bin_centers, bin_edges)
 
     return bin_centers, bin_edges
-

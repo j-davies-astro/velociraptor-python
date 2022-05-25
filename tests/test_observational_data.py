@@ -128,4 +128,3 @@ def test_multi_obs():
     assert new_multi_z.get_datasets_overlapping_with([0.4, 0.6])[0].redshift == 0.5
 
     os.remove("multi_z_test.hdf5")
-

@@ -11,9 +11,6 @@ from astropy.cosmology.core import Cosmology
 from astropy.cosmology import wCDM, FlatLambdaCDM
 
 
-
-
-
 class VelociraptorUnits(object):
     """
     Generates a unyt system that can then be used with the velociraptor data.
@@ -188,20 +185,10 @@ class VelociraptorUnits(object):
         # Omega_r = float(group["Omega_r"])
 
         if w_of_DE != -1.0:
-            cosmology = wCDM(
-                H0=H0,
-                Om0=Omega_m,
-                Ode0=Omega_DE,
-                w0=w_of_DE,
-                Ob0=Omega_b,
-            )
+            cosmology = wCDM(H0=H0, Om0=Omega_m, Ode0=Omega_DE, w0=w_of_DE, Ob0=Omega_b)
         else:
             # No EoS
-            cosmology = FlatLambdaCDM(
-                H0=H0,
-                Om0=Omega_m,
-                Ob0=Omega_b,
-            )
+            cosmology = FlatLambdaCDM(H0=H0, Om0=Omega_m, Ob0=Omega_b)
 
         self.cosmology = cosmology
 

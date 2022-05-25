@@ -88,13 +88,7 @@ class VelociraptorFieldMetadata(object):
         return
 
 
-def generate_getter(
-        filename,
-        name: str,
-        field: str,
-        full_name: str,
-        unit
-):
+def generate_getter(filename, name: str, field: str, full_name: str, unit):
     """
     Generates a function that:
 
@@ -122,7 +116,9 @@ def generate_getter(
             with h5py.File(filename, "r") as handle:
                 try:
                     mask = getattr(self, "mask")
-                    setattr(self, f"_{name}", unyt.unyt_array(handle[field][mask], unit))
+                    setattr(
+                        self, f"_{name}", unyt.unyt_array(handle[field][mask], unit)
+                    )
                     getattr(self, f"_{name}").name = full_name
                     getattr(self, f"_{name}").file = filename
                 except KeyError:
@@ -168,7 +164,7 @@ def generate_sub_catalogue(
     registration_function: Callable,
     units: VelociraptorUnits,
     field_metadata: List[VelociraptorFieldMetadata],
-    mask: slice = Ellipsis
+    mask: slice = Ellipsis,
 ):
     """
     Generates a sub-catalogue object with the correct properties set.
@@ -181,10 +177,7 @@ def generate_sub_catalogue(
     """
 
     # This creates a _copy_ of the _class_, not object.
-    this_sub_catalogue_bases = (
-        __VelociraptorSubCatalogue,
-        object,
-    )
+    this_sub_catalogue_bases = (__VelociraptorSubCatalogue, object)
     this_sub_catalogue_dict = {}
 
     valid_sub_paths = []
@@ -198,7 +191,7 @@ def generate_sub_catalogue(
                 metadata.snake_case,
                 metadata.path,
                 metadata.name,
-                metadata.unit
+                metadata.unit,
             ),
             generate_setter(metadata.snake_case),
             generate_deleter(metadata.snake_case),
@@ -411,7 +404,7 @@ class VelociraptorCatalogue(object):
                     registration_function=self.registration_functions[attribute_name],
                     units=self.units,
                     field_metadata=field_metadata,
-                    mask=self.mask
+                    mask=self.mask,
                 ),
             )
 

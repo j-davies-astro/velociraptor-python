@@ -37,8 +37,7 @@ def registration_fail_all(
     + name: A fancy (possibly LaTeX'd) name for the field.
     + snake_case: A correct snake_case name for the field.
     """
-    
-    
+
     if field_path == "ThisFieldPathWouldNeverExist":
         return (
             unit_system.length,
@@ -1042,10 +1041,10 @@ def registration_cold_dense_gas_properties(
         aperture_size = match.group(2)
 
         try:
-            long_quantity = {"DiffuseMetal": "Diffuse Metal", "Gas": "Gas",}[
+            long_quantity = {"DiffuseMetal": "Diffuse Metal", "Gas": "Gas"}[
                 quantity_key
             ]
-            short_quantity = {"DiffuseMetal": "diffuse_metal", "Gas": "gas",}[
+            short_quantity = {"DiffuseMetal": "diffuse_metal", "Gas": "gas"}[
                 quantity_key
             ]
         except KeyError:
@@ -1097,8 +1096,8 @@ def registration_log_element_ratios_times_masses(
                 "LogIronOverHydrogen": "Fe/H",
             }[long_species]
 
-            short_floortype = {"Lo": "lowfloor", "Hi": "highfloor",}[floor_type]
-            floor_value = {"Lo": "-4", "Hi": "-3",}[floor_type]
+            short_floortype = {"Lo": "lowfloor", "Hi": "highfloor"}[floor_type]
+            floor_value = {"Lo": "-4", "Hi": "-3"}[floor_type]
         except KeyError:
             raise RegistrationDoesNotMatchError
 
@@ -1482,7 +1481,7 @@ def registration_element_masses_in_stars(
 
     return
 
-    
+
 # TODO
 # lambda_B
 # q

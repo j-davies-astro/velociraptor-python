@@ -86,9 +86,7 @@ def run_apidoc(_):
 
     api_doc_dir = os.path.join(cur_dir, "modules")
     module = os.path.join(cur_dir, "../..", "velociraptor")
-    ignore = [
-        os.path.join(cur_dir, "../..", "tests"),
-    ]
+    ignore = [os.path.join(cur_dir, "../..", "tests")]
 
     os.environ["SPHINX_APIDOC_OPTIONS"] = "members,undoc-members,show-inheritance"
     main(["-M", "-f", "-e", "-T", "-d 0", "-o", api_doc_dir, module, *ignore])
