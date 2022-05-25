@@ -37,7 +37,7 @@ def load(
     filename: str,
     disregard_units: bool = False,
     registration_file_path: Union[str, None] = None,
-    mask: slice = Ellipsis
+    mask: slice = Ellipsis,
 ) -> VelociraptorCatalogue:
     """
     Loads a velociraptor catalogue, producing a VelociraptorCatalogue
@@ -79,12 +79,10 @@ def load(
     """
 
     catalogue = VelociraptorCatalogue(
-        filename,
-        disregard_units=disregard_units,
-        mask=mask
+        filename, disregard_units=disregard_units, mask=mask
     )
 
     if registration_file_path is not None:
         catalogue.register_derived_quantities(registration_file_path)
-        
+
     return catalogue

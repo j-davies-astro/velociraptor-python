@@ -17,8 +17,7 @@ from collections import namedtuple
 
 
 def generate_spatial_mask(
-        particles: VelociraptorParticles,
-        snapshot_filename
+    particles: VelociraptorParticles, snapshot_filename
 ) -> swiftsimio.mask:
     """
     Determines the mask defining the spatial region containing
@@ -54,8 +53,7 @@ def generate_spatial_mask(
             length_factor = 1.0
     except AttributeError:
         raise RuntimeError(
-            "Please use a particles instance with an associated halo "
-            "catalogue."
+            "Please use a particles instance with an associated halo " "catalogue."
         )
 
     spatial_mask = [
@@ -79,8 +77,7 @@ def generate_spatial_mask(
 
 
 def generate_bound_mask(
-        data: swiftsimio.reader.SWIFTDataset,
-        particles: VelociraptorParticles
+    data: swiftsimio.reader.SWIFTDataset, particles: VelociraptorParticles
 ) -> namedtuple:
     """
     Determines the mask defining the particles bound to the object
@@ -110,10 +107,7 @@ def generate_bound_mask(
 
     # Finally we generate a named tuple with the correct fields and
     # fill it with the contents of our dictionary
-    MaskTuple = namedtuple(
-        "MaskCollection",
-        data.metadata.present_particle_names
-    )
+    MaskTuple = namedtuple("MaskCollection", data.metadata.present_particle_names)
     mask = MaskTuple(**particle_name_masks)
 
     return mask
@@ -124,8 +118,7 @@ def to_swiftsimio_dataset(
     snapshot_filename,
     generate_extra_mask: bool = False,
 ) -> Union[
-    swiftsimio.reader.SWIFTDataset,
-    Tuple[swiftsimio.reader.SWIFTDataset, namedtuple]
+    swiftsimio.reader.SWIFTDataset, Tuple[swiftsimio.reader.SWIFTDataset, namedtuple]
 ]:
     """
     Loads a VelociraptorParticles instance for one halo into a

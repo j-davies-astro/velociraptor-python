@@ -70,4 +70,3 @@ for halo_id in tqdm(halo_ids):
         fig.savefig(f"{particle_type}_halo_image_{halo_id}.png")
 
         plt.close(fig)
-

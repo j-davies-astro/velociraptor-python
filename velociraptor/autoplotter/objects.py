@@ -745,7 +745,7 @@ class VelociraptorPlot(object):
         return
 
     def get_quantity_from_catalogue_with_mask(
-            self, quantity: str, catalogue: VelociraptorCatalogue,
+        self, quantity: str, catalogue: VelociraptorCatalogue
     ) -> unyt_array:
         """
         Get a quantity from the catalogue using the mask.
@@ -755,17 +755,17 @@ class VelociraptorPlot(object):
         # We give each dataset a custom name, that gets ruined when masking
         # in versions of unyt less than 2.6.0
         name = x.name
-        
+
         if self.structure_mask is not None:
             # if structure_mask already set, mask and return
             x_mask = logical_and(self.global_mask, self.structure_mask)
             x = x[x_mask]
             x.name = name
             return x
-        
+
         # allow all entries by default
         self.structure_mask = ones(x.shape).astype(bool)
-        
+
         if self.selection_mask is not None:
             # Create mask
             self.structure_mask = reduce(
@@ -779,16 +779,14 @@ class VelociraptorPlot(object):
                 )
             self.structure_mask = logical_and(
                 self.structure_mask,
-                catalogue.structure_type.structuretype
-                == self.select_structure_type,
+                catalogue.structure_type.structuretype == self.select_structure_type,
             )
         if self.exclude_structure_type is not None:
             self.structure_mask = logical_and(
                 self.structure_mask,
-                catalogue.structure_type.structuretype
-                != self.exclude_structure_type,
+                catalogue.structure_type.structuretype != self.exclude_structure_type,
             )
-            
+
         # combine global and structure masks
         x_mask = logical_and(self.global_mask, self.structure_mask)
 
@@ -796,7 +794,7 @@ class VelociraptorPlot(object):
         x = x[x_mask]
         x.name = name
         return x
-                
+
     def _make_plot_scatter(
         self, catalogue: VelociraptorCatalogue
     ) -> Tuple[Figure, Axes]:
@@ -962,7 +960,7 @@ class VelociraptorPlot(object):
         return fig, ax
 
     def make_plot(
-        self, catalogue: VelociraptorCatalogue, directory: str, file_extension: str,
+        self, catalogue: VelociraptorCatalogue, directory: str, file_extension: str
     ):
         """
         Federates out data parsing to individual functions based on the
@@ -1048,7 +1046,7 @@ class AutoPlotter(object):
     created_successfully: List[bool]
     # global mask
     global_mask: Union[None, array]
-    
+
     def __init__(
         self,
         filename: Union[str, List[str]],
@@ -1113,7 +1111,9 @@ class AutoPlotter(object):
 
         return
 
-    def link_catalogue(self, catalogue: VelociraptorCatalogue, global_mask_tag: Union[None, str]):
+    def link_catalogue(
+        self, catalogue: VelociraptorCatalogue, global_mask_tag: Union[None, str]
+    ):
         """
         Links a catalogue with this object so that the plots
         can actually be created.

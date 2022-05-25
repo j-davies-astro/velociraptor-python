@@ -58,8 +58,8 @@ class VelociraptorGroups(object):
         """
 
         if catalogue.mask is not Ellipsis:
-            raise ValueError('VelociraptorGroups not compatible with masked catalogue.')
-        
+            raise ValueError("VelociraptorGroups not compatible with masked catalogue.")
+
         self.filename = filename
         self.catalogue = catalogue
 
@@ -100,7 +100,9 @@ class VelociraptorGroups(object):
 
         return
 
-    def extract_halo(self, halo_index: int, filenames: Union[Dict[str, str], None] = None):
+    def extract_halo(
+        self, halo_index: int, filenames: Union[Dict[str, str], None] = None
+    ):
         """
         Get a halo particles object for a given index into the catalogue (NOT the halo unique
         id). Filenames is either a dictionary with the following structure:
@@ -137,11 +139,17 @@ class VelociraptorGroups(object):
 
         if halo_index == self.offset.size - 1:  # last halo in catalog
             with h5py.File(particles_filename) as particles_file:
-                total_particles = particles_file['Total_num_of_particles_in_all_groups'][0]
+                total_particles = particles_file[
+                    "Total_num_of_particles_in_all_groups"
+                ][0]
                 number_of_particles = total_particles - self.offset[halo_index]
             with h5py.File(unbound_particles_filename) as unbound_particles_file:
-                total_unbound_particles = unbound_particles_file['Total_num_of_particles_in_all_groups'][0]
-                number_of_unbound_particles = total_unbound_particles - self.offset_unbound[halo_index]
+                total_unbound_particles = unbound_particles_file[
+                    "Total_num_of_particles_in_all_groups"
+                ][0]
+                number_of_unbound_particles = (
+                    total_unbound_particles - self.offset_unbound[halo_index]
+                )
         else:
             number_of_particles = self.offset[halo_index + 1] - self.offset[halo_index]
             number_of_unbound_particles = (
@@ -151,7 +159,10 @@ class VelociraptorGroups(object):
             number_of_particles + number_of_unbound_particles
             == self.group_size[halo_index]
         ), "Something is incorrect in the calculation of group sizes for halo {}. Group_Size: {}, Bound: {}, Unbound: {}".format(
-            halo_index, self.group_size[halo_index], number_of_particles, number_of_unbound_particles
+            halo_index,
+            self.group_size[halo_index],
+            number_of_particles,
+            number_of_unbound_particles,
         )
 
         particles = VelociraptorParticles(
@@ -260,7 +271,9 @@ class VelociraptorParticles(object):
 
         return
 
-    def register_halo_attributes(self, catalogue: VelociraptorCatalogue, halo_index: int):
+    def register_halo_attributes(
+        self, catalogue: VelociraptorCatalogue, halo_index: int
+    ):
         """
         Registers useful halo attributes to this object (such as the mass and radii of the halo).
         """

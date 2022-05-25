@@ -213,7 +213,7 @@ def create_adaptive_mass_function(
     # plotting elsewhere.
     sorted_masses = np.sort(masses)
 
-    mask = np.logical_and(sorted_masses >= lowest_mass, sorted_masses <= highest_mass,)
+    mask = np.logical_and(sorted_masses >= lowest_mass, sorted_masses <= highest_mass)
 
     # Also, we bin in logspace.
     sorted_masses = np.log10(sorted_masses[mask])
