@@ -13,7 +13,6 @@ from unyt import unyt_quantity, unyt_array, matplotlib_support
 from unyt.exceptions import UnitConversionError
 from numpy import log10, linspace, logspace, array, logical_and, ones
 from matplotlib.pyplot import Axes, Figure, close
-from matplotlib.units import ConversionError
 from yaml import safe_load
 from typing import Union, List, Dict, Tuple
 from pathlib import Path
@@ -1161,7 +1160,7 @@ class AutoPlotter(object):
                     _, _, exc_traceback = sys.exc_info()
                     print("Traceback:")
                     traceback.print_tb(exc_traceback, limit=10, file=sys.stdout)
-            except (UnitConversionError, ConversionError) as e:
+            except UnitConversionError as e:
                 print(
                     f"Unable to create plot {plot.filename} due to an error when "
                     "trying to convert units. This likely means that you are trying "
