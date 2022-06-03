@@ -1095,7 +1095,6 @@ def registration_log_element_ratios_times_masses(
                 "LogSNIaIronOverHydrogen": "SNIa Iron",
                 "LogOxygenOverHydrogenAtomic": "Atomic-phase Oxygen",
                 "LogOxygenOverHydrogenMolecular": "Molecular-phase Oxygen",
-
             }[long_species]
             fraction_name = {
                 "LogOxygenOverHydrogen": "O/H",
@@ -1206,14 +1205,13 @@ def registration_dust_masses(
                 "GraphiteMassesColdDense": "cold_dense_graphite",
                 "SilicatesMassesColdDense": "cold_dense_silicates",
                 "SmallGrainMassesColdDense": "cold_dense_small_grain",
-                "LargeGrainMassesColdDense": "cold_dense_large_grain",                
-
+                "LargeGrainMassesColdDense": "cold_dense_large_grain",
             }[long_species]
             pretty_name = {
                 "GraphiteMasses": "Graphite Dust Mass",
                 "SilicatesMasses": "Silicate Dust Mass",
                 "SmallGrainMasses": "small_grain",
-                "LargeGrainMasses": "large_grain",                
+                "LargeGrainMasses": "large_grain",
                 "GraphiteMassesAtomic": "Graphite Dust Mass in Atomic Gas",
                 "SilicatesMassesAtomic": "Silicate Dust Mass in Atomic Gas",
                 "SmallGrainMassesAtomic": "atomic_small_grain",
@@ -1225,18 +1223,19 @@ def registration_dust_masses(
                 "GraphiteMassesColdDense": "Graphite Dust Mass in Cold-Dense Gas",
                 "SilicatesMassesColdDense": "Silicate Dust Mass in Cold-Dense Gas",
                 "SmallGrainMassesColdDense": "cold_dense_small_grain",
-                "LargeGrainMassesColdDense": "cold_dense_large_grain",                                
+                "LargeGrainMassesColdDense": "cold_dense_large_grain",
             }[long_species]
-        
+
         except KeyError:
             raise RegistrationDoesNotMatchError
 
         full_name = f"{pretty_name} ({aperture_size} kpc)"
         snake_case = f"{short_species}_mass_{aperture_size}_kpc"
-        
+
         return unit, full_name, snake_case
     else:
         raise RegistrationDoesNotMatchError
+
 
 def registration_stellar_luminosities(
     field_path: str, unit_system: VelociraptorUnits

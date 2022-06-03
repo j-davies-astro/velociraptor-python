@@ -6,7 +6,7 @@ from velociraptor import load
 
 
 def test_basic_load_catalogue_no_crash(
-    filename="/Users/mphf18/Desktop/halo_027_z00p101.properties"
+    filename="/Users/mphf18/Desktop/halo_027_z00p101.properties",
 ):
     catalogue = load(filename)
 
