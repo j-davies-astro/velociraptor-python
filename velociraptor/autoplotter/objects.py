@@ -4,6 +4,7 @@ Main objects for holding information relating to the autoplotter.
 
 from velociraptor import VelociraptorCatalogue
 from velociraptor.autoplotter.lines import VelociraptorLine, valid_line_types
+from velociraptor.autoplotter.box_size_correction import VelociraptorBoxSizeCorrection
 from velociraptor.exceptions import AutoPlotterError
 from velociraptor.observations import load_observations
 
@@ -87,6 +88,8 @@ class VelociraptorPlot(object):
     exclude_structure_type: Union[None, int]
     structure_mask: Union[None, array]
     selection_mask: Union[None, array]
+    # Apply a box size correction to the plot?
+    box_size_correction: Union[None, VelociraptorBoxSizeCorrection]
     # Where should the legend and z, a information be placed?
     legend_loc: str
     redshift_loc: str
@@ -523,6 +526,13 @@ class VelociraptorPlot(object):
 
         self._parse_common_histogramtype()
 
+        try:
+            box_size_correction = str(self.data["box_size_correction"])
+            self.box_size_correction = VelociraptorBoxSizeCorrection(
+                box_size_correction
+            )
+        except:
+            self.box_size_correction = None
         # A bit of a hacky workaround - improve this in the future
         # by combining this functionality properly into the
         # VelociraptorLine methods.
@@ -535,6 +545,7 @@ class VelociraptorPlot(object):
                 start=dict(value=self.x_lim[0].value, units=self.x_lim[0].units),
                 end=dict(value=self.x_lim[1].value, units=self.x_lim[1].units),
             ),
+            box_size_correction=self.box_size_correction,
         )
 
         return
@@ -550,6 +561,13 @@ class VelociraptorPlot(object):
 
         self._parse_common_histogramtype()
 
+        try:
+            box_size_correction = str(self.data["box_size_correction"])
+            self.box_size_correction = VelociraptorBoxSizeCorrection(
+                box_size_correction
+            )
+        except:
+            self.box_size_correction = None
         # A bit of a hacky workaround - improve this in the future
         # by combining this functionality properly into the
         # VelociraptorLine methods.
@@ -563,6 +581,7 @@ class VelociraptorPlot(object):
                 end=dict(value=self.x_lim[1].value, units=self.x_lim[1].units),
                 adaptive=True,
             ),
+            box_size_correction=self.box_size_correction,
         )
 
         return
