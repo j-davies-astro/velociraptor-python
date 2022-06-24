@@ -89,6 +89,7 @@ class VelociraptorPlot(object):
     structure_mask: Union[None, array]
     selection_mask: Union[None, array]
     # Apply a box size correction to the plot?
+    correction_directory: str
     box_size_correction: Union[None, VelociraptorBoxSizeCorrection]
     # Where should the legend and z, a information be placed?
     legend_loc: str
@@ -106,6 +107,7 @@ class VelociraptorPlot(object):
         filename: str,
         data: Dict[str, Union[Dict, str]],
         observational_data_directory: str,
+        correction_directory: str,
     ):
         """
         Initialise the plot object variables.
@@ -113,6 +115,7 @@ class VelociraptorPlot(object):
         self.filename = filename
         self.data = data
         self.observational_data_directory = observational_data_directory
+        self.correction_directory = correction_directory
 
         self._parse_data()
 
@@ -529,7 +532,7 @@ class VelociraptorPlot(object):
         try:
             box_size_correction = str(self.data["box_size_correction"])
             self.box_size_correction = VelociraptorBoxSizeCorrection(
-                box_size_correction
+                box_size_correction, self.correction_directory
             )
         except:
             self.box_size_correction = None
@@ -564,7 +567,7 @@ class VelociraptorPlot(object):
         try:
             box_size_correction = str(self.data["box_size_correction"])
             self.box_size_correction = VelociraptorBoxSizeCorrection(
-                box_size_correction
+                box_size_correction, self.correction_directory
             )
         except:
             self.box_size_correction = None
@@ -1061,6 +1064,8 @@ class AutoPlotter(object):
     plots: List[VelociraptorPlot]
     # Directory containing the observational data.
     observational_data_directory: str
+    # Directory containing box size correction data
+    correction_directory: str
     # Whether or not the plots were created successfully.
     created_successfully: List[bool]
     # global mask
@@ -1070,6 +1075,7 @@ class AutoPlotter(object):
         self,
         filename: Union[str, List[str]],
         observational_data_directory: Union[None, str] = None,
+        correction_directory: Union[None, str] = None,
     ) -> None:
         """
         Initialises the AutoPlotter object with the yaml filename(s).
@@ -1093,6 +1099,9 @@ class AutoPlotter(object):
             observational_data_directory
             if observational_data_directory is not None
             else ""
+        )
+        self.correction_directory = Path(
+            correction_directory if correction_directory is not None else ""
         )
 
         self.load_yaml()
@@ -1124,7 +1133,12 @@ class AutoPlotter(object):
         """
 
         self.plots = [
-            VelociraptorPlot(filename, plot, self.observational_data_directory)
+            VelociraptorPlot(
+                filename,
+                plot,
+                self.observational_data_directory,
+                self.correction_directory,
+            )
             for filename, plot in self.yaml.items()
         ]
 
