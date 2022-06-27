@@ -30,4 +30,7 @@ class VelociraptorBoxSizeCorrection:
         else:
             correction = self.correction_spline(bin_centers)
 
-        return bin_centers, mass_function * correction, error
+        corrected_mass_function = mass_function * correction
+        corrected_mass_function.name = mass_function.name
+
+        return bin_centers, corrected_mass_function, error
