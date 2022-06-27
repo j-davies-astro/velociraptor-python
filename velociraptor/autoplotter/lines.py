@@ -323,6 +323,10 @@ class VelociraptorLine(object):
                 box_volume=box_volume,
                 return_bin_edges=True,
             )
+            if self.box_size_correction is not None:
+                mass_function_output = self.box_size_correction.apply_mass_function_correction(
+                    mass_function_output
+                )
             self.output = (
                 *mass_function_output,
                 unyt_array([], units=mass_function_output[0].units),

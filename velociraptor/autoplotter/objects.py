@@ -534,7 +534,7 @@ class VelociraptorPlot(object):
             self.box_size_correction = VelociraptorBoxSizeCorrection(
                 box_size_correction, self.correction_directory
             )
-        except:
+        except KeyError:
             self.box_size_correction = None
         # A bit of a hacky workaround - improve this in the future
         # by combining this functionality properly into the
@@ -569,7 +569,7 @@ class VelociraptorPlot(object):
             self.box_size_correction = VelociraptorBoxSizeCorrection(
                 box_size_correction, self.correction_directory
             )
-        except:
+        except KeyError:
             self.box_size_correction = None
         # A bit of a hacky workaround - improve this in the future
         # by combining this functionality properly into the

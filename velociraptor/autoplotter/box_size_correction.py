@@ -7,6 +7,8 @@ import numpy as np
 import yaml
 import os
 import scipy.interpolate as interpol
+import unyt
+from typing import Tuple
 
 
 class VelociraptorBoxSizeCorrection:
@@ -17,18 +19,26 @@ class VelociraptorBoxSizeCorrection:
         with open(correction_file, "r") as handle:
             correction_data = yaml.safe_load(handle)
         self.is_log_x = correction_data["is_log_x"]
+        self.x_min, self.x_max = correction_data["x_limits"]
         x = np.array(correction_data["x"])
         y = np.array(correction_data["y"])
         self.correction_spline = interpol.InterpolatedUnivariateSpline(x, y)
 
-    def apply_mass_function_correction(self, mass_function_output):
+    def apply_mass_function_correction(
+        self,
+        mass_function_output: Tuple[unyt.unyt_array, unyt.unyt_array, unyt.unyt_array],
+    ) -> Tuple[unyt.unyt_array, unyt.unyt_array, unyt.unyt_array]:
 
         bin_centers, mass_function, error = mass_function_output
 
+        x_vals = bin_centers
+        correction = np.ones(x_vals.shape)
         if self.is_log_x:
-            correction = self.correction_spline(np.log10(bin_centers))
-        else:
-            correction = self.correction_spline(bin_centers)
+            x_vals = np.log10(x_vals)
+        # only apply the correction to bins that are within the range for which
+        # the correction is valid
+        x_mask = (self.x_min <= x_vals) & (x_vals <= self.x_max)
+        correction[x_mask] = self.correction_spline(x_vals[x_mask])
 
         corrected_mass_function = mass_function * correction
         corrected_mass_function.name = mass_function.name

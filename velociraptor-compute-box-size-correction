@@ -104,8 +104,8 @@ if log_y:
 small_spline = interpol.InterpolatedUnivariateSpline(small_box_x, small_box_y)
 large_spline = interpol.InterpolatedUnivariateSpline(large_box_x, large_box_y)
 
-xmin = min(small_box_x.min(), large_box_x.min())
-xmax = max(small_box_x.max(), large_box_x.max())
+xmin = max(small_box_x.min(), large_box_x.min())
+xmax = min(small_box_x.max(), large_box_x.max())
 x_range = np.linspace(xmin, xmax, 100)
 small_y_range = small_spline(x_range)
 large_y_range = large_spline(x_range)
@@ -120,6 +120,8 @@ correction_data = {}
 correction_data["plot_name"] = args.plotname
 correction_data["plot_type"] = args.plottype
 correction_data["is_log_x"] = True
+correction_data["x_units"] = small_box_plot_data["centers_units"]
+correction_data["x_limits"] = np.array([xmin, xmax]).tolist()
 correction_data["x"] = x_range.tolist()
 correction_data["y"] = correction.tolist()
 with open(output_file, "w") as handle:
