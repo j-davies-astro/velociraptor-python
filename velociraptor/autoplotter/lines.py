@@ -275,7 +275,7 @@ class VelociraptorLine(object):
             mass_function_output = create_mass_function_given_bins(
                 masked_x, self.bins, box_volume=box_volume
             )
-            if not self.box_size_correction is None:
+            if self.box_size_correction is not None:
                 mass_function_output = self.box_size_correction.apply_mass_function_correction(
                     mass_function_output
                 )
