@@ -6,7 +6,6 @@ binned in mass bins (e.g. a mass function).
 import numpy as np
 import yaml
 import os
-import numpy as np
 import scipy.interpolate as interpol
 
 
