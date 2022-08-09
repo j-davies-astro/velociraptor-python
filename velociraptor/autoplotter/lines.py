@@ -243,6 +243,15 @@ class VelociraptorLine(object):
         masked_x = x
         masked_y = y
 
+        # filter out NaN values to prevent crashes if all x values are NaN
+        if masked_y is not None:
+            mask = isnan(x) | isnan(y)
+            masked_x = masked_x[~mask]
+            masked_y = masked_y[~mask]
+        else:
+            mask = isnan(x)
+            masked_x = masked_x[~mask]
+
         if self.lower is not None:
             self.lower.convert_to_units(y.units)
             mask = masked_y > self.lower
