@@ -78,6 +78,7 @@ def recreate_instances(
     names: Union[str, List[str]],
     observational_data_directory: Optional[str] = None,
     file_extension: Optional[str] = None,
+    correction_directory: Optional[str] = None,
 ) -> Tuple[AutoPlotter, Dict[str, Dict]]:
     """
     Recreates instances of required objects for passing to
@@ -116,7 +117,9 @@ def recreate_instances(
     """
 
     auto_plotter = AutoPlotter(
-        config, observational_data_directory=observational_data_directory
+        config,
+        observational_data_directory=observational_data_directory,
+        correction_directory=correction_directory,
     )
 
     file_extension = file_extension if file_extension is not None else "png"
