@@ -42,7 +42,7 @@ class VelociraptorUnits(object):
     box_volume: unyt.unyt_quantity
     cosmology: Cosmology
 
-    def __init__(self, filename: str, disregard_units: bool = False):
+    def __init__(self, reader, disregard_units: bool = False):
         """
         Creates an instance of the ``VelociraptorUnits`` Class.
 
@@ -64,10 +64,11 @@ class VelociraptorUnits(object):
 
         """
 
-        self.filename = filename
+        self.reader = reader
         self.disregard_units = disregard_units
 
-        self.get_unit_dictionary()
+        if self.reader.is_old_catalogue():
+            self.get_unit_dictionary()
 
         return
 
@@ -81,7 +82,7 @@ class VelociraptorUnits(object):
 
         self.units = {}
 
-        with h5py.File(self.filename, "r") as handle:
+        with h5py.File(self.reader.get_name(), "r") as handle:
             attributes = handle.attrs
 
             self.units["length"] = attributes["Length_unit_to_kpc"] * unyt.kpc

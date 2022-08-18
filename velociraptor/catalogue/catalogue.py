@@ -4,7 +4,6 @@ Main objects for the velociraptor reading library.
 This is based upon the reading routines in the SWIFTsimIO library.
 """
 
-import h5py
 import unyt
 
 import numpy as np
@@ -15,6 +14,7 @@ from velociraptor.units import VelociraptorUnits
 from velociraptor.catalogue.derived import DerivedQuantities
 from velociraptor.catalogue.registration import global_registration_functions
 from velociraptor.exceptions import RegistrationDoesNotMatchError
+from velociraptor.catalogue.reader import VelociraptorCatalogueReader
 
 
 class VelociraptorFieldMetadata(object):
@@ -43,7 +43,7 @@ class VelociraptorFieldMetadata(object):
 
     def __init__(
         self,
-        filename,
+        reader,
         path: str,
         registration_functions: Dict[str, Callable],
         units: VelociraptorUnits,
@@ -58,9 +58,7 @@ class VelociraptorFieldMetadata(object):
         + units, a pointer or copy of the unit system associated with this file.
         """
 
-        # Filename not currently used but may be required later on if
-        # actual field metadata is included in the velociraptor properties files
-        self.filename = filename
+        self.reader = reader
         self.path = path
         self.registration_functions = registration_functions
         self.units = units
@@ -79,6 +77,9 @@ class VelociraptorFieldMetadata(object):
                 self.unit, self.name, self.snake_case = reg(
                     field_path=self.path, unit_system=self.units
                 )
+                new_unit = self.reader.unit_metadata(self.path)
+                if new_unit is not None:
+                    self.unit = new_unit
                 self.valid = True
                 self.corresponding_registration_function = reg
                 self.corresponding_registration_function_name = reg_name
@@ -88,7 +89,7 @@ class VelociraptorFieldMetadata(object):
         return
 
 
-def generate_getter(filename, name: str, field: str, full_name: str, unit):
+def generate_getter(reader, name: str, field: str, full_name: str, unit):
     """
     Generates a function that:
 
@@ -113,17 +114,15 @@ def generate_getter(filename, name: str, field: str, full_name: str, unit):
         if current_value is not None:
             return current_value
         else:
-            with h5py.File(filename, "r") as handle:
-                try:
-                    mask = getattr(self, "mask")
-                    setattr(
-                        self, f"_{name}", unyt.unyt_array(handle[field][mask], unit)
-                    )
-                    getattr(self, f"_{name}").name = full_name
-                    getattr(self, f"_{name}").file = filename
-                except KeyError:
-                    print(f"Could not read {field}")
-                    return None
+            try:
+                mask = getattr(self, "mask")
+                value = reader.read_field(field, mask, unit)
+                setattr(self, f"_{name}", value)
+                getattr(self, f"_{name}").name = full_name
+                getattr(self, f"_{name}").file = reader.get_name()
+            except KeyError:
+                print(f"Could not read {field}")
+                return None
 
         return getattr(self, f"_{name}")
 
@@ -159,7 +158,7 @@ def generate_deleter(name: str):
 
 
 def generate_sub_catalogue(
-    filename,
+    reader,
     registration_name: str,
     registration_function: Callable,
     units: VelociraptorUnits,
@@ -187,11 +186,7 @@ def generate_sub_catalogue(
 
         this_sub_catalogue_dict[metadata.snake_case] = property(
             generate_getter(
-                filename,
-                metadata.snake_case,
-                metadata.path,
-                metadata.name,
-                metadata.unit,
+                reader, metadata.snake_case, metadata.path, metadata.name, metadata.unit
             ),
             generate_setter(metadata.snake_case),
             generate_deleter(metadata.snake_case),
@@ -206,7 +201,7 @@ def generate_sub_catalogue(
     )
 
     # Finally, we can actually create an instance of our new class.
-    catalogue = ThisSubCatalogue(filename=filename, mask=mask)
+    catalogue = ThisSubCatalogue(reader=reader, mask=mask)
     catalogue.valid_sub_paths = valid_sub_paths
 
     return catalogue
@@ -225,8 +220,8 @@ class __VelociraptorSubCatalogue(object):
     # The valid paths contained within
     valid_sub_paths: List[str]
 
-    def __init__(self, filename, mask=Ellipsis):
-        self.filename = filename
+    def __init__(self, reader, mask=Ellipsis):
+        self.reader = reader
         self.mask = mask
 
         return
@@ -285,7 +280,8 @@ class VelociraptorCatalogue(object):
             arrays. If an int is provided, catalogue arrays are masked to the
             single corresponding element. Default: Ellipsis (``...``).
         """
-        self.filename = filename
+        self.reader = VelociraptorCatalogueReader(filename)
+
         self.disregard_units = disregard_units
         self.extra_registration_functions = extra_registration_functions
         self.mask = mask
@@ -307,13 +303,13 @@ class VelociraptorCatalogue(object):
 
         if self.mask is Ellipsis:
             return (
-                f"Velociraptor catalogue at {self.filename}. "
+                f"Velociraptor catalogue at {self.reader.get_name()}. "
                 "Contains the following field collections: "
                 f"{', '.join(self.valid_field_metadata.keys())}"
             )
         else:
             return (
-                f"Masked velociraptor catalogue at {self.filename}. "
+                f"Masked velociraptor catalogue at {self.reader.get_name()}. "
                 "Contains the following field collections: "
                 f"{', '.join(self.valid_field_metadata.keys())}"
             )
@@ -327,7 +323,7 @@ class VelociraptorCatalogue(object):
         """
 
         self.units = VelociraptorUnits(
-            self.filename, disregard_units=self.disregard_units
+            self.reader, disregard_units=self.disregard_units
         )
 
         return self.units
@@ -369,9 +365,7 @@ class VelociraptorCatalogue(object):
         """
 
         # First load all field names from the HDF5 file so that they can be parsed.
-
-        with h5py.File(self.filename, "r") as handle:
-            field_paths = list(handle.keys())
+        field_paths = self.reader.get_datasets()
 
         # Now build metadata:
         self.valid_field_metadata = {
@@ -381,7 +375,7 @@ class VelociraptorCatalogue(object):
 
         for path in field_paths:
             metadata = VelociraptorFieldMetadata(
-                self.filename, path, self.registration_functions, self.units
+                self.reader, path, self.registration_functions, self.units
             )
 
             if metadata.valid:
@@ -399,7 +393,7 @@ class VelociraptorCatalogue(object):
                 self,
                 attribute_name,
                 generate_sub_catalogue(
-                    filename=self.filename,
+                    reader=self.reader,
                     registration_name=attribute_name,  # This ensures each class has a unique name
                     registration_function=self.registration_functions[attribute_name],
                     units=self.units,
