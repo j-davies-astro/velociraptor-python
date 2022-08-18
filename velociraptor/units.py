@@ -75,6 +75,9 @@ class VelociraptorUnits(object):
             self.scale_factor = a
             self.z = z
             self.redshift = z
+            self.mass = 1.0
+            self.length = 1.0
+            self.velocity = 1.0
 
         return
 

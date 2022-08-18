@@ -25,7 +25,7 @@ class VelociraptorCatalogueReader:
         assert self.type == "new"
         with h5py.File(self.filename, "r") as handle:
             cosmo = handle["SWIFT/Cosmology"].attrs
-            a = cosmo["Scale-Factor"][0]
+            a = cosmo["Scale-factor"][0]
             z = cosmo["Redshift"][0]
         return a, z
 
