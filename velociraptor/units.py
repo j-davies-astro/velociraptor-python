@@ -78,6 +78,9 @@ class VelociraptorUnits(object):
             self.mass = 1.0
             self.length = 1.0
             self.velocity = 1.0
+            self.metallicity = 1.0
+            self.age = 1.0
+            self.star_formation_rate = 1.0
 
         return
 

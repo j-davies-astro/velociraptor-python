@@ -42,7 +42,7 @@ class VelociraptorCatalogueReader:
             return None
         else:
             with h5py.File(self.filename, "r") as handle:
-                data = handle[field][mask]
+                field = f"PseudoVR/{field}"
                 unitdict = dict(handle[field].attrs)
                 factor = (
                     unitdict[
@@ -61,6 +61,7 @@ class VelociraptorCatalogueReader:
             if self.type == "old":
                 return unyt.unyt_array(handle[field][mask], unit)
             else:
+                field = f"PseudoVR/{field}"
                 data = handle[field][mask]
                 unitdict = dict(handle[field].attrs)
                 factor = (
@@ -73,7 +74,6 @@ class VelociraptorCatalogueReader:
                     * unyt.K ** unitdict["U_T exponent"][0]
                     * unyt.s ** unitdict["U_t exponent"][0]
                 )
-                factor.convert_to_units(unit)
+                factor.convert_to_base("galactic")
                 data *= factor
-                data.convert_to_units(unit)
                 return data
