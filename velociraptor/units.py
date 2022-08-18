@@ -69,6 +69,12 @@ class VelociraptorUnits(object):
 
         if self.reader.is_old_catalogue():
             self.get_unit_dictionary()
+        else:
+            a, z = self.reader.get_cosmology()
+            self.a = a
+            self.scale_factor = a
+            self.z = z
+            self.redshift = z
 
         return
 

@@ -21,6 +21,14 @@ class VelociraptorCatalogueReader:
     def is_old_catalogue(self):
         return self.type == "old"
 
+    def get_cosmology(self):
+        assert self.type == "new"
+        with h5py.File(self.filename, "r") as handle:
+            cosmo = handle["SWIFT/Cosmology"].attrs
+            a = cosmo["Scale-Factor"][0]
+            z = cosmo["Redshift"][0]
+        return a, z
+
     def get_datasets(self):
         with h5py.File(self.filename, "r") as handle:
             if self.type == "old":
