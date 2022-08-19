@@ -21,13 +21,30 @@ class VelociraptorCatalogueReader:
     def is_old_catalogue(self):
         return self.type == "old"
 
-    def get_cosmology(self):
+    def get_run_information(self):
         assert self.type == "new"
         with h5py.File(self.filename, "r") as handle:
             cosmo = handle["SWIFT/Cosmology"].attrs
             a = cosmo["Scale-factor"][0]
             z = cosmo["Redshift"][0]
-        return a, z
+            boxsize = handle["PseudoVR"].attrs["Boxsize_in_comoving_Mpc"] * unyt.Mpc
+        physical_boxsize = a * boxsize
+        return {
+            "a": a,
+            "scale_factor": a,
+            "z": z,
+            "redshift": z,
+            "mass": 1.0,
+            "length": 1.0,
+            "velocity": 1.0,
+            "metallicity": 1.0,
+            "age": 1.0,
+            "star_formation_rate": 1.0,
+            "box_length": boxsize,
+            "comoving_box_volume": boxsize ** 3,
+            "period": physical_boxsize,
+            "physical_box_volume": physical_boxsize ** 3,
+        }
 
     def get_datasets(self):
         with h5py.File(self.filename, "r") as handle:
