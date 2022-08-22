@@ -70,9 +70,22 @@ class VelociraptorUnits(object):
         if self.reader.is_old_catalogue():
             self.get_unit_dictionary()
         else:
-            run_info = self.reader.get_run_information()
+            run_info, cosmo_info = self.reader.get_run_information()
             for name, value in run_info.items():
                 setattr(self, name, value)
+            H0 = cosmo_info["H0"]
+            Omega_m = cosmo_info["Omega_m"]
+            Omega_lambda = cosmo_info["Omega_lambda"]
+            w0 = cosmo_info["w0"]
+            Omega_b = cosmo_info["Omega_b"]
+            if w0 != -1.0:
+                cosmology = wCDM(
+                    H0=H0, Om0=Omega_m, Ode0=Omega_DE, w0=w_of_DE, Ob0=Omega_b
+                )
+            else:
+                # No EoS
+                cosmology = FlatLambdaCDM(H0=H0, Om0=Omega_m, Ob0=Omega_b)
+            self.cosmology = cosmology
 
         return
 

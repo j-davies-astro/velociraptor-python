@@ -27,28 +27,38 @@ class VelociraptorCatalogueReader:
             cosmo = handle["SWIFT/Cosmology"].attrs
             a = cosmo["Scale-factor"][0]
             z = cosmo["Redshift"][0]
-            Om0 = cosmo["Omega_m"][0]
-            Omb = cosmo["Omega_b"][0]
+            H0 = cosmo["H0 [internal units]"][0]
+            Omega_m = cosmo["Omega_m"][0]
+            Omega_lambda = cosmo["Omega_lambda"][0]
+            w0 = cosmo["w_0"][0]
+            Omega_b = cosmo["Omega_b"][0]
             boxsize = handle["PseudoVR"].attrs["Boxsize_in_comoving_Mpc"] * unyt.Mpc
         physical_boxsize = a * boxsize
-        return {
-            "a": a,
-            "scale_factor": a,
-            "z": z,
-            "redshift": z,
-            "Om0": Om0,
-            "Omb": Omb,
-            "mass": 1.0,
-            "length": 1.0,
-            "velocity": 1.0,
-            "metallicity": 1.0,
-            "age": 1.0,
-            "star_formation_rate": 1.0,
-            "box_length": boxsize,
-            "comoving_box_volume": boxsize ** 3,
-            "period": physical_boxsize,
-            "physical_box_volume": physical_boxsize ** 3,
-        }
+        return (
+            {
+                "a": a,
+                "scale_factor": a,
+                "z": z,
+                "redshift": z,
+                "mass": 1.0,
+                "length": 1.0,
+                "velocity": 1.0,
+                "metallicity": 1.0,
+                "age": 1.0,
+                "star_formation_rate": 1.0,
+                "box_length": boxsize,
+                "comoving_box_volume": boxsize ** 3,
+                "period": physical_boxsize,
+                "physical_box_volume": physical_boxsize ** 3,
+            },
+            {
+                "H0": H0,
+                "Omega_m": Omega_m,
+                "Omega_lambda": Omega_lambda,
+                "w0": w0,
+                "Omega_b": Omega_b,
+            },
+        )
 
     def get_datasets(self):
         with h5py.File(self.filename, "r") as handle:
