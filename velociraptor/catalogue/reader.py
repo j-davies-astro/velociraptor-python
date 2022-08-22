@@ -27,6 +27,8 @@ class VelociraptorCatalogueReader:
             cosmo = handle["SWIFT/Cosmology"].attrs
             a = cosmo["Scale-factor"][0]
             z = cosmo["Redshift"][0]
+            Om0 = cosmo["Omega_m"][0]
+            Omb = cosmo["Omega_b"][0]
             boxsize = handle["PseudoVR"].attrs["Boxsize_in_comoving_Mpc"] * unyt.Mpc
         physical_boxsize = a * boxsize
         return {
@@ -34,6 +36,8 @@ class VelociraptorCatalogueReader:
             "scale_factor": a,
             "z": z,
             "redshift": z,
+            "Om0": Om0,
+            "Omb": Omb,
             "mass": 1.0,
             "length": 1.0,
             "velocity": 1.0,
