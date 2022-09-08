@@ -982,7 +982,11 @@ class VelociraptorPlot(object):
         return fig, ax
 
     def make_plot(
-        self, catalogue: VelociraptorCatalogue, directory: str, file_extension: str
+        self,
+        catalogue: VelociraptorCatalogue,
+        directory: str,
+        file_extension: str,
+        no_plot: bool = False,
     ):
         """
         Federates out data parsing to individual functions based on the
@@ -1042,7 +1046,8 @@ class VelociraptorPlot(object):
             if self.y_label_override is not None:
                 self.y_label = self.y_label_override
 
-        fig.savefig(f"{directory}/{self.filename}.{file_extension}")
+        if not no_plot:
+            fig.savefig(f"{directory}/{self.filename}.{file_extension}")
 
         # Delete the figure to cut down on memory consumption.
         close(fig)
@@ -1161,7 +1166,11 @@ class AutoPlotter(object):
         return
 
     def create_plots(
-        self, directory: str, file_extension: str = "pdf", debug: bool = False
+        self,
+        directory: str,
+        file_extension: str = "pdf",
+        debug: bool = False,
+        no_plots: bool = False,
     ):
         """
         Creates and saves the plots in a directory.
@@ -1182,6 +1191,7 @@ class AutoPlotter(object):
                     catalogue=self.catalogue,
                     directory=directory,
                     file_extension=file_extension,
+                    no_plot=no_plots,
                 )
                 self.created_successfully.append(True)
             except (AttributeError, ValueError) as e:
