@@ -1537,8 +1537,8 @@ def registration_snia_rates(
     match = regex.match(field_path)
 
     if match:
-        long_species = match.group(1)
-        aperture_size = match.group(2)
+        #long_species = match.group(1)
+        aperture_size = match.group(1)
 
         full_name = f"SNIa rate ({aperture_size} [# $\\rm yr^{-1}$])"
         snake_case = f"snia_rates_{aperture_size}_p_yr"
