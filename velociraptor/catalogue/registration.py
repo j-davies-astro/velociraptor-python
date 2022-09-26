@@ -1529,8 +1529,7 @@ def registration_snia_rates(
     Registers the SNIa rates within apertures
     """
 
-    unit = 1/unit_system.time
-
+    unit = unit_system.length/unit_system.velocity
     # Capture aperture size
     match_string = "Aperture_SNIaRates_aperture_total_gas_([0-9]*)_kpc"
     regex = cached_regex(match_string)
