@@ -1531,7 +1531,7 @@ def registration_snia_rates(
 
     unit = unit_system.length/unit_system.velocity
     # Capture aperture size
-    match_string = "Aperture_SNIaRates_aperture_total_gas_([0-9]*)_kpc"
+    match_string = "Aperture_SNIaRates_aperture_total_star_([0-9]*)_kpc"
     regex = cached_regex(match_string)
 
     match = regex.match(field_path)
