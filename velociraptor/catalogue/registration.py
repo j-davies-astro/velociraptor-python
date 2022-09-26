@@ -1522,6 +1522,31 @@ def registration_element_masses_in_stars(
 
     return
 
+def registration_snia_rates(
+    field_path: str, unit_system: VelociraptorUnits
+) -> (unyt.Unit, str, str):
+    """
+    Registers the SNIa rates within apertures
+    """
+
+    unit = 1/unit_system.time
+
+    # Capture aperture size
+    match_string = "Aperture_SNIaRates_aperture_total_gas_([0-9]*)_kpc"
+    regex = cached_regex(match_string)
+
+    match = regex.match(field_path)
+
+    if match:
+        long_species = match.group(1)
+        aperture_size = match.group(2)
+
+        full_name = f"SNIa rate ({aperture_size} [# $\\rm yr^{-1}$])"
+        snake_case = f"snia_rates_{aperture_size}_p_yr"
+
+        return unit, full_name, snake_case
+    else:
+        raise RegistrationDoesNotMatchError
 
 # TODO
 # lambda_B
@@ -1545,6 +1570,7 @@ def registration_element_masses_in_stars(
 global_registration_functions = {
     k: globals()[f"registration_{k}"]
     for k in [
+        "snia_rates",
         "metallicity",
         "ids",
         "energies",
