@@ -1522,6 +1522,7 @@ def registration_element_masses_in_stars(
 
     return
 
+
 def registration_snia_rates(
     field_path: str, unit_system: VelociraptorUnits
 ) -> (unyt.Unit, str, str):
@@ -1529,7 +1530,7 @@ def registration_snia_rates(
     Registers the SNIa rates within apertures
     """
 
-    unit = unit_system.velocity/unit_system.length
+    unit = unit_system.velocity / unit_system.length
     # Capture aperture size
     match_string = "Aperture_SNIaRates_aperture_total_star_([0-9]*)_kpc"
     regex = cached_regex(match_string)
@@ -1545,6 +1546,7 @@ def registration_snia_rates(
         return unit, full_name, snake_case
     else:
         raise RegistrationDoesNotMatchError
+
 
 # TODO
 # lambda_B
