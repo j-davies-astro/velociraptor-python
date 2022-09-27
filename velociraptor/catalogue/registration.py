@@ -1539,8 +1539,8 @@ def registration_snia_rates(
     if match:
         aperture_size = match.group(1)
 
-        full_name = f"SNIa rate ({aperture_size} [# $\\rm yr^{-1}$])"
-        snake_case = f"snia_rates_{aperture_size}_p_yr"
+        full_name = f"SNIa rate ({aperture_size} kpc)"
+        snake_case = f"snia_rates_{aperture_size}_kpc"
 
         return unit, full_name, snake_case
     else:
