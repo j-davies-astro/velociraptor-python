@@ -410,7 +410,9 @@ class VelociraptorCatalogue(object):
 
         return
 
-    def register_derived_quantities(self, registration_file_path: str) -> None:
+    def register_derived_quantities(
+        self, registration_file_path: Union[List[str], str]
+    ) -> None:
         """
         Register any required derived quantities. These will
         be available through `catalogue.derived_quantities.{your_names}`.
@@ -421,8 +423,8 @@ class VelociraptorCatalogue(object):
         Parameters
         ----------
 
-        registration_file_path: str
-            Path to the python source file that contains the code to
+        registration_file_path: Union[List[str], str]
+            Path to the python source file(s) that contain(s) the code to
             register the additional derived quantities.
         """
 

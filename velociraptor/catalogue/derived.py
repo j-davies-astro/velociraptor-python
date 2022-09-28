@@ -5,12 +5,13 @@ the extension of the `catalogue` object.
 
 import numpy as np
 import unyt
+from typing import Union, List
 
 
 class DerivedQuantities(object):
     """
-    Derived quantities class. Contains methods to open a python
-    source file that creates derived quantities as follows:
+    Derived quantities class. Contains methods to open (a) python
+    source file(s) that create(s) derived quantities as follows:
 
     The source file will have access to:
 
@@ -18,7 +19,7 @@ class DerivedQuantities(object):
     + unyt (imported as unyt)
 
     You should write your derived quantities as follows:
-    
+
     .. code-block:: python
 
         self.derived_quantitiy_name = catalogue.type.field_name * 0.5
@@ -49,9 +50,9 @@ class DerivedQuantities(object):
             setattr(
                 self, f"specific_sfr_gas_{aperture_size}_kpc", ssfr
             )
-    
 
-    The path to this file should be passed to the __init__ method
+
+    The path to this file(s) should be passed to the __init__ method
     of this class. Note that you should only register quantities that
     you do in fact intend to use, as these are not lazily loaded
     in the same way as the properties that are built into catalogues.
@@ -61,9 +62,9 @@ class DerivedQuantities(object):
 
     """
 
-    def __init__(self, registration_file_path: str, catalogue):
+    def __init__(self, registration_file_path: Union[List[str], str], catalogue):
         """
-        Registers additional (derived) quantities from the 
+        Registers additional (derived) quantities from the
         VelociraptorCatalogue to itself, using a python
         source file that does this registration inside
         the private _register_quantities() method.
@@ -71,26 +72,29 @@ class DerivedQuantities(object):
         Parameters
         ----------
 
-        registration_file_path: str
-            Path to the python source file. For more information
-            on the contents of this file, check out the information
+        registration_file_path: Union[List[str], str]
+            Path to the python source file(s). For more information
+            on the contents of this file/these files, check out the information
             of this object.
 
         catalogue: VelociraptorCatalogue
             The catalogue to derive the quantities from.
 
-        
+
         Returns
         -------
-    
+
         DerivedQuantities
             An instance of the DerivedQuantities class with
             the properties defined in registration_file_path
             available as attributes.
-        
+
         """
 
-        self.registration_file_path = registration_file_path
+        if isinstance(registration_file_path, list):
+            self.registration_file_paths = list(registration_file_path)
+        else:
+            self.registration_file_paths = [registration_file_path]
         self.catalogue = catalogue
 
         self._register_quantities()
@@ -105,8 +109,8 @@ class DerivedQuantities(object):
         """
 
         catalogue = self.catalogue
-
-        with open(self.registration_file_path, "r") as handle:
-            exec(handle.read())
+        for file_path in self.registration_file_paths:
+            with open(file_path, "r") as handle:
+                exec(handle.read())
 
         return

@@ -30,13 +30,13 @@ except RuntimeError:
 from velociraptor.catalogue.catalogue import VelociraptorCatalogue
 from velociraptor.__version__ import __version__
 
-from typing import Union
+from typing import Union, List
 
 
 def load(
     filename: str,
     disregard_units: bool = False,
-    registration_file_path: Union[str, None] = None,
+    registration_file_path: Union[List[str], str, None] = None,
     mask: slice = Ellipsis,
 ) -> VelociraptorCatalogue:
     """
@@ -59,8 +59,8 @@ def load(
         star formation rate units are presented in non-internal
         units.
 
-    registration_file_path: str, optional
-        The filename of the derived quantities script to register
+    registration_file_path: Union[List[str], str], optional
+        The filename of the derived quantities script(s) to register
         additional properties with the catalogue. This is an
         advanced feature. See the documentation for more details.
 
