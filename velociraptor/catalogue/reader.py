@@ -6,9 +6,7 @@ import unyt
 class VelociraptorCatalogueReader:
     def __init__(self, filename):
         with h5py.File(filename, "r") as handle:
-            if ("Parameters" in handle) and (
-                "vr_basename" in handle["Parameters"].attrs
-            ):
+            if "PseudoVR" in handle:
                 self.type = "new"
             else:
                 self.type = "old"
