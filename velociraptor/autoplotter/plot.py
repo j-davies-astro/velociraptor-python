@@ -16,9 +16,9 @@ from typing import Tuple, Union
 import velociraptor.tools as tools
 
 
-def scatter_x_against_y(x: unyt.unyt_array, y: unyt.unyt_array, ax: plt.Axes) -> None:
+def scatter_x_against_y(ax: plt.Axes, x: unyt.unyt_array, y: unyt.unyt_array) -> None:
     """
-    Creates a scatter of x against y (unyt arrays).
+    Plots a scatter of x against y (unyt arrays).
     """
 
     kwargs = dict(edgecolor="none", zorder=-100)

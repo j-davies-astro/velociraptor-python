@@ -830,7 +830,7 @@ class VelociraptorPlot(object):
         y.convert_to_units(self.y_units)
 
         fig, ax = subplots()
-        plot.scatter_x_against_y(x, y, ax)
+        plot.scatter_x_against_y(ax=ax, x=x, y=y)
         self._add_lines_to_axes(ax=ax, x=x, y=y)
 
         return fig, ax
