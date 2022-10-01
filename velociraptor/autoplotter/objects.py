@@ -13,7 +13,7 @@ import velociraptor.autoplotter.plot as plot
 from unyt import unyt_quantity, unyt_array, matplotlib_support
 from unyt.exceptions import UnitConversionError
 from numpy import log10, linspace, logspace, array, logical_and, ones
-from matplotlib.pyplot import Axes, Figure, close
+from matplotlib.pyplot import Axes, Figure, close, subplots
 from yaml import safe_load
 from typing import Union, List, Dict, Tuple
 from pathlib import Path
@@ -829,7 +829,8 @@ class VelociraptorPlot(object):
         y = self.get_quantity_from_catalogue_with_mask(self.y, catalogue)
         y.convert_to_units(self.y_units)
 
-        fig, ax = plot.scatter_x_against_y(x, y)
+        fig, ax = subplots()
+        plot.scatter_x_against_y(x, y, ax)
         self._add_lines_to_axes(ax=ax, x=x, y=y)
 
         return fig, ax

@@ -16,14 +16,10 @@ from typing import Tuple, Union
 import velociraptor.tools as tools
 
 
-def scatter_x_against_y(
-    x: unyt.unyt_array, y: unyt.unyt_array
-) -> Tuple[plt.Figure, plt.Axes]:
+def scatter_x_against_y(x: unyt.unyt_array, y: unyt.unyt_array, ax: plt.Axes) -> None:
     """
     Creates a scatter of x against y (unyt arrays).
     """
-
-    fig, ax = plt.subplots()
 
     kwargs = dict(edgecolor="none", zorder=-100)
 
@@ -38,7 +34,7 @@ def scatter_x_against_y(
 
     ax.scatter(x.value, y.value, **kwargs)
 
-    return fig, ax
+    return
 
 
 def histogram_x_against_y(
