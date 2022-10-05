@@ -65,7 +65,7 @@ class DerivedQuantities(object):
     def __init__(self, registration_file_path: Union[List[str], str], catalogue):
         """
         Registers additional (derived) quantities from the
-        VelociraptorCatalogue to itself, using a python
+        Catalogue to itself, using a python
         source file that does this registration inside
         the private _register_quantities() method.
 
@@ -77,7 +77,7 @@ class DerivedQuantities(object):
             on the contents of this file/these files, check out the information
             of this object.
 
-        catalogue: VelociraptorCatalogue
+        catalogue: Catalogue
             The catalogue to derive the quantities from.
 
 

@@ -27,7 +27,8 @@ except RuntimeError:
     pass
 
 
-from velociraptor.catalogue.catalogue import VelociraptorCatalogue
+from velociraptor.catalogue.catalogue import Catalogue
+from velociraptor.catalogue.velociraptor_catalogue import VelociraptorCatalogue
 from velociraptor.__version__ import __version__
 
 from typing import Union, List
@@ -38,10 +39,9 @@ def load(
     disregard_units: bool = False,
     registration_file_path: Union[List[str], str, None] = None,
     mask: slice = Ellipsis,
-) -> VelociraptorCatalogue:
+) -> Catalogue:
     """
-    Loads a velociraptor catalogue, producing a VelociraptorCatalogue
-    object.
+    Loads a velociraptor catalogue, producing a Catalogue object.
 
     Parameters
     ----------
@@ -73,7 +73,7 @@ def load(
     Returns
     -------
 
-    VelociraptorCatalogue
+    Catalogue
         The VelociraptorCatalogue object that describes your
         .properties file.
     """

@@ -2,7 +2,7 @@
 Main objects for holding information relating to the autoplotter.
 """
 
-from velociraptor import VelociraptorCatalogue
+from velociraptor import Catalogue
 from velociraptor.autoplotter.lines import VelociraptorLine, valid_line_types
 from velociraptor.autoplotter.box_size_correction import VelociraptorBoxSizeCorrection
 from velociraptor.exceptions import AutoPlotterError
@@ -767,7 +767,7 @@ class VelociraptorPlot(object):
         return
 
     def get_quantity_from_catalogue_with_mask(
-        self, quantity: str, catalogue: VelociraptorCatalogue
+        self, quantity: str, catalogue: Catalogue
     ) -> unyt_array:
         """
         Get a quantity from the catalogue using the mask.
@@ -817,9 +817,7 @@ class VelociraptorPlot(object):
         x.name = name
         return x
 
-    def _make_plot_scatter(
-        self, catalogue: VelociraptorCatalogue
-    ) -> Tuple[Figure, Axes]:
+    def _make_plot_scatter(self, catalogue: Catalogue) -> Tuple[Figure, Axes]:
         """
         Makes a scatter plot and returns the figure and axes.
         """
@@ -835,9 +833,7 @@ class VelociraptorPlot(object):
 
         return fig, ax
 
-    def _make_plot_2dhistogram(
-        self, catalogue: VelociraptorCatalogue
-    ) -> Tuple[Figure, Axes]:
+    def _make_plot_2dhistogram(self, catalogue: Catalogue) -> Tuple[Figure, Axes]:
         """
         Makes a 2d histogram plot and returns the figure and axes.
         """
@@ -855,9 +851,7 @@ class VelociraptorPlot(object):
 
         return fig, ax
 
-    def _make_plot_massfunction(
-        self, catalogue: VelociraptorCatalogue
-    ) -> Tuple[Figure, Axes]:
+    def _make_plot_massfunction(self, catalogue: Catalogue) -> Tuple[Figure, Axes]:
         """
         Makes a mass function plot and returns the figure and axes.
         """
@@ -888,7 +882,7 @@ class VelociraptorPlot(object):
         return fig, ax
 
     def _make_plot_adaptivemassfunction(
-        self, catalogue: VelociraptorCatalogue
+        self, catalogue: Catalogue
     ) -> Tuple[Figure, Axes]:
         """
         Makes the _adaptive_ mass function plot. Same as mass function.
@@ -896,7 +890,7 @@ class VelociraptorPlot(object):
         return self._make_plot_massfunction(catalogue=catalogue)
 
     def _make_plot_luminosityfunction(
-        self, catalogue: VelociraptorCatalogue
+        self, catalogue: Catalogue
     ) -> Tuple[Figure, Axes]:
         """
         Makes a luminosity function plot and returns the figure and axes.
@@ -927,9 +921,7 @@ class VelociraptorPlot(object):
 
         return fig, ax
 
-    def _make_plot_histogram(
-        self, catalogue: VelociraptorCatalogue
-    ) -> Tuple[Figure, Axes]:
+    def _make_plot_histogram(self, catalogue: Catalogue) -> Tuple[Figure, Axes]:
         """
         Make histogram plot and return the figure and axes.
         """
@@ -950,7 +942,7 @@ class VelociraptorPlot(object):
         return fig, ax
 
     def _make_plot_cumulative_histogram(
-        self, catalogue: VelociraptorCatalogue
+        self, catalogue: Catalogue
     ) -> Tuple[Figure, Axes]:
         """
         Make cumulative histogram plot and return the figure and axes.
@@ -984,7 +976,7 @@ class VelociraptorPlot(object):
 
     def make_plot(
         self,
-        catalogue: VelociraptorCatalogue,
+        catalogue: Catalogue,
         directory: str,
         file_extension: str,
         no_plot: bool = False,
@@ -1065,7 +1057,7 @@ class AutoPlotter(object):
     # Forward declarations
     filename: Union[str, List[str]]
     multiple_yaml_files: bool
-    catalogue: VelociraptorCatalogue
+    catalogue: Catalogue
     yaml: Dict[str, Union[Dict, str]]
     plots: List[VelociraptorPlot]
     # Directory containing the observational data.
@@ -1150,9 +1142,7 @@ class AutoPlotter(object):
 
         return
 
-    def link_catalogue(
-        self, catalogue: VelociraptorCatalogue, global_mask_tag: Union[None, str]
-    ):
+    def link_catalogue(self, catalogue: Catalogue, global_mask_tag: Union[None, str]):
         """
         Links a catalogue with this object so that the plots
         can actually be created.
