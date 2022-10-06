@@ -29,6 +29,7 @@ except RuntimeError:
 
 from velociraptor.catalogue.catalogue import Catalogue
 from velociraptor.catalogue.velociraptor_catalogue import VelociraptorCatalogue
+from velociraptor.catalogue.soap_catalogue import SOAPCatalogue
 from velociraptor.__version__ import __version__
 
 from typing import Union, List
@@ -78,9 +79,12 @@ def load(
         .properties file.
     """
 
-    catalogue = VelociraptorCatalogue(
-        filename, disregard_units=disregard_units, mask=mask
-    )
+    try:
+        catalogue = VelociraptorCatalogue(
+            filename, disregard_units=disregard_units, mask=mask
+        )
+    except KeyError:
+        catalogue = SOAPCatalogue(filename)
 
     if registration_file_path is not None:
         catalogue.register_derived_quantities(registration_file_path)

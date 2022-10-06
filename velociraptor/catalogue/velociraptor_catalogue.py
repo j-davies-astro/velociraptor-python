@@ -17,8 +17,6 @@ from velociraptor.catalogue.registration import global_registration_functions
 from velociraptor.exceptions import RegistrationDoesNotMatchError
 from velociraptor.catalogue.catalogue import Catalogue
 
-from functools import reduce
-
 
 class VelociraptorFieldMetadata(object):
     """
@@ -409,40 +407,6 @@ class VelociraptorCatalogue(Catalogue):
             )
 
         return
-
-    def register_derived_quantities(
-        self, registration_file_path: Union[List[str], str]
-    ) -> None:
-        """
-        Register any required derived quantities. These will
-        be available through `catalogue.derived_quantities.{your_names}`.
-
-        For more information on this feature, see the documentation of
-        :class:`velociraptor.catalogue.derived.DerivedQuantities`.
-
-        Parameters
-        ----------
-
-        registration_file_path: Union[List[str], str]
-            Path to the python source file(s) that contain(s) the code to
-            register the additional derived quantities.
-        """
-
-        self.derived_quantities = DerivedQuantities(registration_file_path, self)
-
-        return
-
-    def get_quantity(self, quantity_name: str):
-        """
-        Get a quantity from the catalogue.
-
-        Parameters
-        ----------
-
-        quantity_name: str
-            Full path to the quantity.
-        """
-        return reduce(getattr, quantity_name.split("."), self)
 
     @property
     def centrals(self):

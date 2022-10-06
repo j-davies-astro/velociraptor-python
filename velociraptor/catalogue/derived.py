@@ -33,14 +33,12 @@ class DerivedQuantities(object):
     .. code-block:: python
 
         for aperture_size in [5, 10, 30, 50, 100]:
-            stellar_mass = getattr(
-                catalogue.apertures,
-                f"mass_star_{aperture_size}_kpc"
+            stellar_mass = catalogue.get_quantity(
+                f"apertures.mass_star_{aperture_size}_kpc"
             )
 
-            star_formation_rate = getattr(
-                catalogue.apertures,
-                f"sfr_gas_{aperture_size}_kpc"
+            star_formation_rate = catalogue.get_quantity(
+                f"apertures.sfr_gas_{aperture_size}_kpc"
             )
 
             ssfr = star_formation_rate / stellar_mass
