@@ -4,6 +4,7 @@ import unyt
 from typing import List
 
 from velociraptor.catalogue.catalogue import Catalogue
+from velociraptor.catalogue.translator import VR_to_SOAP
 
 from functools import reduce
 
@@ -127,7 +128,7 @@ class SOAPCatalogue(Catalogue):
         with h5py.File(self.file_name, "r") as handle:
             self.root = CatalogueGroup(self.file_name, "", handle)
 
-    def get_quantity(self, quantity_name):
+    def get_SOAP_quantity(self, quantity_name):
         path = []
         for path_part in quantity_name.split("."):
             # attribute names cannot start with a number
@@ -136,3 +137,14 @@ class SOAPCatalogue(Catalogue):
             else:
                 path.append(path_part)
         return reduce(getattr, path, self.root)
+
+    def get_quantity(self, quantity_name):
+        try:
+            return self.get_SOAP_quantity(quantity_name)
+        except AttributeError:
+            SOAP_quantity_name, colidx = VR_to_SOAP(quantity_name)
+            quantity = self.get_SOAP_quantity(SOAP_quantity_name)
+            if colidx >= 0:
+                return quantity[:, colidx]
+            else:
+                return quantity
