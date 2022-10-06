@@ -2,6 +2,7 @@ import h5py
 import unyt
 
 from typing import List
+from types import SimpleNamespace
 
 from velociraptor.catalogue.catalogue import Catalogue
 from velociraptor.catalogue.translator import VR_to_SOAP
@@ -9,6 +10,7 @@ from velociraptor.catalogue.translator import VR_to_SOAP
 from functools import reduce
 
 from astropy.cosmology import wCDM, FlatLambdaCDM
+import unyt
 
 
 class CatalogueElement(object):
@@ -130,10 +132,11 @@ class SOAPCatalogue(Catalogue):
         with h5py.File(self.file_name, "r") as handle:
             self.root = CatalogueGroup(self.file_name, "", handle)
             cosmology = handle["SWIFT/Cosmology"].attrs
+            self.units = SimpleNamespace()
             self.a = cosmology["Scale-factor"][0]
-            self.scale_factor = cosmology["Scale-factor"][0]
+            self.units.scale_factor = cosmology["Scale-factor"][0]
             self.z = cosmology["Redshift"][0]
-            self.redshift = cosmology["Redshift"][0]
+            self.units.redshift = cosmology["Redshift"][0]
             H0 = cosmology["H0 [internal units]"][0]
             Omega_m = cosmology["Omega_m"][0]
             Omega_lambda = cosmology["Omega_lambda"][0]
@@ -150,11 +153,12 @@ class SOAPCatalogue(Catalogue):
                 boxsize = handle["SWIFT/Header"].attrs["BoxSize"][0]
             except:
                 boxsize = 1000.0
+            boxsize *= unyt.Mpc
             physical_boxsize = self.a * boxsize
-            self.box_length = boxsize
-            self.comoving_box_volume = boxsize ** 3
-            self.period = physical_boxsize
-            self.physical_box_volume = physical_boxsize ** 3
+            self.units.box_length = boxsize
+            self.units.comoving_box_volume = boxsize ** 3
+            self.units.period = physical_boxsize
+            self.units.physical_box_volume = physical_boxsize ** 3
 
     def get_SOAP_quantity(self, quantity_name):
         path = []
@@ -168,14 +172,25 @@ class SOAPCatalogue(Catalogue):
 
     def get_quantity(self, quantity_name):
         try:
-            super().get_quantity(quantity_name)
+            return super().get_quantity(quantity_name)
         except AttributeError:
-            try:
-                return self.get_SOAP_quantity(quantity_name)
-            except AttributeError:
-                SOAP_quantity_name, colidx = VR_to_SOAP(quantity_name)
-                quantity = self.get_SOAP_quantity(SOAP_quantity_name)
-                if colidx >= 0:
-                    return quantity[:, colidx]
-                else:
-                    return quantity
+            pass
+        try:
+            return self.get_SOAP_quantity(quantity_name)
+        except AttributeError:
+            pass
+        try:
+            SOAP_quantity_name, colidx = VR_to_SOAP(quantity_name)
+            quantity = self.get_SOAP_quantity(SOAP_quantity_name)
+            if colidx >= 0:
+                return quantity[:, colidx]
+            else:
+                return quantity
+        except NotImplementedError as err:
+            if quantity_name in [
+                "apertures.veldisp_star_10_kpc",
+                "apertures.veldisp_star_30_kpc",
+            ]:
+                print(f"Ignoring missing {quantity_name}...")
+                return None
+            raise err

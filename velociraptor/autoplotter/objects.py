@@ -800,12 +800,14 @@ class VelociraptorPlot(object):
                 )
             self.structure_mask = logical_and(
                 self.structure_mask,
-                catalogue.structure_type.structuretype == self.select_structure_type,
+                catalogue.get_quantity("structure_type.structuretype")
+                == self.select_structure_type,
             )
         if self.exclude_structure_type is not None:
             self.structure_mask = logical_and(
                 self.structure_mask,
-                catalogue.structure_type.structuretype != self.exclude_structure_type,
+                catalogue.get_quantity("structure_type.structuretype")
+                != self.exclude_structure_type,
             )
 
         # combine global and structure masks

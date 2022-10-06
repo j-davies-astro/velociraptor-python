@@ -909,6 +909,10 @@ def VR_to_SOAP(particle_property_name: str):
             "boundsubhaloproperties.stellarvelocitydispersionmatrix",
             2,
         ),
+        "stellar_age.tage_star": (
+            "boundsubhaloproperties.massweightedmeanstellarage",
+            -1,
+        ),
     }
 
     try:
