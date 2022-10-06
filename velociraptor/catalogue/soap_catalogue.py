@@ -5,6 +5,8 @@ from typing import List
 
 from velociraptor.catalogue.catalogue import Catalogue
 
+from functools import reduce
+
 
 class CatalogueElement(object):
     file_name: str
@@ -42,7 +44,6 @@ class CatalogueDataset(CatalogueElement):
 
     def get_value(self, group):
         if self._value is None:
-            print(f"reading {self.name}...")
             with h5py.File(self.file_name, "r") as handle:
                 self._value = handle[self.name][:] * self.conversion_factor
         return self._value
@@ -87,6 +88,7 @@ class CatalogueGroup(CatalogueElement):
         self.properties = []
         for el in self.elements:
             basename = el.name.split("/")[-1].lower()
+            # attribute names cannot start with a number
             if basename[0].isnumeric():
                 basename = f"v{basename}"
             if isinstance(el, CatalogueGroup):
@@ -124,3 +126,13 @@ class SOAPCatalogue(Catalogue):
     def _register_quantities(self):
         with h5py.File(self.file_name, "r") as handle:
             self.root = CatalogueGroup(self.file_name, "", handle)
+
+    def get_quantity(self, quantity_name):
+        path = []
+        for path_part in quantity_name.split("."):
+            # attribute names cannot start with a number
+            if path_part[0].isnumeric():
+                path.append(f"v{path_part}")
+            else:
+                path.append(path_part)
+        return reduce(getattr, path, self.root)

@@ -19,7 +19,6 @@ from typing import Union, List, Dict, Tuple
 from pathlib import Path
 
 from os import path, mkdir
-from functools import reduce
 from collections import OrderedDict
 
 valid_plot_types = [
@@ -773,7 +772,7 @@ class VelociraptorPlot(object):
         Get a quantity from the catalogue using the mask.
         """
 
-        x = reduce(getattr, quantity.split("."), catalogue)
+        x = catalogue.get_quantity(quantity)
         # We give each dataset a custom name, that gets ruined when masking
         # in versions of unyt less than 2.6.0
         name = x.name
@@ -790,9 +789,9 @@ class VelociraptorPlot(object):
 
         if self.selection_mask is not None:
             # Create mask
-            self.structure_mask = reduce(
-                getattr, self.selection_mask.split("."), catalogue
-            ).astype(bool)
+            self.structure_mask = catalogue.get_quantity(self.selection_mask).astype(
+                bool
+            )
         if self.select_structure_type is not None:
             if self.select_structure_type == self.exclude_structure_type:
                 raise AutoPlotterError(
@@ -1151,7 +1150,7 @@ class AutoPlotter(object):
         self.catalogue = catalogue
 
         if global_mask_tag is not None:
-            self.global_mask = reduce(getattr, global_mask_tag.split("."), catalogue)
+            self.global_mask = catalogue.get_quantity(global_mask_tag)
         else:
             self.global_mask = True
         return
