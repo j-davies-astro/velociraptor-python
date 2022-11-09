@@ -159,6 +159,7 @@ class SOAPCatalogue(Catalogue):
             self.units.comoving_box_volume = boxsize ** 3
             self.units.period = physical_boxsize
             self.units.physical_box_volume = physical_boxsize ** 3
+            self.units.cosmology = self.cosmology
 
     def get_SOAP_quantity(self, quantity_name):
         path = []

@@ -97,6 +97,22 @@ def VR_to_SOAP(particle_property_name: str):
             "exclusivesphere.50kpc.stellarluminosity",
             4,
         ),
+        "stellar_luminosities.Z_luminosity_100_kpc": (
+            "exclusivesphere.100kpc.stellarluminosity",
+            4,
+        ),
+        "stellar_luminosities.Z_luminosity_10_kpc": (
+            "exclusivesphere.10kpc.stellarluminosity",
+            4,
+        ),
+        "stellar_luminosities.Z_luminosity_30_kpc": (
+            "exclusivesphere.30kpc.stellarluminosity",
+            4,
+        ),
+        "stellar_luminosities.Z_luminosity_50_kpc": (
+            "exclusivesphere.50kpc.stellarluminosity",
+            4,
+        ),
         "stellar_luminosities.Y_luminosity_100_kpc": (
             "exclusivesphere.100kpc.stellarluminosity",
             5,
@@ -165,33 +181,54 @@ def VR_to_SOAP(particle_property_name: str):
         "apertures.sfr_gas_10_kpc": ("exclusivesphere.10kpc.starformationrate", -1),
         "apertures.sfr_gas_30_kpc": ("exclusivesphere.30kpc.starformationrate", -1),
         "apertures.sfr_gas_50_kpc": ("exclusivesphere.50kpc.starformationrate", -1),
-        "apertures.zmet_gas_100_kpc": ("exclusivesphere.100kpc.gasmassinmetals", -1),
-        "apertures.zmet_gas_10_kpc": ("exclusivesphere.10kpc.gasmassinmetals", -1),
-        "apertures.zmet_gas_30_kpc": ("exclusivesphere.30kpc.gasmassinmetals", -1),
-        "apertures.zmet_gas_50_kpc": ("exclusivesphere.50kpc.gasmassinmetals", -1),
+        "apertures.zmet_gas_100_kpc": (
+            "exclusivesphere.100kpc.gasmassfractioninmetals",
+            -1,
+        ),
+        "apertures.zmet_gas_10_kpc": (
+            "exclusivesphere.10kpc.gasmassfractioninmetals",
+            -1,
+        ),
+        "apertures.zmet_gas_30_kpc": (
+            "exclusivesphere.30kpc.gasmassfractioninmetals",
+            -1,
+        ),
+        "apertures.zmet_gas_50_kpc": (
+            "exclusivesphere.50kpc.gasmassfractioninmetals",
+            -1,
+        ),
         "apertures.zmet_gas_sf_100_kpc": (
-            "exclusivesphere.100kpc.starforminggasmassinmetals",
+            "exclusivesphere.100kpc.starforminggasmassfractioninmetals",
             -1,
         ),
         "apertures.zmet_gas_sf_10_kpc": (
-            "exclusivesphere.10kpc.starforminggasmassinmetals",
+            "exclusivesphere.10kpc.starforminggasmassfractioninmetals",
             -1,
         ),
         "apertures.zmet_gas_sf_30_kpc": (
-            "exclusivesphere.30kpc.starforminggasmassinmetals",
+            "exclusivesphere.30kpc.starforminggasmassfractioninmetals",
             -1,
         ),
         "apertures.zmet_gas_sf_50_kpc": (
-            "exclusivesphere.50kpc.starforminggasmassinmetals",
+            "exclusivesphere.50kpc.starforminggasmassfractioninmetals",
             -1,
         ),
         "apertures.zmet_star_100_kpc": (
-            "exclusivesphere.100kpc.stellarmassinmetals",
+            "exclusivesphere.100kpc.stellarmassfractioninmetals",
             -1,
         ),
-        "apertures.zmet_star_10_kpc": ("exclusivesphere.10kpc.stellarmassinmetals", -1),
-        "apertures.zmet_star_30_kpc": ("exclusivesphere.30kpc.stellarmassinmetals", -1),
-        "apertures.zmet_star_50_kpc": ("exclusivesphere.50kpc.stellarmassinmetals", -1),
+        "apertures.zmet_star_10_kpc": (
+            "exclusivesphere.10kpc.stellarmassfractioninmetals",
+            -1,
+        ),
+        "apertures.zmet_star_30_kpc": (
+            "exclusivesphere.30kpc.stellarmassfractioninmetals",
+            -1,
+        ),
+        "apertures.zmet_star_50_kpc": (
+            "exclusivesphere.50kpc.stellarmassfractioninmetals",
+            -1,
+        ),
         "apertures.mass_100_kpc": ("exclusivesphere.100kpc.totalmass", -1),
         "apertures.mass_10_kpc": ("exclusivesphere.10kpc.totalmass", -1),
         "apertures.mass_30_kpc": ("exclusivesphere.30kpc.totalmass", -1),
@@ -831,8 +868,11 @@ def VR_to_SOAP(particle_property_name: str):
         "positions.zc": ("boundsubhaloproperties.centreofmass", 2),
         "positions.zcmbp": ("vr.centreofpotential", 2),
         "positions.zcminpot": ("vr.centreofpotential", 2),
-        "metallicity.zmet_gas": ("boundsubhaloproperties.gasmassinmetals", -1),
-        "metallicity.zmet_star": ("boundsubhaloproperties.stellarmassinmetals", -1),
+        "metallicity.zmet_gas": ("boundsubhaloproperties.gasmassfractioninmetals", -1),
+        "metallicity.zmet_star": (
+            "boundsubhaloproperties.stellarmassfractioninmetals",
+            -1,
+        ),
         "ids.hosthaloid": ("vr.hosthaloid", -1),
         "number.bh": ("boundsubhaloproperties.numberofblackholeparticles", -1),
         "number.gas": ("boundsubhaloproperties.numberofgasparticles", -1),
@@ -911,6 +951,394 @@ def VR_to_SOAP(particle_property_name: str):
         ),
         "stellar_age.tage_star": (
             "boundsubhaloproperties.massweightedmeanstellarage",
+            -1,
+        ),
+        "snia_rates.snia_rates_30_kpc": ("exclusivesphere.30kpc.totalsniarate", -1),
+        "snia_rates.snia_rates_50_kpc": ("exclusivesphere.50kpc.totalsniarate", -1),
+        "snia_rates.snia_rates_100_kpc": ("exclusivesphere.100kpc.totalsniarate", -1),
+        "gas_hydrogen_species_masses.HI_mass_30_kpc": (
+            "exclusivesphere.30kpc.atomichydrogenmass",
+            -1,
+        ),
+        "gas_hydrogen_species_masses.HI_mass_50_kpc": (
+            "exclusivesphere.50kpc.atomichydrogenmass",
+            -1,
+        ),
+        "gas_hydrogen_species_masses.HI_mass_100_kpc": (
+            "exclusivesphere.100kpc.atomichydrogenmass",
+            -1,
+        ),
+        "gas_hydrogen_species_masses.H2_mass_30_kpc": (
+            "exclusivesphere.30kpc.molecularhydrogenmass",
+            -1,
+        ),
+        "gas_hydrogen_species_masses.H2_mass_50_kpc": (
+            "exclusivesphere.50kpc.molecularhydrogenmass",
+            -1,
+        ),
+        "gas_hydrogen_species_masses.H2_mass_100_kpc": (
+            "exclusivesphere.100kpc.molecularhydrogenmass",
+            -1,
+        ),
+        "gas_H_and_He_masses.He_mass_30_kpc": ("exclusivesphere.30kpc.heliummass", -1),
+        "gas_H_and_He_masses.He_mass_50_kpc": ("exclusivesphere.50kpc.heliummass", -1),
+        "gas_H_and_He_masses.He_mass_100_kpc": (
+            "exclusivesphere.100kpc.heliummass",
+            -1,
+        ),
+        "gas_H_and_He_masses.H_mass_30_kpc": ("exclusivesphere.30kpc.hydrogenmass", -1),
+        "gas_H_and_He_masses.H_mass_50_kpc": ("exclusivesphere.50kpc.hydrogenmass", -1),
+        "gas_H_and_He_masses.H_mass_100_kpc": (
+            "exclusivesphere.100kpc.hydrogenmass",
+            -1,
+        ),
+        "element_masses_in_stars.oxygen_mass_30_kpc": (
+            "exclusivesphere.30kpc.stellarmassfractioninoxygen",
+            -1,
+        ),
+        "element_masses_in_stars.oxygen_mass_50_kpc": (
+            "exclusivesphere.50kpc.stellarmassfractioninoxygen",
+            -1,
+        ),
+        "element_masses_in_stars.oxygen_mass_100_kpc": (
+            "exclusivesphere.100kpc.stellarmassfractioninoxygen",
+            -1,
+        ),
+        "element_masses_in_stars.magnesium_mass_30_kpc": (
+            "exclusivesphere.30kpc.stellarmassfractioninmagnesium",
+            -1,
+        ),
+        "element_masses_in_stars.magnesium_mass_50_kpc": (
+            "exclusivesphere.50kpc.stellarmassfractioninmagnesium",
+            -1,
+        ),
+        "element_masses_in_stars.magnesium_mass_100_kpc": (
+            "exclusivesphere.100kpc.stellarmassfractioninmagnesium",
+            -1,
+        ),
+        "element_masses_in_stars.iron_mass_30_kpc": (
+            "exclusivesphere.30kpc.stellarmassfractioniniron",
+            -1,
+        ),
+        "element_masses_in_stars.iron_mass_50_kpc": (
+            "exclusivesphere.50kpc.stellarmassfractioniniron",
+            -1,
+        ),
+        "element_masses_in_stars.iron_mass_100_kpc": (
+            "exclusivesphere.100kpc.stellarmassfractioniniron",
+            -1,
+        ),
+        # unsure if correct
+        "apertures.veldisp_star_10_kpc": (
+            "projectedaperture.10kpc.projx.stellarprojectedvelocitydispersion",
+            -1,
+        ),
+        "apertures.veldisp_star_30_kpc": (
+            "projectedaperture.30kpc.projx.stellarprojectedvelocitydispersion",
+            -1,
+        ),
+        # implement!!!
+        "lin_element_ratios_times_masses.lin_O_over_H_total_times_gas_mass_30_kpc": (
+            "exclusivesphere.30kpc.gasmass",
+            -1,
+        ),
+        "lin_element_ratios_times_masses.lin_O_over_H_total_times_gas_mass_50_kpc": (
+            "exclusivesphere.50kpc.gasmass",
+            -1,
+        ),
+        "lin_element_ratios_times_masses.lin_O_over_H_total_times_gas_mass_100_kpc": (
+            "exclusivesphere.100kpc.gasmass",
+            -1,
+        ),
+        "lin_element_ratios_times_masses.lin_O_over_H_times_gas_mass_30_kpc": (
+            "exclusivesphere.30kpc.gasmass",
+            -1,
+        ),
+        "lin_element_ratios_times_masses.lin_O_over_H_times_gas_mass_50_kpc": (
+            "exclusivesphere.50kpc.gasmass",
+            -1,
+        ),
+        "lin_element_ratios_times_masses.lin_O_over_H_times_gas_mass_100_kpc": (
+            "exclusivesphere.100kpc.gasmass",
+            -1,
+        ),
+        "log_element_ratios_times_masses.log_O_over_H_times_gas_mass_lowfloor_30_kpc": (
+            "exclusivesphere.30kpc.gasmass",
+            -1,
+        ),
+        "log_element_ratios_times_masses.log_O_over_H_times_gas_mass_lowfloor_50_kpc": (
+            "exclusivesphere.50kpc.gasmass",
+            -1,
+        ),
+        "log_element_ratios_times_masses.log_O_over_H_times_gas_mass_lowfloor_100_kpc": (
+            "exclusivesphere.100kpc.gasmass",
+            -1,
+        ),
+        "log_element_ratios_times_masses.log_O_over_H_times_gas_mass_highfloor_30_kpc": (
+            "exclusivesphere.30kpc.gasmass",
+            -1,
+        ),
+        "log_element_ratios_times_masses.log_O_over_H_times_gas_mass_highfloor_50_kpc": (
+            "exclusivesphere.50kpc.gasmass",
+            -1,
+        ),
+        "log_element_ratios_times_masses.log_O_over_H_times_gas_mass_highfloor_100_kpc": (
+            "exclusivesphere.100kpc.gasmass",
+            -1,
+        ),
+        "log_element_ratios_times_masses.log_O_over_H_atomic_times_gas_mass_lowfloor_30_kpc": (
+            "exclusivesphere.30kpc.gasmass",
+            -1,
+        ),
+        "log_element_ratios_times_masses.log_O_over_H_atomic_times_gas_mass_lowfloor_50_kpc": (
+            "exclusivesphere.50kpc.gasmass",
+            -1,
+        ),
+        "log_element_ratios_times_masses.log_O_over_H_atomic_times_gas_mass_lowfloor_100_kpc": (
+            "exclusivesphere.100kpc.gasmass",
+            -1,
+        ),
+        "log_element_ratios_times_masses.log_O_over_H_atomic_times_gas_mass_highfloor_30_kpc": (
+            "exclusivesphere.30kpc.gasmass",
+            -1,
+        ),
+        "log_element_ratios_times_masses.log_O_over_H_atomic_times_gas_mass_highfloor_50_kpc": (
+            "exclusivesphere.50kpc.gasmass",
+            -1,
+        ),
+        "log_element_ratios_times_masses.log_O_over_H_atomic_times_gas_mass_highfloor_100_kpc": (
+            "exclusivesphere.100kpc.gasmass",
+            -1,
+        ),
+        "log_element_ratios_times_masses.log_O_over_H_molecular_times_gas_mass_lowfloor_30_kpc": (
+            "exclusivesphere.30kpc.gasmass",
+            -1,
+        ),
+        "log_element_ratios_times_masses.log_O_over_H_molecular_times_gas_mass_lowfloor_50_kpc": (
+            "exclusivesphere.50kpc.gasmass",
+            -1,
+        ),
+        "log_element_ratios_times_masses.log_O_over_H_molecular_times_gas_mass_lowfloor_100_kpc": (
+            "exclusivesphere.100kpc.gasmass",
+            -1,
+        ),
+        "log_element_ratios_times_masses.log_O_over_H_molecular_times_gas_mass_highfloor_30_kpc": (
+            "exclusivesphere.30kpc.gasmass",
+            -1,
+        ),
+        "log_element_ratios_times_masses.log_O_over_H_molecular_times_gas_mass_highfloor_50_kpc": (
+            "exclusivesphere.50kpc.gasmass",
+            -1,
+        ),
+        "log_element_ratios_times_masses.log_O_over_H_molecular_times_gas_mass_highfloor_100_kpc": (
+            "exclusivesphere.100kpc.gasmass",
+            -1,
+        ),
+        "cold_dense_gas_properties.cold_dense_gas_mass_30_kpc": (
+            "exclusivesphere.30kpc.gasmass",
+            -1,
+        ),
+        "cold_dense_gas_properties.cold_dense_gas_mass_50_kpc": (
+            "exclusivesphere.50kpc.gasmass",
+            -1,
+        ),
+        "cold_dense_gas_properties.cold_dense_gas_mass_100_kpc": (
+            "exclusivesphere.100kpc.gasmass",
+            -1,
+        ),
+        "cold_dense_gas_properties.cold_dense_diffuse_metal_mass_30_kpc": (
+            "exclusivesphere.30kpc.gasmass",
+            -1,
+        ),
+        "cold_dense_gas_properties.cold_dense_diffuse_metal_mass_50_kpc": (
+            "exclusivesphere.50kpc.gasmass",
+            -1,
+        ),
+        "cold_dense_gas_properties.cold_dense_diffuse_metal_mass_100_kpc": (
+            "exclusivesphere.100kpc.gasmass",
+            -1,
+        ),
+        "lin_element_ratios_times_masses.lin_Fe_over_H_times_star_mass_30_kpc": (
+            "exclusivesphere.30kpc.stellarmass",
+            -1,
+        ),
+        "lin_element_ratios_times_masses.lin_Fe_over_H_times_star_mass_50_kpc": (
+            "exclusivesphere.50kpc.stellarmass",
+            -1,
+        ),
+        "lin_element_ratios_times_masses.lin_Fe_over_H_times_star_mass_100_kpc": (
+            "exclusivesphere.100kpc.stellarmass",
+            -1,
+        ),
+        "log_element_ratios_times_masses.log_Fe_over_H_times_star_mass_lowfloor_30_kpc": (
+            "exclusivesphere.30kpc.stellarmass",
+            -1,
+        ),
+        "log_element_ratios_times_masses.log_Fe_over_H_times_star_mass_lowfloor_50_kpc": (
+            "exclusivesphere.50kpc.stellarmass",
+            -1,
+        ),
+        "log_element_ratios_times_masses.log_Fe_over_H_times_star_mass_lowfloor_100_kpc": (
+            "exclusivesphere.100kpc.stellarmass",
+            -1,
+        ),
+        "log_element_ratios_times_masses.log_SNIaFe_over_H_times_star_mass_lowfloor_30_kpc": (
+            "exclusivesphere.30kpc.stellarmass",
+            -1,
+        ),
+        "log_element_ratios_times_masses.log_SNIaFe_over_H_times_star_mass_lowfloor_50_kpc": (
+            "exclusivesphere.50kpc.stellarmass",
+            -1,
+        ),
+        "log_element_ratios_times_masses.log_SNIaFe_over_H_times_star_mass_lowfloor_100_kpc": (
+            "exclusivesphere.100kpc.stellarmass",
+            -1,
+        ),
+        "log_element_ratios_times_masses.log_Fe_over_H_times_star_mass_highfloor_30_kpc": (
+            "exclusivesphere.30kpc.stellarmass",
+            -1,
+        ),
+        "log_element_ratios_times_masses.log_Fe_over_H_times_star_mass_highfloor_50_kpc": (
+            "exclusivesphere.50kpc.stellarmass",
+            -1,
+        ),
+        "log_element_ratios_times_masses.log_Fe_over_H_times_star_mass_highfloor_100_kpc": (
+            "exclusivesphere.100kpc.stellarmass",
+            -1,
+        ),
+        "stellar_birth_densities.logaverage": ("fofsubhaloproperties.stellarmass", -1),
+        "stellar_birth_densities.max": ("fofsubhaloproperties.stellarmass", -1),
+        "snii_thermal_feedback_densities.max": ("fofsubhaloproperties.gasmass", -1),
+        "dust_masses.silicates_mass_30_kpc": ("exclusivesphere.30kpc.gasmass", -1),
+        "dust_masses.silicates_mass_50_kpc": ("exclusivesphere.50kpc.gasmass", -1),
+        "dust_masses.silicates_mass_100_kpc": ("exclusivesphere.100kpc.gasmass", -1),
+        "dust_masses.graphite_mass_30_kpc": ("exclusivesphere.30kpc.gasmass", -1),
+        "dust_masses.graphite_mass_50_kpc": ("exclusivesphere.50kpc.gasmass", -1),
+        "dust_masses.graphite_mass_100_kpc": ("exclusivesphere.100kpc.gasmass", -1),
+        "dust_masses.large_grain_mass_30_kpc": ("exclusivesphere.30kpc.gasmass", -1),
+        "dust_masses.large_grain_mass_50_kpc": ("exclusivesphere.50kpc.gasmass", -1),
+        "dust_masses.large_grain_mass_100_kpc": ("exclusivesphere.100kpc.gasmass", -1),
+        "dust_masses.small_grain_mass_30_kpc": ("exclusivesphere.30kpc.gasmass", -1),
+        "dust_masses.small_grain_mass_50_kpc": ("exclusivesphere.50kpc.gasmass", -1),
+        "dust_masses.small_grain_mass_100_kpc": ("exclusivesphere.100kpc.gasmass", -1),
+        "dust_masses.molecular_large_grain_mass_30_kpc": (
+            "exclusivesphere.30kpc.gasmass",
+            -1,
+        ),
+        "dust_masses.molecular_large_grain_mass_50_kpc": (
+            "exclusivesphere.50kpc.gasmass",
+            -1,
+        ),
+        "dust_masses.molecular_large_grain_mass_100_kpc": (
+            "exclusivesphere.100kpc.gasmass",
+            -1,
+        ),
+        "dust_masses.molecular_small_grain_mass_30_kpc": (
+            "exclusivesphere.30kpc.gasmass",
+            -1,
+        ),
+        "dust_masses.molecular_small_grain_mass_50_kpc": (
+            "exclusivesphere.50kpc.gasmass",
+            -1,
+        ),
+        "dust_masses.molecular_small_grain_mass_100_kpc": (
+            "exclusivesphere.100kpc.gasmass",
+            -1,
+        ),
+        "dust_masses.atomic_silicates_mass_30_kpc": (
+            "exclusivesphere.30kpc.gasmass",
+            -1,
+        ),
+        "dust_masses.atomic_silicates_mass_50_kpc": (
+            "exclusivesphere.50kpc.gasmass",
+            -1,
+        ),
+        "dust_masses.atomic_silicates_mass_100_kpc": (
+            "exclusivesphere.100kpc.gasmass",
+            -1,
+        ),
+        "dust_masses.atomic_graphite_mass_30_kpc": (
+            "exclusivesphere.30kpc.gasmass",
+            -1,
+        ),
+        "dust_masses.atomic_graphite_mass_50_kpc": (
+            "exclusivesphere.50kpc.gasmass",
+            -1,
+        ),
+        "dust_masses.atomic_graphite_mass_100_kpc": (
+            "exclusivesphere.100kpc.gasmass",
+            -1,
+        ),
+        "dust_masses.molecular_silicates_mass_30_kpc": (
+            "exclusivesphere.30kpc.gasmass",
+            -1,
+        ),
+        "dust_masses.molecular_silicates_mass_50_kpc": (
+            "exclusivesphere.50kpc.gasmass",
+            -1,
+        ),
+        "dust_masses.molecular_silicates_mass_100_kpc": (
+            "exclusivesphere.100kpc.gasmass",
+            -1,
+        ),
+        "dust_masses.molecular_graphite_mass_30_kpc": (
+            "exclusivesphere.30kpc.gasmass",
+            -1,
+        ),
+        "dust_masses.molecular_graphite_mass_50_kpc": (
+            "exclusivesphere.50kpc.gasmass",
+            -1,
+        ),
+        "dust_masses.molecular_graphite_mass_100_kpc": (
+            "exclusivesphere.100kpc.gasmass",
+            -1,
+        ),
+        "dust_masses.cold_dense_silicates_mass_30_kpc": (
+            "exclusivesphere.30kpc.gasmass",
+            -1,
+        ),
+        "dust_masses.cold_dense_silicates_mass_50_kpc": (
+            "exclusivesphere.50kpc.gasmass",
+            -1,
+        ),
+        "dust_masses.cold_dense_silicates_mass_100_kpc": (
+            "exclusivesphere.100kpc.gasmass",
+            -1,
+        ),
+        "dust_masses.cold_dense_graphite_mass_30_kpc": (
+            "exclusivesphere.30kpc.gasmass",
+            -1,
+        ),
+        "dust_masses.cold_dense_graphite_mass_50_kpc": (
+            "exclusivesphere.50kpc.gasmass",
+            -1,
+        ),
+        "dust_masses.cold_dense_graphite_mass_100_kpc": (
+            "exclusivesphere.100kpc.gasmass",
+            -1,
+        ),
+        "dust_masses.cold_dense_large_grain_mass_30_kpc": (
+            "exclusivesphere.30kpc.gasmass",
+            -1,
+        ),
+        "dust_masses.cold_dense_large_grain_mass_50_kpc": (
+            "exclusivesphere.50kpc.gasmass",
+            -1,
+        ),
+        "dust_masses.cold_dense_large_grain_mass_100_kpc": (
+            "exclusivesphere.100kpc.gasmass",
+            -1,
+        ),
+        "dust_masses.cold_dense_small_grain_mass_30_kpc": (
+            "exclusivesphere.30kpc.gasmass",
+            -1,
+        ),
+        "dust_masses.cold_dense_small_grain_mass_50_kpc": (
+            "exclusivesphere.50kpc.gasmass",
+            -1,
+        ),
+        "dust_masses.cold_dense_small_grain_mass_100_kpc": (
+            "exclusivesphere.100kpc.gasmass",
             -1,
         ),
     }
