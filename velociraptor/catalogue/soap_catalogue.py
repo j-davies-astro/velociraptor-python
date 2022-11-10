@@ -1,7 +1,8 @@
+import numpy as np
 import h5py
 import unyt
 
-from typing import List
+from typing import List, Set
 from types import SimpleNamespace
 
 from velociraptor.catalogue.catalogue import Catalogue
@@ -51,6 +52,7 @@ class CatalogueDataset(CatalogueElement):
         if self._value is None:
             with h5py.File(self.file_name, "r") as handle:
                 self._value = handle[self.name][:] * self.conversion_factor
+            self._value.name = self.name.replace("/", " ").replace("_", "").strip()
         return self._value
 
     def set_value(self, value, group):
@@ -59,6 +61,41 @@ class CatalogueDataset(CatalogueElement):
     def del_value(self, group):
         del self._value
         self._value = None
+
+
+class CatalogueDerivedDataset(CatalogueElement):
+
+    terms: List[CatalogueDataset]
+
+    def __init__(self, file_name, name, terms):
+        super().__init__(file_name, name)
+        self.terms = list(terms)
+        self._value = None
+
+    def get_value(self, group):
+        if self._value is None:
+            values = [term.get_value(group) for term in self.terms]
+            self._value = self.compute_value(*values)
+        return self._value
+
+    def set_value(self, value, group):
+        self._value = value
+
+    def del_value(self, group):
+        del self._value
+        self._value = None
+
+    def compute_value(self, *values):
+        raise NotImplementedError("This calculation has not been implemented!")
+
+
+class VelocityDispersion(CatalogueDerivedDataset):
+    def compute_value(self, velocity_dispersion_matrix):
+        return np.sqrt(
+            velocity_dispersion_matrix[:, 0]
+            + velocity_dispersion_matrix[:, 1]
+            + velocity_dispersion_matrix[:, 2]
+        )
 
 
 class CatalogueGroup(CatalogueElement):
@@ -71,6 +108,7 @@ class CatalogueGroup(CatalogueElement):
         self.elements = []
         self._register_elements(handle)
         self._register_properties()
+        self._register_extra_properties()
 
     def _register_elements(self, handle):
         h5group = handle[self.name] if self.name != "" else handle["/"]
@@ -90,7 +128,7 @@ class CatalogueGroup(CatalogueElement):
         return f"CatalogueGroup containing the following elements: {[el.name for el in self.elements]}"
 
     def _register_properties(self):
-        self.properties = []
+        self.properties = {}
         for el in self.elements:
             basename = el.name.split("/")[-1].lower()
             # attribute names cannot start with a number
@@ -99,9 +137,30 @@ class CatalogueGroup(CatalogueElement):
             if isinstance(el, CatalogueGroup):
                 setattr(self, basename, el)
             elif isinstance(el, CatalogueDataset):
-                self.properties.append(
-                    (basename, property(el.get_value, el.set_value, el.del_value))
+                self.properties[basename] = (
+                    el,
+                    property(el.get_value, el.set_value, el.del_value),
                 )
+
+    def _register_extra_properties(self):
+        try:
+            stellar_velocity_dispersion_matrix = self.properties[
+                "stellarvelocitydispersionmatrix"
+            ][0]
+            self.elements.append(
+                VelocityDispersion(
+                    self.file_name,
+                    "stellarvelocitydispersion",
+                    [stellar_velocity_dispersion_matrix],
+                )
+            )
+            el = self.elements[-1]
+            self.properties["stellarvelocitydispersion"] = (
+                el,
+                property(el.get_value, el.set_value, el.del_value),
+            )
+        except KeyError:
+            pass
 
 
 def dynamically_register_properties(group: CatalogueGroup):
@@ -110,10 +169,10 @@ def dynamically_register_properties(group: CatalogueGroup):
     that has additional properties. Surprisingly, this works like a charm.
     """
 
-    class_name = f"{group.__class__.__name__}_{group.name.split('/')[-1]}"
+    class_name = f"{group.__class__.__name__}{group.name.replace('/', '_')}"
     props = {}
-    for name, prop in group.properties:
-        props[name] = prop
+    for name in group.properties:
+        props[name] = group.properties[name][1]
     child_class = type(class_name, (group.__class__,), props)
 
     group.__class__ = child_class
@@ -123,10 +182,17 @@ class SOAPCatalogue(Catalogue):
 
     file_name: str
     root: CatalogueGroup
+    names_used: Set[str]
 
     def __init__(self, file_name):
         self.file_name = file_name
+        self.names_used = set()
         self._register_quantities()
+
+    def print_fields(self):
+        print("SOAP catalogue fields used:")
+        for name in self.names_used:
+            print(f"  {name}")
 
     def _register_quantities(self):
         with h5py.File(self.file_name, "r") as handle:
@@ -169,7 +235,9 @@ class SOAPCatalogue(Catalogue):
                 path.append(f"v{path_part}")
             else:
                 path.append(path_part)
-        return reduce(getattr, path, self.root)
+        value = reduce(getattr, path, self.root)
+        self.names_used.add(quantity_name)
+        return value
 
     def get_quantity(self, quantity_name):
         try:

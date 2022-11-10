@@ -647,14 +647,18 @@ class ObservationalData(object):
         # Make both the data name and redshift appear in the legend
         data_label = f"{self.citation} ($z={self.redshift:.1f}$)"
 
-        axes.errorbar(
-            self.x,
-            self.y,
-            yerr=self.y_scatter,
-            xerr=self.x_scatter,
-            **kwargs,
-            label=data_label,
-        )
+        try:
+            axes.errorbar(
+                self.x,
+                self.y,
+                yerr=self.y_scatter,
+                xerr=self.x_scatter,
+                **kwargs,
+                label=data_label,
+            )
+        except ValueError as e:
+            print(data_label, self.x, self.y, self.x_scatter, self.y_scatter)
+            raise e
 
         return
 

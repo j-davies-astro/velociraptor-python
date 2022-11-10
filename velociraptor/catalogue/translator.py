@@ -1028,13 +1028,133 @@ def VR_to_SOAP(particle_property_name: str):
             "exclusivesphere.100kpc.stellarmassfractioniniron",
             -1,
         ),
+        "dust_masses.silicates_mass_30_kpc": (
+            "exclusivesphere.30kpc.dustsilicatesmass",
+            -1,
+        ),
+        "dust_masses.silicates_mass_50_kpc": (
+            "exclusivesphere.50kpc.dustsilicatesmass",
+            -1,
+        ),
+        "dust_masses.silicates_mass_100_kpc": (
+            "exclusivesphere.100kpc.dustsilicatesmass",
+            -1,
+        ),
+        "dust_masses.graphite_mass_30_kpc": (
+            "exclusivesphere.30kpc.dustgraphitemass",
+            -1,
+        ),
+        "dust_masses.graphite_mass_50_kpc": (
+            "exclusivesphere.50kpc.dustgraphitemass",
+            -1,
+        ),
+        "dust_masses.graphite_mass_100_kpc": (
+            "exclusivesphere.100kpc.dustgraphitemass",
+            -1,
+        ),
+        "dust_masses.large_grain_mass_30_kpc": (
+            "exclusivesphere.30kpc.dustlargegrainmass",
+            -1,
+        ),
+        "dust_masses.large_grain_mass_50_kpc": (
+            "exclusivesphere.50kpc.dustlargegrainmass",
+            -1,
+        ),
+        "dust_masses.large_grain_mass_100_kpc": (
+            "exclusivesphere.100kpc.dustlargegrainmass",
+            -1,
+        ),
+        "dust_masses.small_grain_mass_30_kpc": (
+            "exclusivesphere.30kpc.dustsmallgrainmass",
+            -1,
+        ),
+        "dust_masses.small_grain_mass_50_kpc": (
+            "exclusivesphere.50kpc.dustsmallgrainmass",
+            -1,
+        ),
+        "dust_masses.small_grain_mass_100_kpc": (
+            "exclusivesphere.100kpc.dustsmallgrainmass",
+            -1,
+        ),
+        "dust_masses.molecular_large_grain_mass_30_kpc": (
+            "exclusivesphere.30kpc.dustlargegrainmassinmoleculargas",
+            -1,
+        ),
+        "dust_masses.molecular_large_grain_mass_50_kpc": (
+            "exclusivesphere.50kpc.dustlargegrainmassinmoleculargas",
+            -1,
+        ),
+        "dust_masses.molecular_large_grain_mass_100_kpc": (
+            "exclusivesphere.100kpc.dustlargegrainmassinmoleculargas",
+            -1,
+        ),
+        "dust_masses.molecular_small_grain_mass_30_kpc": (
+            "exclusivesphere.30kpc.dustsmallgrainmassinmoleculargas",
+            -1,
+        ),
+        "dust_masses.molecular_small_grain_mass_50_kpc": (
+            "exclusivesphere.50kpc.dustsmallgrainmassinmoleculargas",
+            -1,
+        ),
+        "dust_masses.molecular_small_grain_mass_100_kpc": (
+            "exclusivesphere.100kpc.dustsmallgrainmassinmoleculargas",
+            -1,
+        ),
+        "dust_masses.atomic_silicates_mass_30_kpc": (
+            "exclusivesphere.30kpc.dustsilicatesmassinatomicgas",
+            -1,
+        ),
+        "dust_masses.atomic_silicates_mass_50_kpc": (
+            "exclusivesphere.50kpc.dustsilicatesmassinatomicgas",
+            -1,
+        ),
+        "dust_masses.atomic_silicates_mass_100_kpc": (
+            "exclusivesphere.100kpc.dustsilicatesmassinatomicgas",
+            -1,
+        ),
+        "dust_masses.atomic_graphite_mass_30_kpc": (
+            "exclusivesphere.30kpc.dustgraphitemassinatomicgas",
+            -1,
+        ),
+        "dust_masses.atomic_graphite_mass_50_kpc": (
+            "exclusivesphere.50kpc.dustgraphitemassinatomicgas",
+            -1,
+        ),
+        "dust_masses.atomic_graphite_mass_100_kpc": (
+            "exclusivesphere.100kpc.dustgraphitemassinatomicgas",
+            -1,
+        ),
+        "dust_masses.molecular_silicates_mass_30_kpc": (
+            "exclusivesphere.30kpc.dustsilicatesmassinmoleculargas",
+            -1,
+        ),
+        "dust_masses.molecular_silicates_mass_50_kpc": (
+            "exclusivesphere.50kpc.dustsilicatesmassinmoleculargas",
+            -1,
+        ),
+        "dust_masses.molecular_silicates_mass_100_kpc": (
+            "exclusivesphere.100kpc.dustsilicatesmassinmoleculargas",
+            -1,
+        ),
+        "dust_masses.molecular_graphite_mass_30_kpc": (
+            "exclusivesphere.30kpc.dustgraphitemassinmoleculargas",
+            -1,
+        ),
+        "dust_masses.molecular_graphite_mass_50_kpc": (
+            "exclusivesphere.50kpc.dustgraphitemassinmoleculargas",
+            -1,
+        ),
+        "dust_masses.molecular_graphite_mass_100_kpc": (
+            "exclusivesphere.100kpc.dustgraphitemassinmoleculargas",
+            -1,
+        ),
         # unsure if correct
         "apertures.veldisp_star_10_kpc": (
-            "projectedaperture.10kpc.projx.stellarprojectedvelocitydispersion",
+            "exclusivesphere.10kpc.stellarvelocitydispersion",
             -1,
         ),
         "apertures.veldisp_star_30_kpc": (
-            "projectedaperture.30kpc.projx.stellarprojectedvelocitydispersion",
+            "exclusivesphere.30kpc.stellarvelocitydispersion",
             -1,
         ),
         # implement!!!
@@ -1209,90 +1329,6 @@ def VR_to_SOAP(particle_property_name: str):
         "stellar_birth_densities.logaverage": ("fofsubhaloproperties.stellarmass", -1),
         "stellar_birth_densities.max": ("fofsubhaloproperties.stellarmass", -1),
         "snii_thermal_feedback_densities.max": ("fofsubhaloproperties.gasmass", -1),
-        "dust_masses.silicates_mass_30_kpc": ("exclusivesphere.30kpc.gasmass", -1),
-        "dust_masses.silicates_mass_50_kpc": ("exclusivesphere.50kpc.gasmass", -1),
-        "dust_masses.silicates_mass_100_kpc": ("exclusivesphere.100kpc.gasmass", -1),
-        "dust_masses.graphite_mass_30_kpc": ("exclusivesphere.30kpc.gasmass", -1),
-        "dust_masses.graphite_mass_50_kpc": ("exclusivesphere.50kpc.gasmass", -1),
-        "dust_masses.graphite_mass_100_kpc": ("exclusivesphere.100kpc.gasmass", -1),
-        "dust_masses.large_grain_mass_30_kpc": ("exclusivesphere.30kpc.gasmass", -1),
-        "dust_masses.large_grain_mass_50_kpc": ("exclusivesphere.50kpc.gasmass", -1),
-        "dust_masses.large_grain_mass_100_kpc": ("exclusivesphere.100kpc.gasmass", -1),
-        "dust_masses.small_grain_mass_30_kpc": ("exclusivesphere.30kpc.gasmass", -1),
-        "dust_masses.small_grain_mass_50_kpc": ("exclusivesphere.50kpc.gasmass", -1),
-        "dust_masses.small_grain_mass_100_kpc": ("exclusivesphere.100kpc.gasmass", -1),
-        "dust_masses.molecular_large_grain_mass_30_kpc": (
-            "exclusivesphere.30kpc.gasmass",
-            -1,
-        ),
-        "dust_masses.molecular_large_grain_mass_50_kpc": (
-            "exclusivesphere.50kpc.gasmass",
-            -1,
-        ),
-        "dust_masses.molecular_large_grain_mass_100_kpc": (
-            "exclusivesphere.100kpc.gasmass",
-            -1,
-        ),
-        "dust_masses.molecular_small_grain_mass_30_kpc": (
-            "exclusivesphere.30kpc.gasmass",
-            -1,
-        ),
-        "dust_masses.molecular_small_grain_mass_50_kpc": (
-            "exclusivesphere.50kpc.gasmass",
-            -1,
-        ),
-        "dust_masses.molecular_small_grain_mass_100_kpc": (
-            "exclusivesphere.100kpc.gasmass",
-            -1,
-        ),
-        "dust_masses.atomic_silicates_mass_30_kpc": (
-            "exclusivesphere.30kpc.gasmass",
-            -1,
-        ),
-        "dust_masses.atomic_silicates_mass_50_kpc": (
-            "exclusivesphere.50kpc.gasmass",
-            -1,
-        ),
-        "dust_masses.atomic_silicates_mass_100_kpc": (
-            "exclusivesphere.100kpc.gasmass",
-            -1,
-        ),
-        "dust_masses.atomic_graphite_mass_30_kpc": (
-            "exclusivesphere.30kpc.gasmass",
-            -1,
-        ),
-        "dust_masses.atomic_graphite_mass_50_kpc": (
-            "exclusivesphere.50kpc.gasmass",
-            -1,
-        ),
-        "dust_masses.atomic_graphite_mass_100_kpc": (
-            "exclusivesphere.100kpc.gasmass",
-            -1,
-        ),
-        "dust_masses.molecular_silicates_mass_30_kpc": (
-            "exclusivesphere.30kpc.gasmass",
-            -1,
-        ),
-        "dust_masses.molecular_silicates_mass_50_kpc": (
-            "exclusivesphere.50kpc.gasmass",
-            -1,
-        ),
-        "dust_masses.molecular_silicates_mass_100_kpc": (
-            "exclusivesphere.100kpc.gasmass",
-            -1,
-        ),
-        "dust_masses.molecular_graphite_mass_30_kpc": (
-            "exclusivesphere.30kpc.gasmass",
-            -1,
-        ),
-        "dust_masses.molecular_graphite_mass_50_kpc": (
-            "exclusivesphere.50kpc.gasmass",
-            -1,
-        ),
-        "dust_masses.molecular_graphite_mass_100_kpc": (
-            "exclusivesphere.100kpc.gasmass",
-            -1,
-        ),
         "dust_masses.cold_dense_silicates_mass_30_kpc": (
             "exclusivesphere.30kpc.gasmass",
             -1,
