@@ -283,6 +283,8 @@ class VelociraptorCatalogue(Catalogue):
             arrays. If an int is provided, catalogue arrays are masked to the
             single corresponding element. Default: Ellipsis (``...``).
         """
+        super().__init__("VR")
+
         self.filename = filename
         self.disregard_units = disregard_units
         self.extra_registration_functions = extra_registration_functions

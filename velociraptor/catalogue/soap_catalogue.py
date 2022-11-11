@@ -185,6 +185,7 @@ class SOAPCatalogue(Catalogue):
     names_used: Set[str]
 
     def __init__(self, file_name):
+        super().__init__("SOAP")
         self.file_name = file_name
         self.names_used = set()
         self._register_quantities()

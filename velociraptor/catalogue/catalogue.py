@@ -14,7 +14,11 @@ from functools import reduce
 class Catalogue:
 
     # top level definitions for autocomplete
+    catalogue_type: str
     registration_functions: Union[List[Callable], None]
+
+    def __init__(self, type: str):
+        self.catalogue_type = type
 
     def get_quantity(self, quantity_name: str):
         """
