@@ -1204,6 +1204,34 @@ def VR_to_SOAP(particle_property_name: str):
             "exclusivesphere.30kpc.stellarvelocitydispersion",
             -1,
         ),
+        "cold_dense_gas_properties.cold_dense_gas_mass_30_kpc": (
+            "exclusivesphere.30kpc.gasmassincolddensegas",
+            -1,
+        ),
+        "cold_dense_gas_properties.cold_dense_gas_mass_50_kpc": (
+            "exclusivesphere.50kpc.gasmassincolddensegas",
+            -1,
+        ),
+        "cold_dense_gas_properties.cold_dense_gas_mass_100_kpc": (
+            "exclusivesphere.100kpc.gasmassincolddensegas",
+            -1,
+        ),
+        "stellar_birth_densities.logaverage": (
+            "fofsubhaloproperties.logarithmicallyaveragedstellarbirthdensity",
+            -1,
+        ),
+        "stellar_birth_densities.min": (
+            "fofsubhaloproperties.minimumstellarbirthdensity",
+            -1,
+        ),
+        "stellar_birth_densities.max": (
+            "fofsubhaloproperties.maximumstellarbirthdensity",
+            -1,
+        ),
+        "snii_thermal_feedback_densities.max": (
+            "fofsubhaloproperties.lastsupernovaeventmaximumgasdensity",
+            -1,
+        ),
         # implement!!!
         "lin_element_ratios_times_masses.lin_O_over_H_total_times_gas_mass_30_kpc": (
             "exclusivesphere.30kpc.gasmass",
@@ -1301,18 +1329,6 @@ def VR_to_SOAP(particle_property_name: str):
             "exclusivesphere.100kpc.gasmass",
             -1,
         ),
-        "cold_dense_gas_properties.cold_dense_gas_mass_30_kpc": (
-            "exclusivesphere.30kpc.gasmass",
-            -1,
-        ),
-        "cold_dense_gas_properties.cold_dense_gas_mass_50_kpc": (
-            "exclusivesphere.50kpc.gasmass",
-            -1,
-        ),
-        "cold_dense_gas_properties.cold_dense_gas_mass_100_kpc": (
-            "exclusivesphere.100kpc.gasmass",
-            -1,
-        ),
         "cold_dense_gas_properties.cold_dense_diffuse_metal_mass_30_kpc": (
             "exclusivesphere.30kpc.gasmass",
             -1,
@@ -1373,9 +1389,6 @@ def VR_to_SOAP(particle_property_name: str):
             "exclusivesphere.100kpc.stellarmass",
             -1,
         ),
-        "stellar_birth_densities.logaverage": ("fofsubhaloproperties.stellarmass", -1),
-        "stellar_birth_densities.max": ("fofsubhaloproperties.stellarmass", -1),
-        "snii_thermal_feedback_densities.max": ("fofsubhaloproperties.gasmass", -1),
     }
 
     try:

@@ -1211,5 +1211,16 @@ class AutoPlotter(object):
                     _, _, exc_traceback = sys.exc_info()
                     print("Traceback:")
                     traceback.print_tb(exc_traceback, limit=10, file=sys.stdout)
+            except Exception as e:
+                print(
+                    f"Unable to create plot {plot.filename} due to an unkown error: {e}!"
+                )
+                self.created_successfully.append(False)
+                if debug:
+                    import sys, traceback
+
+                    _, _, exc_traceback = sys.exc_info()
+                    print("Traceback:")
+                    traceback.print_tb(exc_traceback, limit=10, file=sys.stdout)
 
         return
