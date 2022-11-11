@@ -1148,7 +1148,54 @@ def VR_to_SOAP(particle_property_name: str):
             "exclusivesphere.100kpc.dustgraphitemassinmoleculargas",
             -1,
         ),
-        # unsure if correct
+        "dust_masses.cold_dense_silicates_mass_30_kpc": (
+            "exclusivesphere.30kpc.dustsilicatesmassincolddensegas",
+            -1,
+        ),
+        "dust_masses.cold_dense_silicates_mass_50_kpc": (
+            "exclusivesphere.50kpc.dustsilicatesmassincolddensegas",
+            -1,
+        ),
+        "dust_masses.cold_dense_silicates_mass_100_kpc": (
+            "exclusivesphere.100kpc.dustsilicatesmassincolddensegas",
+            -1,
+        ),
+        "dust_masses.cold_dense_graphite_mass_30_kpc": (
+            "exclusivesphere.30kpc.dustgraphitemassincolddensegas",
+            -1,
+        ),
+        "dust_masses.cold_dense_graphite_mass_50_kpc": (
+            "exclusivesphere.50kpc.dustgraphitemassincolddensegas",
+            -1,
+        ),
+        "dust_masses.cold_dense_graphite_mass_100_kpc": (
+            "exclusivesphere.100kpc.dustgraphitemassincolddensegas",
+            -1,
+        ),
+        "dust_masses.cold_dense_large_grain_mass_30_kpc": (
+            "exclusivesphere.30kpc.dustlargegrainmassincolddensegas",
+            -1,
+        ),
+        "dust_masses.cold_dense_large_grain_mass_50_kpc": (
+            "exclusivesphere.50kpc.dustlargegrainmassincolddensegas",
+            -1,
+        ),
+        "dust_masses.cold_dense_large_grain_mass_100_kpc": (
+            "exclusivesphere.100kpc.dustlargegrainmassincolddensegas",
+            -1,
+        ),
+        "dust_masses.cold_dense_small_grain_mass_30_kpc": (
+            "exclusivesphere.30kpc.dustsmallgrainmassincolddensegas",
+            -1,
+        ),
+        "dust_masses.cold_dense_small_grain_mass_50_kpc": (
+            "exclusivesphere.50kpc.dustsmallgrainmassincolddensegas",
+            -1,
+        ),
+        "dust_masses.cold_dense_small_grain_mass_100_kpc": (
+            "exclusivesphere.100kpc.dustsmallgrainmassincolddensegas",
+            -1,
+        ),
         "apertures.veldisp_star_10_kpc": (
             "exclusivesphere.10kpc.stellarvelocitydispersion",
             -1,
@@ -1329,54 +1376,6 @@ def VR_to_SOAP(particle_property_name: str):
         "stellar_birth_densities.logaverage": ("fofsubhaloproperties.stellarmass", -1),
         "stellar_birth_densities.max": ("fofsubhaloproperties.stellarmass", -1),
         "snii_thermal_feedback_densities.max": ("fofsubhaloproperties.gasmass", -1),
-        "dust_masses.cold_dense_silicates_mass_30_kpc": (
-            "exclusivesphere.30kpc.gasmass",
-            -1,
-        ),
-        "dust_masses.cold_dense_silicates_mass_50_kpc": (
-            "exclusivesphere.50kpc.gasmass",
-            -1,
-        ),
-        "dust_masses.cold_dense_silicates_mass_100_kpc": (
-            "exclusivesphere.100kpc.gasmass",
-            -1,
-        ),
-        "dust_masses.cold_dense_graphite_mass_30_kpc": (
-            "exclusivesphere.30kpc.gasmass",
-            -1,
-        ),
-        "dust_masses.cold_dense_graphite_mass_50_kpc": (
-            "exclusivesphere.50kpc.gasmass",
-            -1,
-        ),
-        "dust_masses.cold_dense_graphite_mass_100_kpc": (
-            "exclusivesphere.100kpc.gasmass",
-            -1,
-        ),
-        "dust_masses.cold_dense_large_grain_mass_30_kpc": (
-            "exclusivesphere.30kpc.gasmass",
-            -1,
-        ),
-        "dust_masses.cold_dense_large_grain_mass_50_kpc": (
-            "exclusivesphere.50kpc.gasmass",
-            -1,
-        ),
-        "dust_masses.cold_dense_large_grain_mass_100_kpc": (
-            "exclusivesphere.100kpc.gasmass",
-            -1,
-        ),
-        "dust_masses.cold_dense_small_grain_mass_30_kpc": (
-            "exclusivesphere.30kpc.gasmass",
-            -1,
-        ),
-        "dust_masses.cold_dense_small_grain_mass_50_kpc": (
-            "exclusivesphere.50kpc.gasmass",
-            -1,
-        ),
-        "dust_masses.cold_dense_small_grain_mass_100_kpc": (
-            "exclusivesphere.100kpc.gasmass",
-            -1,
-        ),
     }
 
     try:
