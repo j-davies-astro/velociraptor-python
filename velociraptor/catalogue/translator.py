@@ -1232,103 +1232,103 @@ def VR_to_SOAP(particle_property_name: str):
             "fofsubhaloproperties.lastsupernovaeventmaximumgasdensity",
             -1,
         ),
-        # implement!!!
         "lin_element_ratios_times_masses.lin_O_over_H_total_times_gas_mass_30_kpc": (
-            "exclusivesphere.30kpc.gasmass",
+            "exclusivesphere.30kpc.linearmassweightedoxygenoverhydrogenofgas",
             -1,
         ),
         "lin_element_ratios_times_masses.lin_O_over_H_total_times_gas_mass_50_kpc": (
-            "exclusivesphere.50kpc.gasmass",
+            "exclusivesphere.50kpc.linearmassweightedoxygenoverhydrogenofgas",
             -1,
         ),
         "lin_element_ratios_times_masses.lin_O_over_H_total_times_gas_mass_100_kpc": (
-            "exclusivesphere.100kpc.gasmass",
+            "exclusivesphere.100kpc.linearmassweightedoxygenoverhydrogenofgas",
             -1,
         ),
         "lin_element_ratios_times_masses.lin_O_over_H_times_gas_mass_30_kpc": (
-            "exclusivesphere.30kpc.gasmass",
+            "exclusivesphere.30kpc.linearmassweighteddiffuseoxygenoverhydrogenofgas",
             -1,
         ),
         "lin_element_ratios_times_masses.lin_O_over_H_times_gas_mass_50_kpc": (
-            "exclusivesphere.50kpc.gasmass",
+            "exclusivesphere.50kpc.linearmassweighteddiffuseoxygenoverhydrogenofgas",
             -1,
         ),
         "lin_element_ratios_times_masses.lin_O_over_H_times_gas_mass_100_kpc": (
-            "exclusivesphere.100kpc.gasmass",
+            "exclusivesphere.100kpc.linearmassweighteddiffuseoxygenoverhydrogenofgas",
             -1,
         ),
         "log_element_ratios_times_masses.log_O_over_H_times_gas_mass_lowfloor_30_kpc": (
-            "exclusivesphere.30kpc.gasmass",
+            "exclusivesphere.30kpc.logarithmicmassweighteddiffuseoxygenoverhydrogenofgaslowlimit",
             -1,
         ),
         "log_element_ratios_times_masses.log_O_over_H_times_gas_mass_lowfloor_50_kpc": (
-            "exclusivesphere.50kpc.gasmass",
+            "exclusivesphere.50kpc.logarithmicmassweighteddiffuseoxygenoverhydrogenofgaslowlimit",
             -1,
         ),
         "log_element_ratios_times_masses.log_O_over_H_times_gas_mass_lowfloor_100_kpc": (
-            "exclusivesphere.100kpc.gasmass",
+            "exclusivesphere.100kpc.logarithmicmassweighteddiffuseoxygenoverhydrogenofgaslowlimit",
             -1,
         ),
         "log_element_ratios_times_masses.log_O_over_H_times_gas_mass_highfloor_30_kpc": (
-            "exclusivesphere.30kpc.gasmass",
+            "exclusivesphere.30kpc.logarithmicmassweighteddiffuseoxygenoverhydrogenofgashighlimit",
             -1,
         ),
         "log_element_ratios_times_masses.log_O_over_H_times_gas_mass_highfloor_50_kpc": (
-            "exclusivesphere.50kpc.gasmass",
+            "exclusivesphere.50kpc.logarithmicmassweighteddiffuseoxygenoverhydrogenofgashighlimit",
             -1,
         ),
         "log_element_ratios_times_masses.log_O_over_H_times_gas_mass_highfloor_100_kpc": (
-            "exclusivesphere.100kpc.gasmass",
+            "exclusivesphere.100kpc.logarithmicmassweighteddiffuseoxygenoverhydrogenofgashighlimit",
             -1,
         ),
         "log_element_ratios_times_masses.log_O_over_H_atomic_times_gas_mass_lowfloor_30_kpc": (
-            "exclusivesphere.30kpc.gasmass",
+            "exclusivesphere.30kpc.logarithmicmassweighteddiffuseoxygenoverhydrogenofatomicgaslowlimit",
             -1,
         ),
         "log_element_ratios_times_masses.log_O_over_H_atomic_times_gas_mass_lowfloor_50_kpc": (
-            "exclusivesphere.50kpc.gasmass",
+            "exclusivesphere.50kpc.logarithmicmassweighteddiffuseoxygenoverhydrogenofatomicgaslowlimit",
             -1,
         ),
         "log_element_ratios_times_masses.log_O_over_H_atomic_times_gas_mass_lowfloor_100_kpc": (
-            "exclusivesphere.100kpc.gasmass",
+            "exclusivesphere.100kpc.logarithmicmassweighteddiffuseoxygenoverhydrogenofatomicgaslowlimit",
             -1,
         ),
         "log_element_ratios_times_masses.log_O_over_H_atomic_times_gas_mass_highfloor_30_kpc": (
-            "exclusivesphere.30kpc.gasmass",
+            "exclusivesphere.30kpc.logarithmicmassweighteddiffuseoxygenoverhydrogenofatomicgashighlimit",
             -1,
         ),
         "log_element_ratios_times_masses.log_O_over_H_atomic_times_gas_mass_highfloor_50_kpc": (
-            "exclusivesphere.50kpc.gasmass",
+            "exclusivesphere.50kpc.logarithmicmassweighteddiffuseoxygenoverhydrogenofatomicgashighlimit",
             -1,
         ),
         "log_element_ratios_times_masses.log_O_over_H_atomic_times_gas_mass_highfloor_100_kpc": (
-            "exclusivesphere.100kpc.gasmass",
+            "exclusivesphere.100kpc.logarithmicmassweighteddiffuseoxygenoverhydrogenofatomicgashighlimit",
             -1,
         ),
         "log_element_ratios_times_masses.log_O_over_H_molecular_times_gas_mass_lowfloor_30_kpc": (
-            "exclusivesphere.30kpc.gasmass",
+            "exclusivesphere.30kpc.logarithmicmassweighteddiffuseoxygenoverhydrogenofmoleculargaslowlimit",
             -1,
         ),
         "log_element_ratios_times_masses.log_O_over_H_molecular_times_gas_mass_lowfloor_50_kpc": (
-            "exclusivesphere.50kpc.gasmass",
+            "exclusivesphere.50kpc.logarithmicmassweighteddiffuseoxygenoverhydrogenofmoleculargaslowlimit",
             -1,
         ),
         "log_element_ratios_times_masses.log_O_over_H_molecular_times_gas_mass_lowfloor_100_kpc": (
-            "exclusivesphere.100kpc.gasmass",
+            "exclusivesphere.100kpc.logarithmicmassweighteddiffuseoxygenoverhydrogenofmoleculargaslowlimit",
             -1,
         ),
         "log_element_ratios_times_masses.log_O_over_H_molecular_times_gas_mass_highfloor_30_kpc": (
-            "exclusivesphere.30kpc.gasmass",
+            "exclusivesphere.30kpc.logarithmicmassweighteddiffuseoxygenoverhydrogenofmoleculargashighlimit",
             -1,
         ),
         "log_element_ratios_times_masses.log_O_over_H_molecular_times_gas_mass_highfloor_50_kpc": (
-            "exclusivesphere.50kpc.gasmass",
+            "exclusivesphere.50kpc.logarithmicmassweighteddiffuseoxygenoverhydrogenofmoleculargashighlimit",
             -1,
         ),
         "log_element_ratios_times_masses.log_O_over_H_molecular_times_gas_mass_highfloor_100_kpc": (
-            "exclusivesphere.100kpc.gasmass",
+            "exclusivesphere.100kpc.logarithmicmassweighteddiffuseoxygenoverhydrogenofmoleculargashighlimit",
             -1,
         ),
+        # implement!!!
         "cold_dense_gas_properties.cold_dense_diffuse_metal_mass_30_kpc": (
             "exclusivesphere.30kpc.gasmass",
             -1,
