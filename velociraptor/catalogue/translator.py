@@ -1328,65 +1328,64 @@ def VR_to_SOAP(particle_property_name: str):
             "exclusivesphere.100kpc.logarithmicmassweighteddiffuseoxygenoverhydrogenofmoleculargashighlimit",
             -1,
         ),
-        # implement!!!
-        "cold_dense_gas_properties.cold_dense_diffuse_metal_mass_30_kpc": (
-            "exclusivesphere.30kpc.gasmass",
-            -1,
-        ),
-        "cold_dense_gas_properties.cold_dense_diffuse_metal_mass_50_kpc": (
-            "exclusivesphere.50kpc.gasmass",
-            -1,
-        ),
-        "cold_dense_gas_properties.cold_dense_diffuse_metal_mass_100_kpc": (
-            "exclusivesphere.100kpc.gasmass",
-            -1,
-        ),
         "lin_element_ratios_times_masses.lin_Fe_over_H_times_star_mass_30_kpc": (
-            "exclusivesphere.30kpc.stellarmass",
+            "exclusivesphere.30kpc.linearmassweightedironoverhydrogenofstars",
             -1,
         ),
         "lin_element_ratios_times_masses.lin_Fe_over_H_times_star_mass_50_kpc": (
-            "exclusivesphere.50kpc.stellarmass",
+            "exclusivesphere.50kpc.linearmassweightedironoverhydrogenofstars",
             -1,
         ),
         "lin_element_ratios_times_masses.lin_Fe_over_H_times_star_mass_100_kpc": (
-            "exclusivesphere.100kpc.stellarmass",
+            "exclusivesphere.100kpc.linearmassweightedironoverhydrogenofstars",
             -1,
         ),
         "log_element_ratios_times_masses.log_Fe_over_H_times_star_mass_lowfloor_30_kpc": (
-            "exclusivesphere.30kpc.stellarmass",
+            "exclusivesphere.30kpc.logarithmicmassweightedironoverhydrogenofstarslowlimit",
             -1,
         ),
         "log_element_ratios_times_masses.log_Fe_over_H_times_star_mass_lowfloor_50_kpc": (
-            "exclusivesphere.50kpc.stellarmass",
+            "exclusivesphere.50kpc.logarithmicmassweightedironoverhydrogenofstarslowlimit",
             -1,
         ),
         "log_element_ratios_times_masses.log_Fe_over_H_times_star_mass_lowfloor_100_kpc": (
-            "exclusivesphere.100kpc.stellarmass",
-            -1,
-        ),
-        "log_element_ratios_times_masses.log_SNIaFe_over_H_times_star_mass_lowfloor_30_kpc": (
-            "exclusivesphere.30kpc.stellarmass",
-            -1,
-        ),
-        "log_element_ratios_times_masses.log_SNIaFe_over_H_times_star_mass_lowfloor_50_kpc": (
-            "exclusivesphere.50kpc.stellarmass",
-            -1,
-        ),
-        "log_element_ratios_times_masses.log_SNIaFe_over_H_times_star_mass_lowfloor_100_kpc": (
-            "exclusivesphere.100kpc.stellarmass",
+            "exclusivesphere.100kpc.logarithmicmassweightedironoverhydrogenofstarslowlimit",
             -1,
         ),
         "log_element_ratios_times_masses.log_Fe_over_H_times_star_mass_highfloor_30_kpc": (
-            "exclusivesphere.30kpc.stellarmass",
+            "exclusivesphere.30kpc.logarithmicmassweightedironoverhydrogenofstarshighlimit",
             -1,
         ),
         "log_element_ratios_times_masses.log_Fe_over_H_times_star_mass_highfloor_50_kpc": (
-            "exclusivesphere.50kpc.stellarmass",
+            "exclusivesphere.50kpc.logarithmicmassweightedironoverhydrogenofstarshighlimit",
             -1,
         ),
         "log_element_ratios_times_masses.log_Fe_over_H_times_star_mass_highfloor_100_kpc": (
-            "exclusivesphere.100kpc.stellarmass",
+            "exclusivesphere.100kpc.logarithmicmassweightedironoverhydrogenofstarshighlimit",
+            -1,
+        ),
+        "cold_dense_gas_properties.cold_dense_diffuse_metal_mass_30_kpc": (
+            "exclusivesphere.30kpc.gasmassincolddensediffusemetals",
+            -1,
+        ),
+        "cold_dense_gas_properties.cold_dense_diffuse_metal_mass_50_kpc": (
+            "exclusivesphere.50kpc.gasmassincolddensediffusemetals",
+            -1,
+        ),
+        "cold_dense_gas_properties.cold_dense_diffuse_metal_mass_100_kpc": (
+            "exclusivesphere.100kpc.gasmassincolddensediffusemetals",
+            -1,
+        ),
+        "log_element_ratios_times_masses.log_SNIaFe_over_H_times_star_mass_lowfloor_30_kpc": (
+            "exclusivesphere.30kpc.logarithmicmassweightedironfromsniaoverhydrogenofstarslowlimit",
+            -1,
+        ),
+        "log_element_ratios_times_masses.log_SNIaFe_over_H_times_star_mass_lowfloor_50_kpc": (
+            "exclusivesphere.50kpc.logarithmicmassweightedironfromsniaoverhydrogenofstarslowlimit",
+            -1,
+        ),
+        "log_element_ratios_times_masses.log_SNIaFe_over_H_times_star_mass_lowfloor_100_kpc": (
+            "exclusivesphere.100kpc.logarithmicmassweightedironfromsniaoverhydrogenofstarslowlimit",
             -1,
         ),
     }
