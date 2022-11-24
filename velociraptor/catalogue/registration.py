@@ -1085,21 +1085,18 @@ def registration_log_element_ratios_times_masses(
             short_species = {
                 "LogOxygenOverHydrogen": "O_over_H",
                 "LogIronOverHydrogen": "Fe_over_H",
-                "LogSNIaIronOverHydrogen": "SNIaFe_over_H",
                 "LogOxygenOverHydrogenAtomic": "O_over_H_atomic",
                 "LogOxygenOverHydrogenMolecular": "O_over_H_molecular",
             }[long_species]
             element_name = {
                 "LogOxygenOverHydrogen": "Oxygen",
                 "LogIronOverHydrogen": "Iron",
-                "LogSNIaIronOverHydrogen": "SNIa Iron",
                 "LogOxygenOverHydrogenAtomic": "Atomic-phase Oxygen",
                 "LogOxygenOverHydrogenMolecular": "Molecular-phase Oxygen",
             }[long_species]
             fraction_name = {
                 "LogOxygenOverHydrogen": "O/H",
                 "LogIronOverHydrogen": "Fe/H",
-                "LogSNIaIronOverHydrogen": "Fe_SNIa/H",
                 "LogOxygenOverHydrogenAtomic": "O/H",
                 "LogOxygenOverHydrogenMolecular": "O/H",
             }[long_species]
@@ -1145,16 +1142,19 @@ def registration_lin_element_ratios_times_masses(
                 "TotalOxygenOverHydrogen": "O_over_H_total",
                 "OxygenOverHydrogen": "O_over_H",
                 "IronOverHydrogen": "Fe_over_H",
+                "IronfromSNIaOverHydrogen": "SNIaFe_over_H",
             }[long_species]
             element_name = {
                 "TotalOxygenOverHydrogen": "Oxygen",
                 "OxygenOverHydrogen": "Oxygen",
                 "IronOverHydrogen": "Iron",
+                "IronfromSNIaOverHydrogen": "SNIaIron",
             }[long_species]
             fraction_name = {
                 "TotalOxygenOverHydrogen": "O/H",
                 "OxygenOverHydrogen": "O/H",
                 "IronOverHydrogen": "Fe/H",
+                "IronfromSNIaOverHydrogen": "Fe(SNIa)/H",
             }[long_species]
         except KeyError:
             raise RegistrationDoesNotMatchError
