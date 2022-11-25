@@ -1142,7 +1142,7 @@ def registration_lin_element_ratios_times_masses(
                 "TotalOxygenOverHydrogen": "O_over_H_total",
                 "OxygenOverHydrogen": "O_over_H",
                 "IronOverHydrogen": "Fe_over_H",
-                "IronfromSNIaOverHydrogen": "SNIaFe_over_H",
+                "IronfromSNIaOverHydrogen": "FeSNIa_over_H",
             }[long_species]
             element_name = {
                 "TotalOxygenOverHydrogen": "Oxygen",
