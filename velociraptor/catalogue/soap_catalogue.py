@@ -499,7 +499,7 @@ class SOAPCatalogue(Catalogue):
             # get the box size and length unit from the SWIFT header and unit metadata
             boxsize = handle["SWIFT/Header"].attrs["BoxSize"][0]
             boxsize_unit = (
-                handle["SWIFT/InternalCodeUnits"].attrs["Unit length in cgs (U_L)"]
+                handle["SWIFT/InternalCodeUnits"].attrs["Unit length in cgs (U_L)"][0]
                 * unyt.cm
             ).in_base("galactic")
             boxsize *= boxsize_unit
