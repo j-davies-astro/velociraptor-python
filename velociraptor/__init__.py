@@ -1,7 +1,7 @@
 """
-The velociraptor module. 
+The velociraptor module.
 
-More information is available in the documnetation.
+More information is available in the documentation.
 """
 
 # First things first, we need to upgrade msun and mh from a symbol to a
@@ -75,8 +75,7 @@ def load(
     -------
 
     Catalogue
-        The VelociraptorCatalogue object that describes your
-        .properties file.
+        The Catalogue object that describes your .properties file.
     """
 
     try:
