@@ -657,7 +657,17 @@ class ObservationalData(object):
                 label=data_label,
             )
         except ValueError as e:
-            print(data_label, self.x, self.y, self.x_scatter, self.y_scatter)
+            # at some point, matplotlib decided that negative xerr or yerr
+            # values for errorbars are no longer allowed. This makes sense.
+            # Unfortunately, the current observational data repository does not
+            # guarantee non-negative scatter values. In order to avoid
+            # meaningless error messages, we make the error message more explicit
+            # by naming the offending data.
+            raise ValueError(
+                f"Problem while adding {data_label} data!"
+                f" x: {self.x}, y: {self.y},"
+                f" x_scatter: {self.x_scatter}, y_scatter: {self.y_scatter}"
+            )
             raise e
 
         return

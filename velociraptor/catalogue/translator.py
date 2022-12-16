@@ -8,9 +8,15 @@ import unyt
 from velociraptor.units import VelociraptorUnits
 
 
-def VR_to_SOAP(particle_property_name: str):
+def VR_to_SOAP(particle_property_name: str) -> str:
     """
     Convert a VR property name into its SOAP counterpart (if one exists).
+
+    Parameters:
+     - particle_property_name: str
+       VR-like property name.
+
+    Returns the SOAP-like equivalent of the same name, if one exists.
     """
 
     # dictionary with translations:

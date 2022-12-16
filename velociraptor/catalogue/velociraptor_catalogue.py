@@ -15,7 +15,7 @@ from velociraptor.units import VelociraptorUnits
 from velociraptor.catalogue.derived import DerivedQuantities
 from velociraptor.catalogue.registration import global_registration_functions
 from velociraptor.exceptions import RegistrationDoesNotMatchError
-from velociraptor.catalogue.catalogue import Catalogue
+from velociraptor.catalogue.catalogue import Catalogue, CatalogueTypeError
 
 
 class VelociraptorFieldMetadata(object):
@@ -284,6 +284,10 @@ class VelociraptorCatalogue(Catalogue):
             single corresponding element. Default: Ellipsis (``...``).
         """
         super().__init__("VR")
+
+        with h5py.File(filename, "r") as handle:
+            if "Length_unit_to_kpc" not in handle.attrs:
+                raise CatalogueTypeError(f"Not a VR catalogue!")
 
         self.filename = filename
         self.disregard_units = disregard_units

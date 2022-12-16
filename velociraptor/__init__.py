@@ -27,7 +27,7 @@ except RuntimeError:
     pass
 
 
-from velociraptor.catalogue.catalogue import Catalogue
+from velociraptor.catalogue.catalogue import Catalogue, CatalogueTypeError
 from velociraptor.catalogue.velociraptor_catalogue import VelociraptorCatalogue
 from velociraptor.catalogue.soap_catalogue import SOAPCatalogue
 from velociraptor.__version__ import __version__
@@ -82,7 +82,7 @@ def load(
         catalogue = VelociraptorCatalogue(
             filename, disregard_units=disregard_units, mask=mask
         )
-    except KeyError:
+    except CatalogueTypeError:
         catalogue = SOAPCatalogue(filename)
 
     if registration_file_path is not None:

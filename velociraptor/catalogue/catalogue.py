@@ -11,6 +11,10 @@ from velociraptor.catalogue.derived import DerivedQuantities
 from functools import reduce
 
 
+class CatalogueTypeError(Exception):
+    pass
+
+
 class Catalogue:
 
     # top level definitions for autocomplete
