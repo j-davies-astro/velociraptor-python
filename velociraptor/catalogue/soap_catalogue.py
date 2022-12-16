@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import numpy as np
 import h5py
 import unyt
@@ -321,7 +323,7 @@ class CatalogueGroup(CatalogueElement):
         Create CatologueGroup and CatalogueDataset objects for all the elements
         of this group in the SOAP HDF5 file.
         """
-        h5group = handle[self.name] if self.name != None else handle["/"]
+        h5group = handle[self.name] if self.name != "" else handle["/"]
         for (key, h5obj) in h5group.items():
             if isinstance(h5obj, h5py.Group):
                 el = CatalogueGroup(self.file_name, f"{self.name}/{key}", handle)
@@ -474,7 +476,7 @@ class SOAPCatalogue(Catalogue):
         Also read some relevant metadata, like the box size and the cosmology.
         """
         with h5py.File(self.file_name, "r") as handle:
-            self.root = CatalogueGroup(self.file_name, None, handle)
+            self.root = CatalogueGroup(self.file_name, "", handle)
             cosmology = handle["SWIFT/Cosmology"].attrs
             # set up a dummy units object for compatibility with the old VR API
             self.units = SimpleNamespace()
