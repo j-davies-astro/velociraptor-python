@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import numpy as np
 import h5py
-import unyt
 
 from typing import List, Set, Union, Dict
 from types import SimpleNamespace
@@ -12,11 +11,61 @@ from velociraptor.catalogue.translator import VR_to_SOAP
 
 from functools import reduce
 
-from astropy.cosmology import wCDM, FlatLambdaCDM
 import unyt
+from swiftsimio.conversions import swift_cosmology_to_astropy
+from swiftsimio.metadata.unit.unit_types import find_nearest_base_unit
+from swiftsimio.metadata.unit.unit_types import unit_names_to_unyt
 
 from abc import ABC, abstractmethod
 from pathlib import Path
+
+
+class SWIFTUnits_from_dictionary(object):
+    """
+    Takes a dict with internal swift units and generates
+    a unyt system compatible with swiftsimio.
+
+    Attributes
+    ----------
+    mass : float
+        unit for mass used
+    length : float
+        unit for length used
+    time : float
+        unit for time used
+    current : float
+        unit for current used
+    temperature : float
+        unit for temperature used
+    """
+
+    def __init__(self, units: Dict):
+        """
+        Parameters
+        ----------
+        units : Dict
+            Dictionary with internal units from the swift snapshot
+            metadata saved in the SOAP catalogue
+        """
+
+        unyt_units = {
+            name: unyt.unyt_quantity(value[0], units=unit_names_to_unyt[name])
+            for name, value in units.items()
+        }
+
+        self.mass = find_nearest_base_unit(unyt_units["Unit mass in cgs (U_M)"], "mass")
+        self.length = find_nearest_base_unit(
+            unyt_units["Unit length in cgs (U_L)"], "length"
+        )
+        self.time = find_nearest_base_unit(unyt_units["Unit time in cgs (U_t)"], "time")
+        self.current = find_nearest_base_unit(
+            unyt_units["Unit current in cgs (U_I)"], "current"
+        )
+        self.temperature = find_nearest_base_unit(
+            unyt_units["Unit temperature in cgs (U_T)"], "temperature"
+        )
+
+        return
 
 
 class CatalogueElement(object):
@@ -484,18 +533,10 @@ class SOAPCatalogue(Catalogue):
             self.units.scale_factor = cosmology["Scale-factor"][0]
             self.z = cosmology["Redshift"][0]
             self.units.redshift = cosmology["Redshift"][0]
-            H0 = cosmology["H0 [internal units]"][0]
-            Omega_m = cosmology["Omega_m"][0]
-            Omega_lambda = cosmology["Omega_lambda"][0]
-            w0 = cosmology["w_0"][0]
-            Omega_b = cosmology["Omega_b"][0]
-            if w0 != -1.0:
-                self.cosmology = wCDM(
-                    H0=H0, Om0=Omega_m, Ode0=Omega_DE, w0=w_of_DE, Ob0=Omega_b
-                )
-            else:
-                # No EoS
-                self.cosmology = FlatLambdaCDM(H0=H0, Om0=Omega_m, Ob0=Omega_b)
+
+            swift_units = SWIFTUnits_from_dictionary(dict(handle["SWIFT/Units"].attrs))
+            self.cosmology = swift_cosmology_to_astropy(dict(cosmology), swift_units)
+
             # get the box size and length unit from the SWIFT header and unit metadata
             boxsize = handle["SWIFT/Header"].attrs["BoxSize"][0]
             boxsize_unit = (
