@@ -20,7 +20,7 @@ from abc import ABC, abstractmethod
 from pathlib import Path
 
 
-class SWIFTUnits_from_dictionary(object):
+class SWIFTUnitsMockup(object):
     """
     Takes a dict with internal swift units and generates
     a unyt system compatible with swiftsimio.
@@ -534,7 +534,7 @@ class SOAPCatalogue(Catalogue):
             self.z = cosmology["Redshift"][0]
             self.units.redshift = cosmology["Redshift"][0]
 
-            swift_units = SWIFTUnits_from_dictionary(dict(handle["SWIFT/Units"].attrs))
+            swift_units = SWIFTUnitsMockup(dict(handle["SWIFT/Units"].attrs))
             self.cosmology = swift_cosmology_to_astropy(dict(cosmology), swift_units)
 
             # get the box size and length unit from the SWIFT header and unit metadata
