@@ -325,7 +325,7 @@ class VelocityDispersion(CatalogueDerivedDataset):
 
         Returns the 1D velocity dispersion as a unyt.unyt_array.
         """
-        return np.sqrt(velocity_dispersion_matrix[:, 0:2].sum(axis=1))
+        return np.sqrt(velocity_dispersion_matrix[:, 0:3].sum(axis=1))
 
 
 class CatalogueGroup(CatalogueElement):
