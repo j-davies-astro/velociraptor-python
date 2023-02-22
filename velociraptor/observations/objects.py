@@ -640,7 +640,7 @@ class ObservationalData(object):
                 kwargs["markerfacecolor"] = "none"
 
             if len(self.x) > 1000:
-                kwargs["rasterize"] = True
+                kwargs["rasterized"] = True
         elif self.plot_as == "line":
             kwargs["zorder"] = line_zorder
 
