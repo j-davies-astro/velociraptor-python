@@ -1394,6 +1394,18 @@ def VR_to_SOAP(particle_property_name: str) -> str:
             "exclusivesphere.100kpc.logarithmicmassweightedironfromsniaoverhydrogenofstarslowlimit",
             -1,
         ),
+        "lin_element_ratios_times_masses.lin_FeSNIa_over_H_times_star_mass_30_kpc": (
+            "exclusivesphere.30kpc.linearmassweightedironfromsniaoverhydrogenofstars",
+            -1,
+        ),
+        "lin_element_ratios_times_masses.lin_FeSNIa_over_H_times_star_mass_50_kpc": (
+            "exclusivesphere.50kpc.linearmassweightedironfromsniaoverhydrogenofstars",
+            -1,
+        ),
+        "lin_element_ratios_times_masses.lin_FeSNIa_over_H_times_star_mass_100_kpc": (
+            "exclusivesphere.100kpc.linearmassweightedironfromsniaoverhydrogenofstars",
+            -1,
+        ),
     }
 
     try:
