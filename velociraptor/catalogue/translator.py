@@ -1466,8 +1466,8 @@ def get_particle_property_name_conversion(name: str, ptype: str):
     combined_name = f"{corrected_name}_{ptype}".lower()
 
     key = {
-        "sfr_": "SFR $\dot{\\rho}_*$",
-        "sfr_gas": "Gas SFR $\dot{\\rho}_*$",
+        "sfr_": "SFR $\\dot{\\rho}_*$",
+        "sfr_gas": "Gas SFR $\\dot{\\rho}_*$",
         "zmet_": "Metallicity $Z$",
         "zmet_gas": "Gas Metallicity $Z_{\\rm g}$",
         "zmet_star": "Star Metallicity $Z_*$",
@@ -1487,10 +1487,10 @@ def get_particle_property_name_conversion(name: str, ptype: str):
         "rhalfmass_star": "Stellar Half-mass Radius $R_{50, *}$",
         "rhalfmass_bh": "Black Hole Half-mass Radius $R_{50, {\\rm BH}}$",
         "r_": "Radius $R_{\\rm SO}$",
-        "veldisp_": "Velocity Dispersion $\sigma$",
-        "veldisp_gas": "Gas Velocity Dispersion $\sigma_{\\rm g}}$",
-        "veldisp_star": "Stellar Velocity Dispersion $\sigma_{*}$",
-        "veldisp_bh": "Black Hole Velocity Dispersion $\sigma_{\\rm BH}$",
+        "veldisp_": "Velocity Dispersion $\\sigma$",
+        "veldisp_gas": "Gas Velocity Dispersion $\\sigma_{\\rm g}}$",
+        "veldisp_star": "Stellar Velocity Dispersion $\\sigma_{*}$",
+        "veldisp_bh": "Black Hole Velocity Dispersion $\\sigma_{\\rm BH}$",
         "subgridmasses_aperture_total_solar_mass_bh": "Subgrid Black Hole Mass $M_{\\rm BH}$",
     }
 
