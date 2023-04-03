@@ -716,7 +716,7 @@ def registration_veldisp(
         coordinate = match.group(1)
         ptype = match.group(2)
 
-        full_name = "$\\sigma_{{{{\\rm v}}, {coordinate.lower()}}}$"
+        full_name = f"$\\sigma_{{{{\\rm v}}, {coordinate.lower()}}}$"
 
         if ptype:
             full_name += f" ({ptype})"
