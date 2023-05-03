@@ -28,8 +28,6 @@ except RuntimeError:
 
 
 from velociraptor.catalogue.catalogue import Catalogue, CatalogueTypeError
-from velociraptor.catalogue.velociraptor_catalogue import VelociraptorCatalogue
-from velociraptor.catalogue.soap_catalogue import SOAPCatalogue
 from velociraptor.__version__ import __version__
 
 from typing import Union, List
@@ -77,6 +75,8 @@ def load(
     Catalogue
         The Catalogue object that describes your .properties file.
     """
+    from velociraptor.catalogue.velociraptor_catalogue import VelociraptorCatalogue
+    from velociraptor.catalogue.soap_catalogue import SOAPCatalogue
 
     try:
         catalogue = VelociraptorCatalogue(
