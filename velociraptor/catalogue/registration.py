@@ -1087,18 +1087,24 @@ def registration_log_element_ratios_times_masses(
                 "LogIronOverHydrogen": "Fe_over_H",
                 "LogOxygenOverHydrogenAtomic": "O_over_H_atomic",
                 "LogOxygenOverHydrogenMolecular": "O_over_H_molecular",
+                "LogNitrogenOverOxygen": "N_over_O",
+                "LogCarbonOverOxygen": "C_over_O",
             }[long_species]
             element_name = {
                 "LogOxygenOverHydrogen": "Oxygen",
                 "LogIronOverHydrogen": "Iron",
                 "LogOxygenOverHydrogenAtomic": "Atomic-phase Oxygen",
                 "LogOxygenOverHydrogenMolecular": "Molecular-phase Oxygen",
+                "LogNitrogenOverOxygen": "Nitrogen over Oxygen",
+                "LogCarbonOverOxygen": "Carbon over Oxygen",
             }[long_species]
             fraction_name = {
                 "LogOxygenOverHydrogen": "O/H",
                 "LogIronOverHydrogen": "Fe/H",
                 "LogOxygenOverHydrogenAtomic": "O/H",
                 "LogOxygenOverHydrogenMolecular": "O/H",
+                "LogNitrogenOverOxygen": "N/O",
+                "LogCarbonOverOxygen": "C/O",
             }[long_species]
 
             short_floortype = {"Lo": "lowfloor", "Hi": "highfloor"}[floor_type]
@@ -1143,18 +1149,24 @@ def registration_lin_element_ratios_times_masses(
                 "OxygenOverHydrogen": "O_over_H",
                 "IronOverHydrogen": "Fe_over_H",
                 "IronfromSNIaOverHydrogen": "FeSNIa_over_H",
+                "NitrogenOverOxygen": "N_over_O",
+                "CarbonOverOxygen": "C_over_O",
             }[long_species]
             element_name = {
                 "TotalOxygenOverHydrogen": "Oxygen",
                 "OxygenOverHydrogen": "Oxygen",
                 "IronOverHydrogen": "Iron",
                 "IronfromSNIaOverHydrogen": "SNIaIron",
+                "NitrogenOverOxygen": "Nitrogen over Oxygen",
+                "CarbonOverOxygen": "Carbon over Oxygen",
             }[long_species]
             fraction_name = {
                 "TotalOxygenOverHydrogen": "O/H",
                 "OxygenOverHydrogen": "O/H",
                 "IronOverHydrogen": "Fe/H",
                 "IronfromSNIaOverHydrogen": "Fe(SNIa)/H",
+                "NitrogenOverOxygen": "N/O",
+                "CarbonOverOxygen": "C/O",
             }[long_species]
         except KeyError:
             raise RegistrationDoesNotMatchError
@@ -1465,11 +1477,13 @@ def registration_spherical_overdensities(
 
     if match:
         quantity = match.group(1)
+        print(quantity)
         ptype = match.group(2)
         star_forming = match.group(3)
         aperture_size = int(match.group(4))
 
         unit = get_aperture_unit(quantity, unit_system)
+        print(unit)
         name = get_particle_property_name_conversion(quantity, ptype)
 
         if star_forming:
@@ -1483,7 +1497,6 @@ def registration_spherical_overdensities(
         return unit, full_name, snake_case
     else:
         raise RegistrationDoesNotMatchError
-
 
 def registration_element_masses_in_stars(
     field_path: str, unit_system: VelociraptorUnits

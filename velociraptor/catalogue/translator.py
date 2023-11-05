@@ -1262,6 +1262,78 @@ def VR_to_SOAP(particle_property_name: str) -> str:
             "exclusivesphere.100kpc.linearmassweighteddiffuseoxygenoverhydrogenofgas",
             -1,
         ),
+        "lin_element_ratios_times_masses.lin_N_over_O_times_gas_mass_30_kpc": (
+            "exclusivesphere.30kpc.linearmassweightednitrogenoveroxygenofgas",
+            -1,
+        ),
+        "lin_element_ratios_times_masses.lin_N_over_O_times_gas_mass_50_kpc": (
+            "exclusivesphere.50kpc.linearmassweightednitrogenoveroxygenofgas",
+            -1,
+        ),
+        "lin_element_ratios_times_masses.lin_N_over_O_times_gas_mass_100_kpc": (
+            "exclusivesphere.100kpc.linearmassweightednitrogenoveroxygenofgas",
+            -1,
+        ),
+        "log_element_ratios_times_masses.log_N_over_O_times_gas_mass_lowfloor_30_kpc": (
+            "exclusivesphere.30kpc.logarithmicmassweightednitrogenoveroxygenofgaslowlimit",
+            -1,
+        ),
+        "log_element_ratios_times_masses.log_N_over_O_times_gas_mass_lowfloor_50_kpc": (
+            "exclusivesphere.50kpc.logarithmicmassweightednitrogenoveroxygenofgaslowlimit",
+            -1,
+        ),
+        "log_element_ratios_times_masses.log_N_over_O_times_gas_mass_lowfloor_100_kpc": (
+            "exclusivesphere.100kpc.logarithmicmassweightednitrogenoveroxygenofgaslowlimit",
+            -1,
+        ),
+        "log_element_ratios_times_masses.log_N_over_O_times_gas_mass_highfloor_30_kpc": (
+            "exclusivesphere.30kpc.logarithmicmassweightednitrogenoveroxygenofgashighlimit",
+            -1,
+        ),
+        "log_element_ratios_times_masses.log_N_over_O_times_gas_mass_highfloor_50_kpc": (
+            "exclusivesphere.50kpc.logarithmicmassweightednitrogenoveroxygenofgashighlimit",
+            -1,
+        ),
+        "log_element_ratios_times_masses.log_N_over_O_times_gas_mass_highfloor_100_kpc": (
+            "exclusivesphere.100kpc.logarithmicmassweightednitrogenoveroxygenofgashighlimit",
+            -1,
+        ),
+        "lin_element_ratios_times_masses.lin_C_over_O_times_gas_mass_30_kpc": (
+            "exclusivesphere.30kpc.linearmassweightedcarbonoveroxygenofgas",
+            -1,
+        ),
+        "lin_element_ratios_times_masses.lin_C_over_O_times_gas_mass_50_kpc": (
+            "exclusivesphere.50kpc.linearmassweightedcarbonoveroxygenofgas",
+            -1,
+        ),
+        "lin_element_ratios_times_masses.lin_C_over_O_times_gas_mass_100_kpc": (
+            "exclusivesphere.100kpc.linearmassweightedcarbonoveroxygenofgas",
+            -1,
+        ),
+        "log_element_ratios_times_masses.log_C_over_O_times_gas_mass_lowfloor_30_kpc": (
+            "exclusivesphere.30kpc.logarithmicmassweightedcarbonoveroxygenofgaslowlimit",
+            -1,
+        ),
+        "log_element_ratios_times_masses.log_C_over_O_times_gas_mass_lowfloor_50_kpc": (
+            "exclusivesphere.50kpc.logarithmicmassweightedcarbonoveroxygenofgaslowlimit",
+            -1,
+        ),
+        "log_element_ratios_times_masses.log_C_over_O_times_gas_mass_lowfloor_100_kpc": (
+            "exclusivesphere.100kpc.logarithmicmassweightedcarbonoveroxygenofgaslowlimit",
+            -1,
+        ),
+        "log_element_ratios_times_masses.log_C_over_O_times_gas_mass_highfloor_30_kpc": (
+            "exclusivesphere.30kpc.logarithmicmassweightedcarbonoveroxygenofgashighlimit",
+            -1,
+        ),
+        "log_element_ratios_times_masses.log_C_over_O_times_gas_mass_highfloor_50_kpc": (
+            "exclusivesphere.50kpc.logarithmicmassweightedcarbonoveroxygenofgashighlimit",
+            -1,
+        ),
+        "log_element_ratios_times_masses.log_C_over_O_times_gas_mass_highfloor_100_kpc": (
+            "exclusivesphere.100kpc.logarithmicmassweightedcarbonoveroxygenofgashighlimit",
+            -1,
+        ),
         "log_element_ratios_times_masses.log_O_over_H_times_gas_mass_lowfloor_30_kpc": (
             "exclusivesphere.30kpc.logarithmicmassweighteddiffuseoxygenoverhydrogenofgaslowlimit",
             -1,

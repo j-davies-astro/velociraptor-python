@@ -1,5 +1,7 @@
 import setuptools
-from velociraptor import __version__
+
+with open('velociraptor/__version__.py', 'r') as v_file:
+    __version__ = v_file.readline().split('=')[-1].replace('"', '').replace("'", '').strip()
 
 with open("README.md", "r") as fh:
     long_description = fh.read()
