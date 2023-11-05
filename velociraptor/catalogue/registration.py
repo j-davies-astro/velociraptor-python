@@ -1498,6 +1498,7 @@ def registration_spherical_overdensities(
     else:
         raise RegistrationDoesNotMatchError
 
+
 def registration_element_masses_in_stars(
     field_path: str, unit_system: VelociraptorUnits
 ) -> (unyt.Unit, str, str):
