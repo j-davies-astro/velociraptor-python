@@ -1477,13 +1477,11 @@ def registration_spherical_overdensities(
 
     if match:
         quantity = match.group(1)
-        print(quantity)
         ptype = match.group(2)
         star_forming = match.group(3)
         aperture_size = int(match.group(4))
 
         unit = get_aperture_unit(quantity, unit_system)
-        print(unit)
         name = get_particle_property_name_conversion(quantity, ptype)
 
         if star_forming:
