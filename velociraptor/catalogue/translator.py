@@ -1274,15 +1274,15 @@ def VR_to_SOAP(particle_property_name: str) -> str:
             "exclusivesphere.100kpc.linearmassweightednitrogenoveroxygenofgas",
             -1,
         ),
-        "lin_element_ratios_times_masses.lin_N_over_O_gas_mass_30_kpc": (
+        "lin_element_ratios_times_masses.lin_N_over_O_times_gas_mass_30_kpc": (
             "exclusivesphere.30kpc.linearmassweighteddiffusenitrogenoveroxygenofgas",
             -1,
         ),
-        "lin_element_ratios_times_masses.lin_N_over_O_gas_mass_50_kpc": (
+        "lin_element_ratios_times_masses.lin_N_over_O_times_gas_mass_50_kpc": (
             "exclusivesphere.50kpc.linearmassweighteddiffusenitrogenoveroxygenofgas",
             -1,
         ),
-        "lin_element_ratios_times_masses.lin_N_over_O_gas_mass_100_kpc": (
+        "lin_element_ratios_times_masses.lin_N_over_O_times_gas_mass_100_kpc": (
             "exclusivesphere.100kpc.linearmassweighteddiffusenitrogenoveroxygenofgas",
             -1,
         ),
