@@ -1087,18 +1087,24 @@ def registration_log_element_ratios_times_masses(
                 "LogIronOverHydrogen": "Fe_over_H",
                 "LogOxygenOverHydrogenAtomic": "O_over_H_atomic",
                 "LogOxygenOverHydrogenMolecular": "O_over_H_molecular",
+                "LogNitrogenOverOxygen": "N_over_O",
+                "LogCarbonOverOxygen": "C_over_O",
             }[long_species]
             element_name = {
                 "LogOxygenOverHydrogen": "Oxygen",
                 "LogIronOverHydrogen": "Iron",
                 "LogOxygenOverHydrogenAtomic": "Atomic-phase Oxygen",
                 "LogOxygenOverHydrogenMolecular": "Molecular-phase Oxygen",
+                "LogNitrogenOverOxygen": "Nitrogen over Oxygen",
+                "LogCarbonOverOxygen": "Carbon over Oxygen",
             }[long_species]
             fraction_name = {
                 "LogOxygenOverHydrogen": "O/H",
                 "LogIronOverHydrogen": "Fe/H",
                 "LogOxygenOverHydrogenAtomic": "O/H",
                 "LogOxygenOverHydrogenMolecular": "O/H",
+                "LogNitrogenOverOxygen": "N/O",
+                "LogCarbonOverOxygen": "C/O",
             }[long_species]
 
             short_floortype = {"Lo": "lowfloor", "Hi": "highfloor"}[floor_type]
@@ -1143,18 +1149,24 @@ def registration_lin_element_ratios_times_masses(
                 "OxygenOverHydrogen": "O_over_H",
                 "IronOverHydrogen": "Fe_over_H",
                 "IronfromSNIaOverHydrogen": "FeSNIa_over_H",
+                "NitrogenOverOxygen": "N_over_O",
+                "CarbonOverOxygen": "C_over_O",
             }[long_species]
             element_name = {
                 "TotalOxygenOverHydrogen": "Oxygen",
                 "OxygenOverHydrogen": "Oxygen",
                 "IronOverHydrogen": "Iron",
                 "IronfromSNIaOverHydrogen": "SNIaIron",
+                "NitrogenOverOxygen": "Nitrogen over Oxygen",
+                "CarbonOverOxygen": "Carbon over Oxygen",
             }[long_species]
             fraction_name = {
                 "TotalOxygenOverHydrogen": "O/H",
                 "OxygenOverHydrogen": "O/H",
                 "IronOverHydrogen": "Fe/H",
                 "IronfromSNIaOverHydrogen": "Fe(SNIa)/H",
+                "NitrogenOverOxygen": "N/O",
+                "CarbonOverOxygen": "C/O",
             }[long_species]
         except KeyError:
             raise RegistrationDoesNotMatchError
