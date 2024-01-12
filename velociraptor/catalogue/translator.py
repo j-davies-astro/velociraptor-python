@@ -1234,6 +1234,18 @@ def VR_to_SOAP(particle_property_name: str) -> str:
             "fofsubhaloproperties.maximumstellarbirthdensity",
             -1,
         ),
+        "stellar_birth_temperatures.logaverage": (
+            "fofsubhaloproperties.logarithmicallyaveragedstellarbirthtemperature",
+            -1,
+        ),
+        "stellar_birth_temperatures.min": (
+            "fofsubhaloproperties.minimumstellarbirthtemperature",
+            -1,
+        ),
+        "stellar_birth_temperatures.max": (
+            "fofsubhaloproperties.maximumstellarbirthtemperature",
+            -1,
+        ),
         "snii_thermal_feedback_densities.max": (
             "fofsubhaloproperties.lastsupernovaeventmaximumgasdensity",
             -1,
