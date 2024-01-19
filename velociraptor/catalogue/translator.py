@@ -1222,8 +1222,8 @@ def VR_to_SOAP(particle_property_name: str) -> str:
             "exclusivesphere.100kpc.gasmassincolddensegas",
             -1,
         ),
-        "stellar_birth_densities.logaverage": (
-            "fofsubhaloproperties.logarithmicallyaveragedstellarbirthdensity",
+        "stellar_birth_densities.median": (
+            "fofsubhaloproperties.medianstellarbirthdensity",
             -1,
         ),
         "stellar_birth_densities.min": (
@@ -1234,8 +1234,20 @@ def VR_to_SOAP(particle_property_name: str) -> str:
             "fofsubhaloproperties.maximumstellarbirthdensity",
             -1,
         ),
-        "stellar_birth_temperatures.logaverage": (
-            "fofsubhaloproperties.logarithmicallyaveragedstellarbirthtemperature",
+        "stellar_birth_pressures.median": (
+            "fofsubhaloproperties.medianstellarbirthpressure",
+            -1,
+        ),
+        "stellar_birth_pressures.min": (
+            "fofsubhaloproperties.minimumstellarbirthpressure",
+            -1,
+        ),
+        "stellar_birth_pressures.max": (
+            "fofsubhaloproperties.maximumstellarbirthpressure",
+            -1,
+        ),
+        "stellar_birth_temperatures.median": (
+            "fofsubhaloproperties.medianstellarbirthtemperature",
             -1,
         ),
         "stellar_birth_temperatures.min": (
