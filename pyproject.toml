@@ -9,7 +9,8 @@ packages = ["velociraptor"]
 name = "velociraptor-python"
 version="0.16.1"
 authors = [
-    { name="Josh Borrow", email="joshua.borrow@durham.ac.uk" },
+    { name="Josh Borrow", email="josh@joshborrow.com" },
+    { name="Kyle Oman", email="kyle.a.oman@durham.ac.uk" },
 ]
 description="Velociraptor catalogue reading routines."
 readme = "README.md"
