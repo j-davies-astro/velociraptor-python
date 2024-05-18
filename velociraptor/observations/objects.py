@@ -9,7 +9,6 @@ and reading files.
 
 from unyt import unyt_quantity, unyt_array
 from numpy import tanh, log10, logical_and
-from numpy import sum as np_sum
 from matplotlib.pyplot import Axes
 from matplotlib import rcParams
 
@@ -180,7 +179,7 @@ class ObservationalData(object):
     y_description: str
         Default label for horizontal axis (without units), also a
         description of the variable.
-
+from numpy import sum as np_sum
     filename: str
         Filename that the data was read from, or was written to.
 
@@ -231,8 +230,8 @@ class ObservationalData(object):
     x_scatter: Union[unyt_array, None]
     y_scatter: Union[unyt_array, None]
     # are y data points upper/lower limits?
-    lower_limits: Union[unyt_array[bool], None]
-    upper_limits: Union[unyt_array[bool], None]
+    lower_limits: Union[unyt_array, None]
+    upper_limits: Union[unyt_array, None]
     # x and y are comoving?
     x_comoving: bool
     y_comoving: bool
@@ -478,8 +477,8 @@ class ObservationalData(object):
         scatter: Union[unyt_array, None],
         comoving: bool,
         description: str,
-        lolims: Union[unyt_array[bool], None] = None,
-        uplims: Union[unyt_array[bool], None] = None,
+        lolims: Union[unyt_array, None] = None,
+        uplims: Union[unyt_array, None] = None,
     ):
         """
         Associate an y quantity with this observational data instance.
@@ -501,12 +500,12 @@ class ObservationalData(object):
             Short description of the data, e.g. Stellar Masses
 
         lolims: Union[unyt_array[bool], None]
-            A bool unyt_array indicating whether the y values are lower limits.
-            The default is `no'.
+           A bool unyt_array indicating whether the y values are lower limits.
+           The default is None, meaning no data point is a lower limit.
 
         uplims: Union[unyt_array[bool], None]
             A bool unyt_array indicating whether the y values are upper limits.
-            The default is `no'.
+            The default is None, meaning no data point is an upper limit.
         """
 
         self.y = array
