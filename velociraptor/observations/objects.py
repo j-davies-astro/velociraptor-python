@@ -329,13 +329,6 @@ class ObservationalData(object):
         except KeyError:
             self.upper_limits = None
 
-        try:
-            self.y_scatter = unyt_array.from_hdf5(
-                filename, dataset_name=f"{prefix}scatter", group_name="y"
-            )
-        except KeyError:
-            self.y_scatter = None
-
         with h5py.File(filename, "r") as handle:
             metadata = handle[f"{prefix}metadata"].attrs
 
