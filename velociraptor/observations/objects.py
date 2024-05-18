@@ -179,7 +179,7 @@ class ObservationalData(object):
     y_description: str
         Default label for horizontal axis (without units), also a
         description of the variable.
-from numpy import sum as np_sum
+
     filename: str
         Filename that the data was read from, or was written to.
 
