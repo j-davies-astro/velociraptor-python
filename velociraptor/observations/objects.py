@@ -6,7 +6,7 @@ Tools for adding in extra (e.g. observational) data to plots.
 Includes an object container and helper functions for creating
 and reading files.
 """
-import numpy as np
+
 from unyt import unyt_quantity, unyt_array
 from numpy import tanh, log10, logical_and
 from matplotlib.pyplot import Axes
