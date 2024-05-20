@@ -6,7 +6,7 @@ Tools for adding in extra (e.g. observational) data to plots.
 Includes an object container and helper functions for creating
 and reading files.
 """
-
+import numpy as np
 from unyt import unyt_quantity, unyt_array
 from numpy import tanh, log10, logical_and
 from matplotlib.pyplot import Axes
@@ -508,6 +508,8 @@ class ObservationalData(object):
 
         if scatter is not None:
             self.y_scatter = scatter.to(self.y_units)
+        elif lolims is not None or uplims is not None:
+            self.y_scatter = self.y * 0.0
         else:
             self.y_scatter = None
 
@@ -521,11 +523,26 @@ class ObservationalData(object):
                         "Entries of the unyt arrays representing lower and upper limits must be "
                         "of 'bool' type and cannot both be 'True' for the same data points."
                     )
+
+            # In the case of upper or lower limits, the scatter values define the size of the arrows
+            lolims_arrow_size = self.y[self.lower_limits.value] / 3.0
+            try:
+                self.y_scatter[self.lower_limits.value] = lolims_arrow_size
+            except IndexError:
+                self.y_scatter[:, self.lower_limits.value] = lolims_arrow_size
+
         else:
             self.lower_limits = None
 
         if uplims is not None:
             self.upper_limits = uplims
+
+            # In the case of upper or lower limits, the scatter values define the size of the arrows
+            uplims_arrow_size = self.y[self.upper_limits.value] / 3.0
+            try:
+                self.y_scatter[self.upper_limits.value] = uplims_arrow_size
+            except IndexError:
+                self.y_scatter[:, self.upper_limits.value] = uplims_arrow_size
         else:
             self.upper_limits = None
 
