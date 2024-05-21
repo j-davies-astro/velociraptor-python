@@ -492,11 +492,11 @@ class ObservationalData(object):
         description: str
             Short description of the data, e.g. Stellar Masses
 
-        lolims: Union[unyt_array[bool], None]
+        lolims: Union[unyt_array, None]
            A bool unyt_array indicating whether the y values are lower limits.
            The default is None, meaning no data point is a lower limit.
 
-        uplims: Union[unyt_array[bool], None]
+        uplims: Union[unyt_array, None]
             A bool unyt_array indicating whether the y values are upper limits.
             The default is None, meaning no data point is an upper limit.
         """
@@ -505,13 +505,6 @@ class ObservationalData(object):
         self.y_units = array.units
         self.y_comoving = comoving
         self.y_description = description
-
-        if scatter is not None:
-            self.y_scatter = scatter.to(self.y_units)
-        elif lolims is not None or uplims is not None:
-            self.y_scatter = self.y * 0.0
-        else:
-            self.y_scatter = None
 
         if lolims is not None:
             self.lower_limits = lolims
@@ -524,27 +517,29 @@ class ObservationalData(object):
                         "of 'bool' type and cannot both be 'True' for the same data points."
                     )
 
-            # In the case of upper or lower limits, the scatter values define the size of the arrows
-            lolims_arrow_size = self.y[self.lower_limits.value] / 3.0
-            try:
-                self.y_scatter[self.lower_limits.value] = lolims_arrow_size
-            except IndexError:
-                self.y_scatter[:, self.lower_limits.value] = lolims_arrow_size
-
         else:
             self.lower_limits = None
 
         if uplims is not None:
             self.upper_limits = uplims
-
-            # In the case of upper or lower limits, the scatter values define the size of the arrows
-            uplims_arrow_size = self.y[self.upper_limits.value] / 3.0
-            try:
-                self.y_scatter[self.upper_limits.value] = uplims_arrow_size
-            except IndexError:
-                self.y_scatter[:, self.upper_limits.value] = uplims_arrow_size
         else:
             self.upper_limits = None
+
+        if scatter is not None:
+            self.y_scatter = scatter.to(self.y_units)
+        # In the absence of provided scatter values, set default values to indicate the lower or upper limits
+        elif lolims is not None or uplims is not None:
+            self.y_scatter = self.y * 0.0
+            if lolims is not None:
+                self.y_scatter[self.lower_limits.value] = (
+                    self.y[self.lower_limits.value] / 3.0
+                )
+            if uplims is not None:
+                self.y_scatter[self.upper_limits.value] = (
+                    self.y[self.upper_limits.value] / 3.0
+                )
+        else:
+            self.y_scatter = None
 
         return
 
