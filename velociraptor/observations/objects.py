@@ -8,7 +8,7 @@ and reading files.
 """
 
 from unyt import unyt_quantity, unyt_array
-from numpy import tanh, log10
+from numpy import tanh, log10, logical_and
 from matplotlib.pyplot import Axes
 from matplotlib import rcParams
 
@@ -17,7 +17,6 @@ from astropy.cosmology.core import Cosmology
 from astropy.cosmology import wCDM, FlatLambdaCDM
 
 import h5py
-import json
 
 from typing import Union, Optional, List
 
@@ -131,7 +130,7 @@ class ObservationalData(object):
     Attributes
     ----------
     name: str
-        Name of the observation for users to identifty
+        Name of the observation for users to identify
 
     x_units: unyt_quantity
         Units for horizontal axes
@@ -154,6 +153,16 @@ class ObservationalData(object):
         Scatter in vertical direction. Can be None, or an
         unyt_array of shape 1XN (symmetric) or 2XN (non-symmetric)
         such that it can be passed to plt.errorbar easily.
+
+    lolims: Union[unyt_array[bool], None]
+        A bool unyt_array specifying whether y data values are only lower limits
+        (with entries equal to True or False for each data point, with `True' standing
+        for the lower limits). The default is None, i.e. all values are not lower limits.
+
+    uplims: Union[unyt_array[bool], None]
+        A bool unyt_array specifying whether y data values are only upper limits
+        (with entries equal to True or False for each data point, with `True' standing
+        for the upper limits). The default is None, i.e. all values are not upper limits.
 
     x_comoving: bool
         Whether or not the horizontal values are comoving (True)
@@ -220,6 +229,9 @@ class ObservationalData(object):
     # scatter
     x_scatter: Union[unyt_array, None]
     y_scatter: Union[unyt_array, None]
+    # are y data points upper/lower limits?
+    lower_limits: Union[unyt_array, None]
+    upper_limits: Union[unyt_array, None]
     # x and y are comoving?
     x_comoving: bool
     y_comoving: bool
@@ -303,6 +315,20 @@ class ObservationalData(object):
         except KeyError:
             self.y_scatter = None
 
+        try:
+            self.lower_limits = unyt_array.from_hdf5(
+                filename, dataset_name=f"{prefix}lower_limits", group_name="y"
+            )
+        except KeyError:
+            self.lower_limits = None
+
+        try:
+            self.upper_limits = unyt_array.from_hdf5(
+                filename, dataset_name=f"{prefix}upper_limits", group_name="y"
+            )
+        except KeyError:
+            self.upper_limits = None
+
         with h5py.File(filename, "r") as handle:
             metadata = handle[f"{prefix}metadata"].attrs
 
@@ -365,6 +391,16 @@ class ObservationalData(object):
         if self.y_scatter is not None:
             self.y_scatter.write_hdf5(
                 filename, dataset_name=f"{prefix}scatter", group_name="y"
+            )
+
+        if self.lower_limits is not None:
+            self.lower_limits.write_hdf5(
+                filename, dataset_name=f"{prefix}lower_limits", group_name="y"
+            )
+
+        if self.upper_limits is not None:
+            self.upper_limits.write_hdf5(
+                filename, dataset_name=f"{prefix}upper_limits", group_name="y"
             )
 
         with h5py.File(filename, "a") as handle:
@@ -434,6 +470,8 @@ class ObservationalData(object):
         scatter: Union[unyt_array, None],
         comoving: bool,
         description: str,
+        lolims: Union[unyt_array, None] = None,
+        uplims: Union[unyt_array, None] = None,
     ):
         """
         Associate an y quantity with this observational data instance.
@@ -453,6 +491,14 @@ class ObservationalData(object):
 
         description: str
             Short description of the data, e.g. Stellar Masses
+
+        lolims: Union[unyt_array, None]
+           A bool unyt_array indicating whether the y values are lower limits.
+           The default is None, meaning no data point is a lower limit.
+
+        uplims: Union[unyt_array, None]
+            A bool unyt_array indicating whether the y values are upper limits.
+            The default is None, meaning no data point is an upper limit.
         """
 
         self.y = array
@@ -460,8 +506,38 @@ class ObservationalData(object):
         self.y_comoving = comoving
         self.y_description = description
 
+        if lolims is not None:
+            self.lower_limits = lolims
+
+            # Check for invalid input
+            if uplims is not None:
+                if sum(logical_and(lolims, uplims)):
+                    raise RuntimeError(
+                        "Entries of the unyt arrays representing lower and upper limits must be "
+                        "of 'bool' type and cannot both be 'True' for the same data points."
+                    )
+
+        else:
+            self.lower_limits = None
+
+        if uplims is not None:
+            self.upper_limits = uplims
+        else:
+            self.upper_limits = None
+
         if scatter is not None:
             self.y_scatter = scatter.to(self.y_units)
+        # In the absence of provided scatter values, set default values to indicate the lower or upper limits
+        elif lolims is not None or uplims is not None:
+            self.y_scatter = self.y * 0.0
+            if lolims is not None:
+                self.y_scatter[self.lower_limits.value] = (
+                    self.y[self.lower_limits.value] / 3.0
+                )
+            if uplims is not None:
+                self.y_scatter[self.upper_limits.value] = (
+                    self.y[self.upper_limits.value] / 3.0
+                )
         else:
             self.y_scatter = None
 
@@ -653,6 +729,12 @@ class ObservationalData(object):
                 self.y,
                 yerr=self.y_scatter,
                 xerr=self.x_scatter,
+                lolims=self.lower_limits.value
+                if self.lower_limits is not None
+                else None,
+                uplims=self.upper_limits.value
+                if self.upper_limits is not None
+                else None,
                 **kwargs,
                 label=data_label,
             )
