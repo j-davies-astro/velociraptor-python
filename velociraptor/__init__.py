@@ -30,7 +30,13 @@ except RuntimeError:
 from velociraptor.catalogue.catalogue import Catalogue, CatalogueTypeError
 from velociraptor.catalogue.velociraptor_catalogue import VelociraptorCatalogue
 from velociraptor.catalogue.soap_catalogue import SOAPCatalogue
-from velociraptor.__version__ import __version__
+
+from sys import version_info
+if version_info >= (3, 8):
+    from importlib import metadata
+else:
+    import importlib_metadata as metadata
+__version__ = metadata.version("velociraptor-python")
 
 from typing import Union, List
 
