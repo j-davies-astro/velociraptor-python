@@ -10,7 +10,6 @@ setuptools.setup(
     author="Josh Borrow",
     author_email="joshua.borrow@durham.ac.uk",
     packages=setuptools.find_packages(),
-    scripts=["velociraptor-plot"],
     long_description=long_description,
     long_description_content_type="text/markdown",
     zip_safe=False,
